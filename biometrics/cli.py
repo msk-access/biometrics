@@ -1,7 +1,7 @@
 """Console script for biometrics."""
 import argparse
 
-from .utils import exit_error
+from utils import exit_error
 
 
 def add_common_args(parser):
@@ -10,7 +10,7 @@ def add_common_args(parser):
         '-t', '--titlefile', action="append",
         help='''Path to title file. Can specify more than once.''')
     parser.add_argument(
-        '-sb', '--sample-bam', help='''Space-delimited list of BAM files.''')
+        '-sb', '--sample-bam', nargs="+", help='''Space-delimited list of BAM files.''')
     parser.add_argument(
         '-st', '--sample-type', help='''Space-delimited list of sample
         types: Normal or Tumor. Must be in the same order as --sample-bam.''')
@@ -46,10 +46,22 @@ def add_outdir(parser):
     return parser
 
 
+def check_arg_equal_len(vals1, vals2, name):
+    if vals2 is not None and len(vals1) != len(vals2):
+        exit_error('{} does not have the same number of items as --sample-bam')
+
+
 def check_args(args):
 
     if not args.titlefile and not args.sample_bam:
         exit_error('You must specify either --titlefile or --sample-bam')
+
+    if args.sample_bam:
+        check_arg_equal_len(args.sample_bam, args.sample_name, '--sample-name')
+        check_arg_equal_len(args.sample_bam, args.sample_type, '--sample-type')
+        check_arg_equal_len(
+            args.sample_bam, args.sample_group, '--sample-group')
+        check_arg_equal_len(args.sample_bam, args.sample_sex, '--sample-sex')
 
 
 def get_args():
@@ -64,8 +76,8 @@ def get_args():
 
     parser_extract = subparsers.add_parser(
         'extract',
-        help='''Extract genotype info from one or more samples.
-        The output from this step is required for the rest of the
+        help='''Intermediate step to extract genotype info from one or more
+        samples. The output from this step is required for the rest of the
         fingerprinting tools. However, you do not need to run this step
         manually since it will run automatically if the necessary files
         are missing.''')
