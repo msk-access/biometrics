@@ -26,8 +26,10 @@ def add_common_args(parser):
         If not specified, sample name is automatically figured out from the
         BAM file. Must be in the same order as --sample-bam.''')
     parser.add_argument(
+        '--vcf', required=True,
+        help='''VCF file containing the sites to be queried.''')
+    parser.add_argument(
         '-db', '--database',
-        default=['/juno/work/access/production/data/bams'],
         help='''Directory to store the intermediate files after
         running the extraction step.''')
     parser.add_argument(
