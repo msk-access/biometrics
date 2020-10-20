@@ -1,28 +1,32 @@
 #!/usr/bin/env python
 import sys
 
+import pandas as pd
+import vcf
+
 from cli import get_args
 from sample import Sample
-import pandas as pd
+from extract import Extract
 
 
-def run_extract(args):
+def run_extract(args, samples, sites):
+    extractor = Extract(db=args.db, sites=sites)
+    extractor.extract(samples)
+
+
+def run_sexmismatch(args, samples):
     pass
 
 
-def run_sexmismatch(args):
+def run_minor_contamination(args, samples):
     pass
 
 
-def run_minor_contamination(args):
+def run_major_contamination(args, samples):
     pass
 
 
-def run_major_contamination(args):
-    pass
-
-
-def run_genotyping(args):
+def run_genotyping(args, samples):
     pass
 
 
@@ -38,7 +42,8 @@ def get_samples_from_titlefile(args):
                 patient=titlefile.at[i, 'Patient_ID'],
                 name=titlefile.at[i, 'Patient_ID'],
                 sample_type=titlefile.at[i, 'Sample_type'],
-                sex=titlefile.at[i, 'Sex'])
+                sex=titlefile.at[i, 'Sex'],
+                db=args.db)
 
             sample.find_titlefile_alignment(args.bam_basedir)
             samples.append(sample)
@@ -51,17 +56,16 @@ def get_samples_list(args):
 
     for i, bam in enumerate(args.sample_bams):
 
+        sex = args.sample_sex[i] if args.sample_sex is not None else None
+        name = args.sample_name[i] if args.sample_name is not None else None
         patient = args.sample_patient[i] \
-            if args.sample_patient[i] is not None else None
-        sex = args.sample_sex[i] \
-            if args.sample_sex[i] is not None else None
+            if args.sample_patient is not None else None
         sample_type = args.sample_type[i] \
-            if args.sample_type[i] is not None else None
-        name = args.sample_name[i] \
-            if args.sample_name[i] is not None else None
+            if args.sample_type is not None else None
 
         sample = Sample(
-            patient=patient, name=name, sample_type=sample_type(), sex=sex)
+            alignment_file=bam, patient=patient, name=name,
+            sample_type=sample_type, sex=sex, db=args.db)
 
         samples.append(sample)
 
@@ -81,22 +85,35 @@ def get_samples(args):
     return samples
 
 
+def parse_vcf(vcf_file):
+    sites = []
+
+    for record in vcf.Reader(open(vcf_file, 'r')):
+        sites.append({
+            'chrom': record.CHROM,
+            'pos': record.POS
+        })
+
+    return sites
+
+
 def main():
 
     args = get_args()
 
     samples = get_samples(args)
+    sites = parse_vcf(args.vcf)
 
-    if args.subparser_name == 'extract':
-        run_extract(args)
-    elif args.subparser_name == 'sexmismatch':
-        run_sexmismatch(args)
+    run_extract(args, samples, sites)
+
+    if args.subparser_name == 'sexmismatch':
+        run_sexmismatch(args, samples)
     elif args.subparser_name == 'minor':
-        run_minor_contamination(args)
+        run_minor_contamination(args, samples)
     elif args.subparser_name == 'major':
-        run_major_contamination(args)
+        run_major_contamination(args, samples)
     elif args.subparser_name == 'genotype':
-        run_genotyping(args)
+        run_genotyping(args, samples)
 
 
 if __name__ == "__main__":
