@@ -2,7 +2,6 @@
 import sys
 
 import pandas as pd
-import vcf
 
 from cli import get_args
 from sample import Sample
@@ -10,7 +9,7 @@ from extract import Extract
 
 
 def run_extract(args, samples, sites):
-    extractor = Extract(db=args.db, sites=sites)
+    extractor = Extract(args=args)
     extractor.extract(samples)
 
 
@@ -85,24 +84,11 @@ def get_samples(args):
     return samples
 
 
-def parse_vcf(vcf_file):
-    sites = []
-
-    for record in vcf.Reader(open(vcf_file, 'r')):
-        sites.append({
-            'chrom': record.CHROM,
-            'pos': record.POS
-        })
-
-    return sites
-
-
 def main():
 
     args = get_args()
 
     samples = get_samples(args)
-    sites = parse_vcf(args.vcf)
 
     run_extract(args, samples, sites)
 

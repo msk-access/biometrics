@@ -15,6 +15,7 @@ class Sample:
         self.sex = sex
         self.patient = patient
         self.sample_type = sample_type
+        self.pileup = None
 
         if db is not None:
             self.extraction_file = os.path.join(db, self.name, '.pk')
