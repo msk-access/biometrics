@@ -74,6 +74,8 @@ def get_args():
         and BAM location is automatically figure out.''')
     subparsers = parser.add_subparsers(help='', dest="")
 
+    # extract parser
+
     parser_extract = subparsers.add_parser(
         'extract',
         help='''Intermediate step to extract genotype info from one or more
@@ -83,20 +85,28 @@ def get_args():
         are missing.''')
     parser_extract = add_common_args(parser_extract)
 
+    # sex mismatch parser
+
     parser_sexmismatch = subparsers.add_parser(
         'sexmismatch', help='Check for sex mismatches.')
     parser_sexmismatch = add_common_args(parser_sexmismatch)
     parser_sexmismatch = add_outdir(parser_sexmismatch)
+
+    # minor contamination parser
 
     parser_minor = subparsers.add_parser(
         'minor', help='Check for minor contamination.')
     parser_minor = add_common_args(parser_minor)
     parser_minor = add_outdir(parser_minor)
 
+    # major contamination parser
+
     parser_major = subparsers.add_parser(
         'major', help='Check for major contamination.')
     parser_major = add_common_args(parser_major)
     parser_major = add_outdir(parser_major)
+
+    # genotyping parser
 
     parser_genotype = subparsers.add_parser(
         'genotype', help='Genotype a set of samples.')
