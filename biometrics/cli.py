@@ -34,8 +34,14 @@ def add_common_args(parser):
         running the extraction step.''')
     parser.add_argument(
         '--bam-basedir', default='/juno/work/access/production/data/bams',
-        help='''Base directory where BAM files are located if you specified
-        title files.''')
+        help='''Base directory where BAM files are located (if you specified
+        title files).''')
+    parser.add_argument(
+        '-q', '--min-mapping-quality', default=1, type=int,
+        help='''Minimum mapping quality of reads to be used for pileup.''')
+    parser.add_argument(
+        '-Q', '--min-base-quality', default=1, type=int,
+        help='''Minimum base quality of reads to be used for pileup.''')
 
     return parser
 
