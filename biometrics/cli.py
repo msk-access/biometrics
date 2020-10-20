@@ -18,8 +18,8 @@ def add_common_args(parser):
         '-ss', '--sample-sex', help='''Space-delimited list of sample
         sex (i.e. M or F). Must be in the same order as --sample-bam.''')
     parser.add_argument(
-        '-sg', '--sample-group', help='''Space-delimited list of sample
-        grouping information (e.g. P-D012F). Must be in the same order
+        '-sp', '--sample-patient', help='''Space-delimited list of sample
+        patient information (e.g. P-D012F). Must be in the same order
         as --sample-bam.''')
     parser.add_argument(
         '-sn', '--sample-name', help='''Space-delimited list of sample names.
@@ -60,7 +60,7 @@ def check_args(args):
         check_arg_equal_len(args.sample_bam, args.sample_name, '--sample-name')
         check_arg_equal_len(args.sample_bam, args.sample_type, '--sample-type')
         check_arg_equal_len(
-            args.sample_bam, args.sample_group, '--sample-group')
+            args.sample_bam, args.sample_patient, '--sample-patient')
         check_arg_equal_len(args.sample_bam, args.sample_sex, '--sample-sex')
 
 
