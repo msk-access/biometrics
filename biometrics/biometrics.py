@@ -6,6 +6,7 @@ import pandas as pd
 from cli import get_args
 from sample import Sample
 from extract import Extract
+from utils import standardize_sex_nomenclature
 
 
 def run_extract(args, samples, sites):
@@ -41,7 +42,7 @@ def get_samples_from_titlefile(args):
                 patient=titlefile.at[i, 'Patient_ID'],
                 name=titlefile.at[i, 'Patient_ID'],
                 sample_type=titlefile.at[i, 'Sample_type'],
-                sex=titlefile.at[i, 'Sex'],
+                sex=standardize_sex_nomenclature(titlefile.at[i, 'Sex']),
                 db=args.db)
 
             sample.find_titlefile_alignment(args.bam_basedir)
@@ -55,7 +56,8 @@ def get_samples_list(args):
 
     for i, bam in enumerate(args.sample_bams):
 
-        sex = args.sample_sex[i] if args.sample_sex is not None else None
+        sex = standardize_sex_nomenclature(
+            args.sample_sex[i] if args.sample_sex is not None else None)
         name = args.sample_name[i] if args.sample_name is not None else None
         patient = args.sample_patient[i] \
             if args.sample_patient is not None else None
