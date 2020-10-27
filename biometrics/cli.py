@@ -10,21 +10,25 @@ def add_common_args(parser):
         '-t', '--titlefile', action="append",
         help='''Path to title file. Can specify more than once.''')
     parser.add_argument(
-        '-sb', '--sample-bam', nargs="+", help='''Space-delimited list of BAM files.''')
+        '-sb', '--sample-bam', nargs="+",
+        help='''Space-delimited list of BAM files.''')
     parser.add_argument(
-        '-st', '--sample-type', help='''Space-delimited list of sample
-        types: Normal or Tumor. Must be in the same order as --sample-bam.''')
+        '-st', '--sample-type', nargs="+",
+        help='''Space-delimited list of sample types: Normal or Tumor.
+        Must be in the same order as --sample-bam.''')
     parser.add_argument(
-        '-ss', '--sample-sex', help='''Space-delimited list of sample
-        sex (i.e. M or F). Must be in the same order as --sample-bam.''')
+        '-ss', '--sample-sex', nargs="+",
+        help='''Space-delimited list of sample sex (i.e. M or F). Must be
+        in the same order as --sample-bam.''')
     parser.add_argument(
-        '-sp', '--sample-patient', help='''Space-delimited list of sample
-        patient information (e.g. P-D012F). Must be in the same order
-        as --sample-bam.''')
+        '-sp', '--sample-patient', nargs="+",
+        help='''Space-delimited list of sample patient information
+        (e.g. P-D012F). Must be in the same order as --sample-bam.''')
     parser.add_argument(
-        '-sn', '--sample-name', help='''Space-delimited list of sample names.
-        If not specified, sample name is automatically figured out from the
-        BAM file. Must be in the same order as --sample-bam.''')
+        '-sn', '--sample-name', nargs="+",
+        help='''Space-delimited list of sample names. If not specified,
+        sample name is automatically figured out from the BAM file. Must
+        be in the same order as --sample-bam.''')
     parser.add_argument(
         '--vcf', required=True,
         help='''VCF file containing the sites to be queried.''')
@@ -36,6 +40,9 @@ def add_common_args(parser):
         '--bam-basedir', default='/juno/work/access/production/data/bams',
         help='''Base directory where BAM files are located (if you specified
         title files).''')
+    parser.add_argument(
+        '--fafile', required=True,
+        help='''Path to reference fasta file.''')
     parser.add_argument(
         '-q', '--min-mapping-quality', default=1, type=int,
         help='''Minimum mapping quality of reads to be used for pileup.''')
@@ -56,7 +63,9 @@ def add_outdir(parser):
 
 def check_arg_equal_len(vals1, vals2, name):
     if vals2 is not None and len(vals1) != len(vals2):
-        exit_error('{} does not have the same number of items as --sample-bam')
+        exit_error(
+            '{} does not have the same number of items as --sample-bam'.format(
+                name))
 
 
 def check_args(args):
@@ -80,7 +89,7 @@ def get_args():
         Sample information to each sub command is supplied via title file(s)
         and/or as individual samples. For title files, the sample annotation
         and BAM location is automatically figure out.''')
-    subparsers = parser.add_subparsers(help='', dest="")
+    subparsers = parser.add_subparsers(help='', dest="subparser_name")
 
     # extract parser
 

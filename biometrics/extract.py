@@ -14,10 +14,11 @@ class Extract:
     """
 
     def __init__(self, args):
-        self.db = args.db
+        self.db = args.database
         self.min_mapping_quality = args.min_mapping_quality
         self.min_base_quality = args.min_base_quality
         self.vcf = args.vcf
+        self.fafile = args.fafile
 
         self.parse_vcf()
 
@@ -28,7 +29,9 @@ class Extract:
             self.sites.append({
                 'chrom': record.CHROM,
                 'start': record.POS,
-                'end': record.POS + 1
+                'end': record.POS + 1,
+                'ref_allele': record.REF,
+                'alt_allele': record.ALT[0]
             })
 
     def _save_to_file(self, sample):
@@ -44,20 +47,26 @@ class Extract:
 
     def _extract_sample(self, sample):
 
+        # get the pileup
+
         bam = AlignmentFile(sample.alignment_file)
         pileup = pd.DataFrame()
 
         for site in self.sites:
-
             pileup_site = pysamstats.load_pileup(
                 'variation', bam, chrom=site['chrom'], start=site['start'],
-                end=site['end'], truncate=True,
+                end=site['end'], truncate=True, fafile=self.fafile,
                 max_depth=30000, min_baseq=self.min_base_quality,
                 min_mapq=self.min_mapping_quality)
 
             pileup = pd.concat([pileup, pd.DataFrame(pileup_site)])
 
         sample.pileup = pileup
+        sample.pileup = sample.pileup[[
+            'chrom', 'pos', 'ref', 'reads_all', 'matches', 'mismatches', 'A',
+            'C', 'T', 'G', 'N']]
+
+        # compute some metrics
 
         self._save_to_file(sample)
 
@@ -65,7 +74,7 @@ class Extract:
 
         for i, sample in enumerate(samples):
 
-            # if extraction file exists then skip
+            # if extraction file exists then load it
 
             if os.path.exists(sample.extraction_file):
 
