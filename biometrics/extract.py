@@ -36,15 +36,29 @@ class Extract:
             })
 
     def _save_to_file(self, sample):
-        pickle.dump(
-            sample.pileup.to_dict(),
-            open(sample.extraction_file, "wb"))
+
+        pileup_data = sample.pileup.to_dict()
+        sample_data = {
+            'alignment_file': sample.alignment_file,
+            'name': sample.name,
+            'sex': sample.sex,
+            'patient': sample.patient,
+            'sample_type': sample.sample_type,
+            'pileup_data': pileup_data
+        }
+
+        pickle.dump(sample_data, open(sample.extraction_file, "wb"))
 
     def _load_from_file(self, sample):
-        pileup = pickle.load(open(sample.extraction_file, "rb"))
-        sample.pileup = pileup
+        sample_data = pickle.load(open(sample.extraction_file, "rb"))
+        sample.pileup = sample_data['pileup']
+        sample.alignment_file = sample_data['alignment_file']
+        sample.name = sample_data['name']
+        sample.sex = sample_data['sex']
+        sample.patient = sample_data['patient']
+        sample.sample_type = sample_data['sample_type']
 
-        return pileup
+        return sample
 
     def _extract_sample(self, sample):
 
