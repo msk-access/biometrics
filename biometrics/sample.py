@@ -10,7 +10,7 @@ class Sample:
     """
 
     def __init__(self, name, alignment_file=None, patient=None, sex=None, sample_type=None, db=None):
-        self.alignment_file = None
+        self.alignment_file = alignment_file
         self.name = name
         self.sex = sex
         self.patient = patient
@@ -18,7 +18,7 @@ class Sample:
         self.pileup = None
 
         if db is not None:
-            self.extraction_file = os.path.join(db, self.name, '.pk')
+            self.extraction_file = os.path.join(db, self.name + '.pk')
         else:
             self.extraction_file = os.path.join(os.getcwd(), self.name, '.pk')
 

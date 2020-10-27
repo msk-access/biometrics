@@ -9,7 +9,7 @@ from extract import Extract
 from utils import standardize_sex_nomenclature
 
 
-def run_extract(args, samples, sites):
+def run_extract(args, samples):
     extractor = Extract(args=args)
     extractor.extract(samples)
 
@@ -54,7 +54,7 @@ def get_samples_from_titlefile(args):
 def get_samples_list(args):
     samples = []
 
-    for i, bam in enumerate(args.sample_bams):
+    for i, bam in enumerate(args.sample_bam):
 
         sex = standardize_sex_nomenclature(
             args.sample_sex[i] if args.sample_sex is not None else None)
@@ -66,7 +66,7 @@ def get_samples_list(args):
 
         sample = Sample(
             alignment_file=bam, patient=patient, name=name,
-            sample_type=sample_type, sex=sex, db=args.db)
+            sample_type=sample_type, sex=sex, db=args.database)
 
         samples.append(sample)
 
@@ -92,7 +92,7 @@ def main():
 
     samples = get_samples(args)
 
-    run_extract(args, samples, sites)
+    run_extract(args, samples)
 
     if args.subparser_name == 'sexmismatch':
         run_sexmismatch(args, samples)
