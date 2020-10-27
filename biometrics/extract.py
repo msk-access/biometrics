@@ -19,6 +19,7 @@ class Extract:
         self.min_base_quality = args.min_base_quality
         self.vcf = args.vcf
         self.fafile = args.fafile
+        self.overwrite = args.overwrite
 
         self.parse_vcf()
 
@@ -76,7 +77,7 @@ class Extract:
 
             # if extraction file exists then load it
 
-            if os.path.exists(sample.extraction_file):
+            if os.path.exists(sample.extraction_file) and not self.overwrite:
 
                 samples[i] = self._load_from_file(sample)
 

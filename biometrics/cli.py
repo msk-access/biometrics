@@ -49,6 +49,9 @@ def add_common_args(parser):
     parser.add_argument(
         '-Q', '--min-base-quality', default=1, type=int,
         help='''Minimum base quality of reads to be used for pileup.''')
+    parser.add_argument(
+        '-ov', '--overwrite', action='store_true',
+        help='''Overwrite any existing extraction results.''')
 
     return parser
 
