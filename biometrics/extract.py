@@ -24,6 +24,7 @@ class Extract:
         self.vcf = args.vcf
         self.fafile = args.fafile
         self.overwrite = args.overwrite
+        self.min_coverage = args.min_coverage
 
         self.parse_vcf()
 
@@ -64,11 +65,8 @@ class Extract:
 
         return sample
 
-    def _get_pileup_allele_count(self, pileup_site, allele):
-        return pileup_site[allele][0]
-
     def _get_minor_allele_freq(self, allele_counts):
-        if sum(allele_counts) == 0:
+        if sum(allele_counts) <= self.min_coverage:
             return np.nan
         else:
             return min(allele_counts) / sum(allele_counts)
@@ -94,22 +92,23 @@ class Extract:
             else:
                 return alleles[1]
 
-    def _get_genotype_info(self, pileup_site, site):
-
-        ref_allele = site['ref_allele']
-        alt_allele = site['alt_allele']
+    def _get_genotype_info(self, pileup_site):
 
         allele_counts = [
-            self._get_pileup_allele_count(pileup_site, ref_allele),
-            self._get_pileup_allele_count(pileup_site, alt_allele)
-        ]
+            pileup_site[pileup_site['ref_allele']][0],
+            pileup_site[pileup_site['alt_allele']][0]]
 
-        minor_allele_freq = self._get_minor_allele_freq(allele_counts)
-        genotype_class = self._get_genotype_class(minor_allele_freq)
-        genotype_allele = self._get_genotype(
-            genotype_class, allele_counts, [ref_allele, alt_allele])
+        pileup_site['minor_allele_freq'] = self._get_minor_allele_freq(
+            allele_counts)
 
-        return minor_allele_freq, genotype_class, genotype_allele
+        pileup_site['genotype_class'] = self._get_genotype_class(
+            pileup_site['minor_allele_freq'])
+
+        pileup_site['genotype'] = self._get_genotype(
+            pileup_site['genotype_class'][0], allele_counts,
+            [pileup_site['ref_allele'], pileup_site['alt_allele']])
+
+        return pileup_site
 
     def _extract_sample(self, sample):
 
@@ -127,12 +126,10 @@ class Extract:
 
             pileup_site = pd.DataFrame(pileup_site)
 
-            minor_allele_freq, genotype_class, genotype = self._get_genotype_info(
-                pileup_site, site)
+            pileup_site['ref_allele'] = site['ref_allele']
+            pileup_site['alt_allele'] = site['alt_allele']
 
-            pileup_site['minor_allele_freq'] = minor_allele_freq
-            pileup_site['genotype_class'] = genotype_class
-            pileup_site['genotype'] = genotype
+            pileup_site = self._get_genotype_info(pileup_site)
 
             pileup = pd.concat([pileup, pileup_site])
 

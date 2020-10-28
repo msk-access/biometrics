@@ -31,7 +31,6 @@ def run_minor_contamination(args, samples):
 def run_major_contamination(args, samples):
     major_contamination = MajorContamination(args)
     samples = major_contamination.estimate(samples)
-    import pdb; pdb.set_trace()
 
 
 def run_genotyping(args, samples):
