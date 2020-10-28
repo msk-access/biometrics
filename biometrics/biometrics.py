@@ -13,6 +13,8 @@ def run_extract(args, samples):
     extractor = Extract(args=args)
     extractor.extract(samples)
 
+    return samples
+
 
 def run_sexmismatch(args, samples):
     pass
@@ -91,8 +93,7 @@ def main():
     args = get_args()
 
     samples = get_samples(args)
-
-    run_extract(args, samples)
+    samples = run_extract(args, samples)
 
     if args.subparser_name == 'sexmismatch':
         run_sexmismatch(args, samples)
