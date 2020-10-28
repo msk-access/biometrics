@@ -14,14 +14,10 @@ class MinorContamination:
 
         for i, sample in enumerate(samples):
 
-            pileup = sample.pileup
+            sites = sample.pileup
+            sites_notna = sites[~pd.isna(sites['genotype_class'])]
 
-            hom_sites = pileup[
-                (
-                    pileup['genotype_class'] == 'Hom'
-                ) & (
-                    ~pd.isna(pileup['genotype_class'])
-                )]
+            hom_sites = sites_notna[sites_notna['genotype_class']=='Hom']
 
             if hom_sites.shape[0] == 0:
                 samples[i].metrics['minor_contamination'] = np.nan
