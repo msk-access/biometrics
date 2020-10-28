@@ -8,6 +8,7 @@ from sample import Sample
 from extract import Extract
 from genotype import Genotyper
 from minor_contamination import MinorContamination
+from major_contamination import MajorContamination
 from utils import standardize_sex_nomenclature
 
 
@@ -28,7 +29,9 @@ def run_minor_contamination(args, samples):
 
 
 def run_major_contamination(args, samples):
-    pass
+    major_contamination = MajorContamination(args)
+    samples = major_contamination.estimate(samples)
+    import pdb; pdb.set_trace()
 
 
 def run_genotyping(args, samples):
