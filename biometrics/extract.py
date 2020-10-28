@@ -55,7 +55,7 @@ class Extract:
 
     def _load_from_file(self, sample):
         sample_data = pickle.load(open(sample.extraction_file, "rb"))
-        sample.pileup = pd.DataFrame(sample_data['pileup'])
+        sample.pileup = pd.DataFrame(sample_data['pileup_data'])
         sample.alignment_file = sample_data['alignment_file']
         sample.name = sample_data['name']
         sample.sex = sample_data['sex']
