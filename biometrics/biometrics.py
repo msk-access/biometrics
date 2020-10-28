@@ -6,6 +6,8 @@ import pandas as pd
 from cli import get_args
 from sample import Sample
 from extract import Extract
+from genotype import Genotyper
+from minor_contamination import MinorContamination
 from utils import standardize_sex_nomenclature
 
 
@@ -21,7 +23,8 @@ def run_sexmismatch(args, samples):
 
 
 def run_minor_contamination(args, samples):
-    pass
+    minor_contamination = MinorContamination(args)
+    samples = minor_contamination.estimate(samples)
 
 
 def run_major_contamination(args, samples):
@@ -29,7 +32,9 @@ def run_major_contamination(args, samples):
 
 
 def run_genotyping(args, samples):
-    pass
+    genotyper = Genotyper(args)
+
+    genotyper.genotype(samples)
 
 
 def get_samples_from_titlefile(args):
