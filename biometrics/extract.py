@@ -2,6 +2,7 @@ import os
 import pickle
 
 import pandas as pd
+import numpy as np
 import vcf
 import pysamstats
 from pysam import AlignmentFile
@@ -60,6 +61,20 @@ class Extract:
 
         return sample
 
+    def _get_pileup_allele_count(self, pileup_site, allele):
+        return pileup_site[allele][0]
+
+    def _get_minor_allele_freq(self, pileup_site, site):
+        allele_counts = [
+            self._get_pileup_allele_count(pileup_site, site['ref_allele']),
+            self._get_pileup_allele_count(pileup_site, site['alt_allele'])
+        ]
+
+        if sum(allele_counts) == 0:
+            return np.nan
+        else:
+            return min(allele_counts) / sum(allele_counts)
+
     def _extract_sample(self, sample):
 
         # get the pileup
@@ -74,12 +89,16 @@ class Extract:
                 max_depth=30000, min_baseq=self.min_base_quality,
                 min_mapq=self.min_mapping_quality)
 
-            pileup = pd.concat([pileup, pd.DataFrame(pileup_site)])
+            pileup_site = pd.DataFrame(pileup_site)
+            pileup_site['minor_allele_freq'] = self._get_minor_allele_freq(
+                pileup_site, site)
+
+            pileup = pd.concat([pileup, pileup_site])
 
         sample.pileup = pileup
         sample.pileup = sample.pileup[[
             'chrom', 'pos', 'ref', 'reads_all', 'matches', 'mismatches', 'A',
-            'C', 'T', 'G', 'N']]
+            'C', 'T', 'G', 'N', 'minor_allele_freq']]
 
         # compute some metrics
 
