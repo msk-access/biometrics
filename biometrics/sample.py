@@ -16,6 +16,7 @@ class Sample:
         self.patient = patient
         self.sample_type = sample_type
         self.pileup = None
+        self.metrics = {}
 
         if db is not None:
             self.extraction_file = os.path.join(db, self.name + '.pk')
