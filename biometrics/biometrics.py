@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import sys
+import os
 
 import pandas as pd
 
@@ -9,7 +10,7 @@ from extract import Extract
 from genotype import Genotyper
 from minor_contamination import MinorContamination
 from major_contamination import MajorContamination
-from utils import standardize_sex_nomenclature
+from utils import standardize_sex_nomenclature, exit_error
 
 
 def run_extract(args, samples):
@@ -35,26 +36,32 @@ def run_major_contamination(args, samples):
 
 def run_genotyping(args, samples):
     genotyper = Genotyper(args)
-
     genotyper.genotype(samples)
 
 
-def get_samples_from_titlefile(args):
+def get_samples_from_input(args):
     samples = []
 
-    for fpath in args.titlefile:
+    for fpath in args.input:
 
-        titlefile = pd.read_csv(fpath, sep='\t')
+        input = pd.read_csv(fpath, sep=',')
 
-        for i in titlefile.index:
+        for i in input.index:
+
+            alignment_file = input.at[i, 'alignment_file']
+
+            if not os.path.exists(alignment_file):
+                exit_error('Alignment file does not exist: {}.'.format(
+                    alignment_file))
+
             sample = Sample(
-                patient=titlefile.at[i, 'Patient_ID'],
-                name=titlefile.at[i, 'Patient_ID'],
-                sample_type=titlefile.at[i, 'Sample_type'],
-                sex=standardize_sex_nomenclature(titlefile.at[i, 'Sex']),
+                alignment_file=alignment_file,
+                group=input.at[i, 'group'],
+                name=input.at[i, 'sample_name'],
+                sample_type=input.at[i, 'type'],
+                sex=standardize_sex_nomenclature(input.at[i, 'sex']),
                 db=args.db)
 
-            sample.find_titlefile_alignment(args.bam_basedir)
             samples.append(sample)
 
     return samples
@@ -68,13 +75,13 @@ def get_samples_list(args):
         sex = standardize_sex_nomenclature(
             args.sample_sex[i] if args.sample_sex is not None else None)
         name = args.sample_name[i] if args.sample_name is not None else None
-        patient = args.sample_patient[i] \
+        group = args.sample_group[i] \
             if args.sample_patient is not None else None
         sample_type = args.sample_type[i] \
             if args.sample_type is not None else None
 
         sample = Sample(
-            alignment_file=bam, patient=patient, name=name,
+            alignment_file=bam, group=group, name=name,
             sample_type=sample_type, sex=sex, db=args.database)
 
         samples.append(sample)
@@ -86,8 +93,8 @@ def get_samples(args):
 
     samples = []
 
-    if args.titlefile:
-        samples += get_samples_from_titlefile(args)
+    if args.input:
+        samples += get_samples_from_input(args)
 
     if args.sample_bam:
         samples += get_samples_list(args)

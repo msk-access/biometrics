@@ -9,11 +9,11 @@ class Sample:
     Class to hold information related to a single sample.
     """
 
-    def __init__(self, name, alignment_file=None, patient=None, sex=None, sample_type=None, db=None):
+    def __init__(self, name, alignment_file=None, group=None, sex=None, sample_type=None, db=None):
         self.alignment_file = alignment_file
         self.name = name
         self.sex = sex
-        self.patient = patient
+        self.group = group
         self.sample_type = sample_type
         self.pileup = None
         self.metrics = {}
@@ -25,7 +25,7 @@ class Sample:
 
     def find_titlefile_alignment(self, basedir, bam_type=None):
 
-        bam_basedir = os.path.join(basedir, self.patient, self.name, 'latest')
+        bam_basedir = os.path.join(basedir, self.group, self.name, 'latest')
 
         bam = glob.glob(
             os.path.join(

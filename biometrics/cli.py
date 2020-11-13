@@ -7,8 +7,8 @@ from utils import exit_error
 def add_common_args(parser):
 
     parser.add_argument(
-        '-t', '--titlefile', action="append",
-        help='''Path to title file. Can specify more than once.''')
+        '-i', '--input', action="append",
+        help='''Path to file containing sample information (one per line). For example: sample_name,alignment_file,type,sex,group''')
     parser.add_argument(
         '-sb', '--sample-bam', nargs="+",
         help='''Space-delimited list of BAM files.''')
@@ -21,9 +21,9 @@ def add_common_args(parser):
         help='''Space-delimited list of sample sex (i.e. M or F). Must be
         in the same order as --sample-bam.''')
     parser.add_argument(
-        '-sp', '--sample-patient', nargs="+",
-        help='''Space-delimited list of sample patient information
-        (e.g. P-D012F). Must be in the same order as --sample-bam.''')
+        '-sp', '--sample-group', nargs="+",
+        help='''Space-delimited list of sample group information
+        (e.g. sample patient ID). Must be in the same order as --sample-bam.''')
     parser.add_argument(
         '-sn', '--sample-name', nargs="+",
         help='''Space-delimited list of sample names. If not specified,
@@ -32,6 +32,9 @@ def add_common_args(parser):
     parser.add_argument(
         '--vcf', required=True,
         help='''VCF file containing the sites to be queried.''')
+    parser.add_argument(
+        '--bed', required=False,
+        help='''BED file containing the intervals to be queried.''')
     parser.add_argument(
         '-db', '--database',
         help='''Directory to store the intermediate files after
