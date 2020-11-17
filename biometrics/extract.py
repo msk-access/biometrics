@@ -25,11 +25,12 @@ class Extract:
         self.fafile = args.fafile
         self.overwrite = args.overwrite
         self.min_coverage = args.min_coverage
+        self.sites = []
+        self.regions = []
 
         self.parse_vcf()
 
     def parse_vcf(self):
-        self.sites = []
 
         for record in vcf.Reader(open(self.vcf, 'r')):
             self.sites.append({
