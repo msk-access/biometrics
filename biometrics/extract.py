@@ -48,7 +48,7 @@ class Extract:
             'alignment_file': sample.alignment_file,
             'name': sample.name,
             'sex': sample.sex,
-            'patient': sample.patient,
+            'group': sample.group,
             'sample_type': sample.sample_type,
             'pileup_data': pileup_data
         }
@@ -61,7 +61,7 @@ class Extract:
         sample.alignment_file = sample_data['alignment_file']
         sample.name = sample_data['name']
         sample.sex = sample_data['sex']
-        sample.patient = sample_data['patient']
+        sample.group = sample_data['group']
         sample.sample_type = sample_data['sample_type']
 
         return sample
@@ -96,14 +96,14 @@ class Extract:
     def _get_genotype_info(self, pileup_site):
 
         allele_counts = [
-            pileup_site[pileup_site['ref_allele']][0],
-            pileup_site[pileup_site['alt_allele']][0]]
+            pileup_site[pileup_site['ref_allele'][0]][0],
+            pileup_site[pileup_site['alt_allele'][0]][0]]
 
         pileup_site['minor_allele_freq'] = self._get_minor_allele_freq(
             allele_counts)
 
         pileup_site['genotype_class'] = self._get_genotype_class(
-            pileup_site['minor_allele_freq'])
+            pileup_site['minor_allele_freq'][0])
 
         pileup_site['genotype'] = self._get_genotype(
             pileup_site['genotype_class'][0], allele_counts,
