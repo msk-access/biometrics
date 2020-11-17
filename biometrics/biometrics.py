@@ -1,16 +1,13 @@
-#!/usr/bin/env python
-import sys
 import os
 
 import pandas as pd
 
-from cli import get_args
-from sample import Sample
-from extract import Extract
-from genotype import Genotyper
-from minor_contamination import MinorContamination
-from major_contamination import MajorContamination
-from utils import standardize_sex_nomenclature, exit_error
+from biometrics.sample import Sample
+from biometrics.extract import Extract
+from biometrics.genotype import Genotyper
+from biometrics.minor_contamination import MinorContamination
+from biometrics.major_contamination import MajorContamination
+from biometrics.utils import standardize_sex_nomenclature, exit_error
 
 
 def run_extract(args, samples):
@@ -102,9 +99,7 @@ def get_samples(args):
     return samples
 
 
-def main():
-
-    args = get_args()
+def run_biometrics(args):
 
     samples = get_samples(args)
     samples = run_extract(args, samples)
@@ -117,7 +112,3 @@ def main():
         run_major_contamination(args, samples)
     elif args.subparser_name == 'genotype':
         run_genotyping(args, samples)
-
-
-if __name__ == "__main__":
-    sys.exit(main())

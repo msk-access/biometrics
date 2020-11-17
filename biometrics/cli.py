@@ -1,31 +1,34 @@
+#!/usr/bin/env python
 """Console script for biometrics."""
+import sys
 import argparse
 
 from utils import exit_error
+from biometrics.biometrics import run_biometrics
 
 
 def add_common_args(parser):
 
     parser.add_argument(
-        '-i', '--input', action="append",
+        '-i', '--input', action="append", required=False,
         help='''Path to file containing sample information (one per line). For example: sample_name,alignment_file,type,sex,group''')
     parser.add_argument(
-        '-sb', '--sample-bam', nargs="+",
+        '-sb', '--sample-bam', nargs="+", required=False,
         help='''Space-delimited list of BAM files.''')
     parser.add_argument(
-        '-st', '--sample-type', nargs="+",
+        '-st', '--sample-type', nargs="+", required=False,
         help='''Space-delimited list of sample types: Normal or Tumor.
         Must be in the same order as --sample-bam.''')
     parser.add_argument(
-        '-ss', '--sample-sex', nargs="+",
+        '-ss', '--sample-sex', nargs="+", required=False,
         help='''Space-delimited list of sample sex (i.e. M or F). Must be
         in the same order as --sample-bam.''')
     parser.add_argument(
-        '-sp', '--sample-group', nargs="+",
+        '-sp', '--sample-group', nargs="+", required=False,
         help='''Space-delimited list of sample group information
         (e.g. sample patient ID). Must be in the same order as --sample-bam.''')
     parser.add_argument(
-        '-sn', '--sample-name', nargs="+",
+        '-sn', '--sample-name', nargs="+", required=False,
         help='''Space-delimited list of sample names. If not specified,
         sample name is automatically figured out from the BAM file. Must
         be in the same order as --sample-bam.''')
@@ -79,14 +82,14 @@ def check_arg_equal_len(vals1, vals2, name):
 
 def check_args(args):
 
-    if not args.titlefile and not args.sample_bam:
-        exit_error('You must specify either --titlefile or --sample-bam')
+    if not args.input and not args.sample_bam:
+        exit_error('You must specify either --input or --sample-bam')
 
     if args.sample_bam:
         check_arg_equal_len(args.sample_bam, args.sample_name, '--sample-name')
         check_arg_equal_len(args.sample_bam, args.sample_type, '--sample-type')
         check_arg_equal_len(
-            args.sample_bam, args.sample_patient, '--sample-patient')
+            args.sample_bam, args.sample_group, '--sample-group')
         check_arg_equal_len(args.sample_bam, args.sample_sex, '--sample-sex')
 
 
@@ -95,9 +98,8 @@ def get_args():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         description='''Various tools for fingerprinting samples from BAM files.
-        Sample information to each sub command is supplied via title file(s)
-        and/or as individual samples. For title files, the sample annotation
-        and BAM location is automatically figure out.''')
+        Sample information to each sub command is supplied via input file(s)
+        and/or as individual samples.''')
     subparsers = parser.add_subparsers(help='', dest="subparser_name")
 
     # extract parser
@@ -144,3 +146,14 @@ def get_args():
     check_args(args)
 
     return args
+
+
+def main():
+
+    args = get_args()
+
+    run_biometrics(args)
+
+
+if __name__ == "__main__":
+    sys.exit(main())
