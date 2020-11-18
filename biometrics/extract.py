@@ -132,6 +132,7 @@ class Extract:
 
             pileup_site = self._get_genotype_info(pileup_site)
 
+
             pileup = pd.concat([pileup, pileup_site])
 
         sample.pileup = pileup
