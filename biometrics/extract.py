@@ -35,8 +35,8 @@ class Extract:
         for record in vcf.Reader(open(self.vcf, 'r')):
             self.sites.append({
                 'chrom': record.CHROM,
-                'start': record.POS,
-                'end': record.POS + 1,
+                'start': record.POS-1,
+                'end': record.POS,
                 'ref_allele': str(record.REF),
                 'alt_allele': str(record.ALT[0])
             })
@@ -107,7 +107,7 @@ class Extract:
 
         pileup_site['genotype'] = self._get_genotype(
             pileup_site['genotype_class'][0], allele_counts,
-            [pileup_site['ref_allele'], pileup_site['alt_allele']])
+            [pileup_site['ref_allele'][0], pileup_site['alt_allele'][0]])
 
         return pileup_site
 
@@ -119,6 +119,7 @@ class Extract:
         pileup = pd.DataFrame()
 
         for site in self.sites:
+
             pileup_site = pysamstats.load_pileup(
                 'variation', bam, chrom=site['chrom'], start=site['start'],
                 end=site['end'], truncate=True, fafile=self.fafile,
@@ -131,7 +132,6 @@ class Extract:
             pileup_site['alt_allele'] = site['alt_allele']
 
             pileup_site = self._get_genotype_info(pileup_site)
-
 
             pileup = pd.concat([pileup, pileup_site])
 
