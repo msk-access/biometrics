@@ -20,9 +20,9 @@ class MajorContamination:
             het_sites = sites_notna[sites_notna['genotype_class']=='Het']
 
             if sites_notna.shape[0] == 0:
-                samples[i].metrics['minor_contamination'] = np.nan
+                samples[i].metrics['major_contamination'] = np.nan
             else:
-                samples[i].metrics['minor_contamination'] = \
+                samples[i].metrics['major_contamination'] = \
                     het_sites.shape[0] / sites_notna.shape[0]
 
         return samples
