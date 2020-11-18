@@ -8,7 +8,7 @@ import argparse
 from unittest import TestCase
 from unittest import mock
 
-from biometrics.biometrics import get_samples
+from biometrics.biometrics import get_samples, run_minor_contamination, run_major_contamination
 from biometrics.cli import get_args
 from biometrics.extract import Extract
 
@@ -47,7 +47,7 @@ class TestBiometrics(TestCase):
         self.assertGreater(
             len(extractor.sites), 0, msg="Could not parse VCF sites.")
         self.assertEqual(
-            len(extractor.sites), 4, msg="Did not parse right number of sites.")
+            len(extractor.sites), 5, msg="Did not parse right number of sites.")
 
     def test_extract_sample(self):
 
@@ -57,4 +57,19 @@ class TestBiometrics(TestCase):
 
         self.assertEqual(samples[0].name, 'test_sample1', msg='Sample was not loaded correctly.')
         self.assertIsNotNone(samples[0].pileup, msg='Sample pileup was not loaded correctly.')
-        self.assertEqual(samples[0].pileup.shape[0], 4, msg='Did not find pileup for 4 variants. Found: {}.'.format(samples[0].pileup))
+        self.assertEqual(samples[0].pileup.shape[0], 5, msg='Did not find pileup for 4 variants. Found: {}.'.format(samples[0].pileup))
+
+    def test_sample_contamination(self):
+
+        extractor = Extract(self.args)
+        samples = get_samples(self.args)
+        samples = extractor.extract(samples)
+
+        samples = run_minor_contamination(self.args, samples)
+        samples = run_major_contamination(self.args, samples)
+
+        self.assertAlmostEqual(
+            samples[0].metrics['minor_contamination'], 0.0323, places=3, msg='Minor contamination is wrong.')
+
+        self.assertAlmostEqual(
+            samples[0].metrics['major_contamination'], 0.5, places=3, msg='Major contamination is wrong.')
