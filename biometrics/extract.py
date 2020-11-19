@@ -1,5 +1,4 @@
 import os
-import pickle
 
 import pandas as pd
 import numpy as np
@@ -40,31 +39,6 @@ class Extract:
                 'ref_allele': str(record.REF),
                 'alt_allele': str(record.ALT[0])
             })
-
-    def _save_to_file(self, sample):
-
-        pileup_data = sample.pileup.to_dict()
-        sample_data = {
-            'alignment_file': sample.alignment_file,
-            'name': sample.name,
-            'sex': sample.sex,
-            'group': sample.group,
-            'sample_type': sample.sample_type,
-            'pileup_data': pileup_data
-        }
-
-        pickle.dump(sample_data, open(sample.extraction_file, "wb"))
-
-    def _load_from_file(self, sample):
-        sample_data = pickle.load(open(sample.extraction_file, "rb"))
-        sample.pileup = pd.DataFrame(sample_data['pileup_data'])
-        sample.alignment_file = sample_data['alignment_file']
-        sample.name = sample_data['name']
-        sample.sex = sample_data['sex']
-        sample.group = sample_data['group']
-        sample.sample_type = sample_data['sample_type']
-
-        return sample
 
     def _get_minor_allele_freq(self, allele_counts):
         if sum(allele_counts) <= self.min_coverage:
@@ -140,7 +114,7 @@ class Extract:
             'chrom', 'pos', 'ref', 'reads_all', 'matches', 'mismatches', 'A',
             'C', 'T', 'G', 'N', 'minor_allele_freq', 'genotype_class', 'genotype']]
 
-        self._save_to_file(sample)
+        sample.save_to_file()
 
         return sample
 
@@ -152,7 +126,7 @@ class Extract:
 
             if os.path.exists(sample.extraction_file) and not self.overwrite:
 
-                samples[i] = self._load_from_file(sample)
+                samples[i].load_from_file()
 
                 continue
 
