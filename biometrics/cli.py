@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 """Console script for biometrics."""
 import sys
+import os
 import argparse
 
 from utils import exit_error
-from biometrics.biometrics import run_biometrics
+# from biometrics.biometrics import run_biometrics
+from biometrics import run_biometrics
 
 
 def add_common_args(parser):
@@ -24,7 +26,7 @@ def add_common_args(parser):
         help='''Space-delimited list of sample sex (i.e. M or F). Must be
         in the same order as --sample-bam.''')
     parser.add_argument(
-        '-sp', '--sample-group', nargs="+", required=False,
+        '-sg', '--sample-group', nargs="+", required=False,
         help='''Space-delimited list of sample group information
         (e.g. sample patient ID). Must be in the same order as --sample-bam.''')
     parser.add_argument(
@@ -43,9 +45,11 @@ def add_common_args(parser):
         help='''Directory to store the intermediate files after
         running the extraction step.''')
     parser.add_argument(
-        '--bam-basedir', default='/juno/work/access/production/data/bams',
-        help='''Base directory where BAM files are located (if you specified
-        title files).''')
+        '-ov', '--overwrite', action='store_true',
+        help='''Overwrite any existing extraction results.''')
+    parser.add_argument(
+        '-nc', '--no-db-comparison', action='store_true',
+        help='''Do not compare the sample(s) you provided to all samples in the database (--db).''')
     parser.add_argument(
         '--fafile', required=True,
         help='''Path to reference fasta file.''')
@@ -58,9 +62,6 @@ def add_common_args(parser):
     parser.add_argument(
         '-mc', '--min-coverage', default=10, type=int,
         help='''Minimum coverage to count a site.''')
-    parser.add_argument(
-        '-ov', '--overwrite', action='store_true',
-        help='''Overwrite any existing extraction results.''')
 
     return parser
 
