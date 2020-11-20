@@ -114,6 +114,10 @@ class Extract:
             'chrom', 'pos', 'ref', 'reads_all', 'matches', 'mismatches', 'A',
             'C', 'T', 'G', 'N', 'minor_allele_freq', 'genotype_class', 'genotype']]
 
+        # because pysamstats works in 0-based coordinates. so ned to convert to
+        # 1-based
+        sample.pileup['pos'] = sample.pileup['pos'] + 1
+
         sample.save_to_file()
 
         return sample
