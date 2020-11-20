@@ -17,13 +17,12 @@ class Sample:
         self.group = group
         self.sample_type = sample_type
         self.pileup = None
+        self.extraction_file = None
         self.is_in_db = is_in_db
         self.metrics = {}
 
-        if db is not None:
+        if db is not None and self.name is not None:
             self.extraction_file = os.path.join(db, self.name + '.pk')
-        else:
-            self.extraction_file = os.path.join(os.getcwd(), self.name, '.pk')
 
     def save_to_file(self):
 
@@ -39,7 +38,13 @@ class Sample:
 
         pickle.dump(sample_data, open(self.extraction_file, "wb"))
 
-    def load_from_file(self, sample):
+    def load_from_file(self, extraction_file=None):
+
+        if extraction_file is not None:
+            self.extraction_file = extraction_file
+
+        if self.extraction_file is None:
+            exit_error('Extraction file path is None.')
 
         if not os.path.exists(self.extraction_file):
             exit_error('Extraction file does not exist: {}'.format(
