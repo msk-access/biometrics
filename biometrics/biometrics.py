@@ -1,18 +1,51 @@
 import os
+import glob
 
 import pandas as pd
 
-from biometrics.sample import Sample
-from biometrics.extract import Extract
-from biometrics.genotype import Genotyper
-from biometrics.minor_contamination import MinorContamination
-from biometrics.major_contamination import MajorContamination
-from biometrics.utils import standardize_sex_nomenclature, exit_error
+# from biometrics.sample import Sample
+# from biometrics.extract import Extract
+# from biometrics.genotype import Genotyper
+# from biometrics.minor_contamination import MinorContamination
+# from biometrics.major_contamination import MajorContamination
+# from biometrics.utils import standardize_sex_nomenclature, exit_error
+
+from sample import Sample
+from extract import Extract
+from genotype import Genotyper
+from minor_contamination import MinorContamination
+from major_contamination import MajorContamination
+from utils import standardize_sex_nomenclature, exit_error
+
+
+def load_extra_database_samples(args, existing_samples):
+
+    samples = []
+
+    if args.no_db_comparison:
+        return samples
+
+    for pickle_file in glob.glob(os.path.join(args.database, '*pk')):
+
+        sample_name = os.path.basename(pickle_file).replace('.pk', '')
+
+        if sample_name in existing_samples:
+            continue
+
+        sample = Sample(db=args.database, is_in_db=True)
+        sample.load_from_file(extraction_file=pickle_file)
+
+        samples.append(sample)
+
+    return samples
 
 
 def run_extract(args, samples):
     extractor = Extract(args=args)
-    extractor.extract(samples)
+    samples = extractor.extract(samples)
+    existing_samples = set([i.name for i in samples])
+
+    samples += load_extra_database_samples(args, existing_samples)
 
     return samples
 
@@ -25,15 +58,21 @@ def run_minor_contamination(args, samples):
     minor_contamination = MinorContamination(args)
     samples = minor_contamination.estimate(samples)
 
+    return samples
+
 
 def run_major_contamination(args, samples):
     major_contamination = MajorContamination(args)
     samples = major_contamination.estimate(samples)
 
+    return samples
+
 
 def run_genotyping(args, samples):
     genotyper = Genotyper(args)
     genotyper.genotype(samples)
+
+    return samples
 
 
 def get_samples_from_input(args):
@@ -73,7 +112,7 @@ def get_samples_list(args):
             args.sample_sex[i] if args.sample_sex is not None else None)
         name = args.sample_name[i] if args.sample_name is not None else None
         group = args.sample_group[i] \
-            if args.sample_patient is not None else None
+            if args.sample_group is not None else None
         sample_type = args.sample_type[i] \
             if args.sample_type is not None else None
 
