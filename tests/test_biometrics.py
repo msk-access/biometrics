@@ -22,10 +22,10 @@ class TestBiometrics(TestCase):
         'argparse.ArgumentParser.parse_args',
         return_value=argparse.Namespace(
             input=None,
-            sample_bam=[os.path.join(CUR_DIR, 'test_data/test_golden.bam')],
+            sample_bam=[os.path.join(CUR_DIR, 'test_data/test_sample1_golden.bam')],
             sample_name=['test_sample1'],
             sample_type=['tumor'],
-            sample_group=['Patient1'],
+            sample_group=['test_sample1'],
             sample_sex=None,
             database=os.path.join(CUR_DIR, 'test_data/'),
             min_mapping_quality=1,
@@ -47,7 +47,7 @@ class TestBiometrics(TestCase):
         self.assertGreater(
             len(extractor.sites), 0, msg="Could not parse VCF sites.")
         self.assertEqual(
-            len(extractor.sites), 5, msg="Did not parse right number of sites.")
+            len(extractor.sites), 15, msg="Did not parse right number of sites.")
 
     def test_extract_sample(self):
 
@@ -57,7 +57,7 @@ class TestBiometrics(TestCase):
 
         self.assertEqual(samples[0].name, 'test_sample1', msg='Sample was not loaded correctly.')
         self.assertIsNotNone(samples[0].pileup, msg='Sample pileup was not loaded correctly.')
-        self.assertEqual(samples[0].pileup.shape[0], 5, msg='Did not find pileup for 4 variants. Found: {}.'.format(samples[0].pileup))
+        self.assertEqual(samples[0].pileup.shape[0], 15, msg='Did not find pileup for 4 variants. Found: {}.'.format(samples[0].pileup))
 
     def test_sample_contamination(self):
 
@@ -69,7 +69,7 @@ class TestBiometrics(TestCase):
         samples = run_major_contamination(self.args, samples)
 
         self.assertAlmostEqual(
-            samples[0].metrics['minor_contamination'], 0.0323, places=3, msg='Minor contamination is wrong.')
+            samples[0].metrics['minor_contamination'], 0.0045, places=4, msg='Minor contamination is wrong.')
 
         self.assertAlmostEqual(
-            samples[0].metrics['major_contamination'], 0.5, places=3, msg='Major contamination is wrong.')
+            samples[0].metrics['major_contamination'], 0.2, places=1, msg='Major contamination is wrong.')
