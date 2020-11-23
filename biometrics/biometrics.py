@@ -3,24 +3,24 @@ import glob
 
 import pandas as pd
 
-from biometrics.sample import Sample
-from biometrics.extract import Extract
-from biometrics.genotype import Genotyper
-from biometrics.minor_contamination import MinorContamination
-from biometrics.major_contamination import MajorContamination
-from biometrics.utils import standardize_sex_nomenclature, exit_error
+# from biometrics.sample import Sample
+# from biometrics.extract import Extract
+# from biometrics.genotype import Genotyper
+# from biometrics.minor_contamination import MinorContamination
+# from biometrics.major_contamination import MajorContamination
+# from biometrics.utils import standardize_sex_nomenclature, exit_error
 
-# from sample import Sample
-# from extract import Extract
-# from genotype import Genotyper
-# from minor_contamination import MinorContamination
-# from major_contamination import MajorContamination
-# from utils import standardize_sex_nomenclature, exit_error
+from sample import Sample
+from extract import Extract
+from genotype import Genotyper
+from minor_contamination import MinorContamination
+from major_contamination import MajorContamination
+from utils import standardize_sex_nomenclature, exit_error
 
 
 def load_extra_database_samples(args, existing_samples):
 
-    samples = []
+    samples = {}
 
     if args.no_db_comparison:
         return samples
@@ -35,7 +35,7 @@ def load_extra_database_samples(args, existing_samples):
         sample = Sample(db=args.database, is_in_db=False)
         sample.load_from_file(extraction_file=pickle_file)
 
-        samples.append(sample)
+        samples[sample.name] = sample
 
     return samples
 
@@ -45,7 +45,7 @@ def run_extract(args, samples):
     samples = extractor.extract(samples)
     existing_samples = set([i for i in samples.keys()])
 
-    samples += load_extra_database_samples(args, existing_samples)
+    samples.update(load_extra_database_samples(args, existing_samples))
 
     return samples
 
