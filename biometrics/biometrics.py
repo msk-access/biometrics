@@ -1,5 +1,6 @@
 import os
 import glob
+import json
 
 import pandas as pd
 
@@ -18,6 +19,18 @@ from major_contamination import MajorContamination
 from utils import standardize_sex_nomenclature, exit_error
 
 
+def write_to_file(args, data, basename):
+
+    outdir = os.path.abspath(args.outdir)
+
+    outpath = os.path.join(outdir, basename + '.csv')
+    data.to_csv(outpath, index=False)
+
+    if args.json:
+        outpath = os.path.join(outdir, basename + '.json')
+        data.to_json(outpath)
+
+
 def load_extra_database_samples(args, existing_samples):
 
     samples = {}
@@ -32,7 +45,7 @@ def load_extra_database_samples(args, existing_samples):
         if sample_name in existing_samples:
             continue
 
-        sample = Sample(db=args.database, is_in_db=False)
+        sample = Sample(db=args.database, is_in_db=True)
         sample.load_from_file(extraction_file=pickle_file)
 
         samples[sample.name] = sample
@@ -70,7 +83,9 @@ def run_major_contamination(args, samples):
 
 def run_genotyping(args, samples):
     genotyper = Genotyper(args)
-    genotyper.genotype(samples)
+    data = genotyper.genotype(samples)
+
+    write_to_file(args, data, 'genotype_comparison')
 
     return samples
 
@@ -138,16 +153,26 @@ def get_samples(args):
     return samples
 
 
+def create_outdir(outdir):
+    os.makedirs(outdir, exist_ok=True)
+
+
 def run_biometrics(args):
+
+    create_outdir(args.database)
 
     samples = get_samples(args)
     samples = run_extract(args, samples)
 
     if args.subparser_name == 'sexmismatch':
+        create_outdir(args.outdir)
         run_sexmismatch(args, samples)
     elif args.subparser_name == 'minor':
+        create_outdir(args.outdir)
         run_minor_contamination(args, samples)
     elif args.subparser_name == 'major':
+        create_outdir(args.outdir)
         run_major_contamination(args, samples)
     elif args.subparser_name == 'genotype':
+        create_outdir(args.outdir)
         run_genotyping(args, samples)

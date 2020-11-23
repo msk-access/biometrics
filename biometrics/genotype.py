@@ -10,7 +10,7 @@ DISCORDANCE_THRES = 0.05
 class Genotyper:
 
     def __init__(self, args):
-        self.no_db_comparison = args.no_db_comparison
+        self.no_db_compare = args.no_db_compare
 
     def are_samples_same_group(self, sample1, sample2):
 
@@ -55,31 +55,32 @@ class Genotyper:
         samples_input = dict(filter(
             lambda x: not x[1].is_in_db, samples.items()))
 
-        if not self.no_db_comparison:
+        if self.no_db_compare:
             if len(samples_input) <= 1:
                 exit_error("You need to specify 2 or more samples in order to compare genotypes.")
         else:
             if len(samples_db) <= 1:
                 exit_error("There are no samples in the database to compare with")
 
-        # compare all the input samples to each other
+        if len(samples_input) > 1:
+            # compare all the input samples to each other
 
-        for i, sample_name1 in enumerate(samples_input):
-            for j, sample_name2 in enumerate(samples_input):
+            for i, sample_name1 in enumerate(samples_input):
+                for j, sample_name2 in enumerate(samples_input):
 
-                if i == j:
-                    continue
+                    if i == j:
+                        continue
 
-                row = {
-                    'ReferenceSample': sample_name1,
-                    'QuerySample': sample_name2}
-                row = self.compute_discordance(
-                    row, samples[sample_name1], samples[sample_name2])
-                data.append(row)
+                    row = {
+                        'ReferenceSample': sample_name1,
+                        'QuerySample': sample_name2}
+                    row = self.compute_discordance(
+                        row, samples[sample_name1], samples[sample_name2])
+                    data.append(row)
 
         # for each input sample, compare with all the samples in the db
 
-        if not self.no_db_comparison and len(samples_db) > 0:
+        if not self.no_db_compare and len(samples_db) > 0:
             for i, sample_name1 in enumerate(samples_input):
                 for j, sample_name2 in enumerate(samples_db):
 
