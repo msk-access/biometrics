@@ -3,19 +3,19 @@ import glob
 
 import pandas as pd
 
-# from biometrics.sample import Sample
-# from biometrics.extract import Extract
-# from biometrics.genotype import Genotyper
-# from biometrics.minor_contamination import MinorContamination
-# from biometrics.major_contamination import MajorContamination
-# from biometrics.utils import standardize_sex_nomenclature, exit_error
+from biometrics.sample import Sample
+from biometrics.extract import Extract
+from biometrics.genotype import Genotyper
+from biometrics.minor_contamination import MinorContamination
+from biometrics.major_contamination import MajorContamination
+from biometrics.utils import standardize_sex_nomenclature, exit_error
 
-from sample import Sample
-from extract import Extract
-from genotype import Genotyper
-from minor_contamination import MinorContamination
-from major_contamination import MajorContamination
-from utils import standardize_sex_nomenclature, exit_error
+# from sample import Sample
+# from extract import Extract
+# from genotype import Genotyper
+# from minor_contamination import MinorContamination
+# from major_contamination import MajorContamination
+# from utils import standardize_sex_nomenclature, exit_error
 
 
 def load_extra_database_samples(args, existing_samples):
@@ -43,7 +43,7 @@ def load_extra_database_samples(args, existing_samples):
 def run_extract(args, samples):
     extractor = Extract(args=args)
     samples = extractor.extract(samples)
-    existing_samples = set([i.name for i in samples])
+    existing_samples = set([i for i in samples.keys()])
 
     samples += load_extra_database_samples(args, existing_samples)
 
@@ -76,7 +76,7 @@ def run_genotyping(args, samples):
 
 
 def get_samples_from_input(args):
-    samples = []
+    samples = {}
 
     for fpath in args.input:
 
@@ -98,13 +98,13 @@ def get_samples_from_input(args):
                 sex=standardize_sex_nomenclature(input.at[i, 'sex']),
                 db=args.db)
 
-            samples.append(sample)
+            samples[sample.name] = sample
 
     return samples
 
 
 def get_samples_list(args):
-    samples = []
+    samples = {}
 
     for i, bam in enumerate(args.sample_bam):
 
@@ -120,20 +120,20 @@ def get_samples_list(args):
             alignment_file=bam, group=group, name=name,
             sample_type=sample_type, sex=sex, db=args.database)
 
-        samples.append(sample)
+        samples[sample.name] = sample
 
     return samples
 
 
 def get_samples(args):
 
-    samples = []
+    samples = {}
 
     if args.input:
-        samples += get_samples_from_input(args)
+        samples.update(get_samples_from_input(args))
 
     if args.sample_bam:
-        samples += get_samples_list(args)
+        samples.update(get_samples_list(args))
 
     return samples
 

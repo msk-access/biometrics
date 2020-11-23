@@ -12,17 +12,17 @@ class MinorContamination:
 
     def estimate(self, samples):
 
-        for i, sample in enumerate(samples):
+        for i, sample_name in enumerate(samples):
 
-            sites = sample.pileup
+            sites = samples[sample_name].pileup
             sites_notna = sites[~pd.isna(sites['genotype_class'])]
 
-            hom_sites = sites_notna[sites_notna['genotype_class']=='Hom']
+            hom_sites = sites_notna[sites_notna['genotype_class'] == 'Hom']
 
             if hom_sites.shape[0] == 0:
-                samples[i].metrics['minor_contamination'] = np.nan
+                samples[sample_name].metrics['minor_contamination'] = np.nan
             else:
-                samples[i].metrics['minor_contamination'] = \
+                samples[sample_name].metrics['minor_contamination'] = \
                     hom_sites['minor_allele_freq'].mean()
 
         return samples

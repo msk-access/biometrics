@@ -124,16 +124,16 @@ class Extract:
 
     def extract(self, samples):
 
-        for i, sample in enumerate(samples):
+        for i, sample_name in enumerate(samples):
 
             # if extraction file exists then load it
 
-            if os.path.exists(sample.extraction_file) and not self.overwrite:
+            if os.path.exists(samples[sample_name].extraction_file) and not self.overwrite:
 
-                samples[i].load_from_file()
+                samples[sample_name].load_from_file()
 
                 continue
 
-            samples[i] = self._extract_sample(sample)
+            samples[sample_name] = self._extract_sample(samples[sample_name])
 
         return samples

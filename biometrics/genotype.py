@@ -28,27 +28,33 @@ class Genotyper:
 
         # compare all the input samples to each other
 
-        for i, sample1 in enumerate(samples_input):
-            for j, sample2 in enumerate(samples_input):
+        for i, sample_name1 in enumerate(samples_input):
+            for j, sample_name2 in enumerate(samples_input):
 
                 if i == j:
                     continue
 
-                row = {'ReferenceSample': sample1.name, 'QuerySample': sample2.name}
-                row = self.compute_discordance(row, sample1, sample2)
+                row = {
+                    'ReferenceSample': sample_name1,
+                    'QuerySample': sample_name2}
+                row = self.compute_discordance(
+                    row, samples[sample_name1], samples[sample_name2])
                 data.append(row)
 
         # for each input sample, compare with all the samples in the db
 
         if not self.no_db_comparison and len(samples_db) > 0:
-            for i, sample1 in enumerate(samples_input):
-                for j, sample2 in enumerate(samples_db):
+            for i, sample_name1 in enumerate(samples_input):
+                for j, sample_name2 in enumerate(samples_db):
 
                     if i == j:
                         continue
 
-                    row = {'ReferenceSample': sample1.name, 'QuerySample': sample2.name}
-                    row = self.compute_discordance(row, sample1, sample2)
+                    row = {
+                        'ReferenceSample': sample_name1,
+                        'QuerySample': sample_name2}
+                    row = self.compute_discordance(
+                        row, samples[sample_name1], samples[sample_name2])
                     data.append(row)
 
         data = pd.DataFrame(data)

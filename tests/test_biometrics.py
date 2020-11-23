@@ -55,9 +55,9 @@ class TestBiometrics(TestCase):
         samples = get_samples(self.args)
         samples = extractor.extract(samples)
 
-        self.assertEqual(samples[0].name, 'test_sample1', msg='Sample was not loaded correctly.')
-        self.assertIsNotNone(samples[0].pileup, msg='Sample pileup was not loaded correctly.')
-        self.assertEqual(samples[0].pileup.shape[0], 15, msg='Did not find pileup for 4 variants. Found: {}.'.format(samples[0].pileup))
+        self.assertEqual(samples['test_sample1'].name, 'test_sample1', msg='Sample was not loaded correctly.')
+        self.assertIsNotNone(samples['test_sample1'].pileup, msg='Sample pileup was not loaded correctly.')
+        self.assertEqual(samples['test_sample1'].pileup.shape[0], 15, msg='Did not find pileup for 4 variants. Found: {}.'.format(samples['test_sample1'].pileup))
 
     def test_sample_contamination(self):
 
@@ -69,7 +69,7 @@ class TestBiometrics(TestCase):
         samples = run_major_contamination(self.args, samples)
 
         self.assertAlmostEqual(
-            samples[0].metrics['minor_contamination'], 0.0045, places=4, msg='Minor contamination is wrong.')
+            samples['test_sample1'].metrics['minor_contamination'], 0.0045, places=4, msg='Minor contamination is wrong.')
 
         self.assertAlmostEqual(
-            samples[0].metrics['major_contamination'], 0.2, places=1, msg='Major contamination is wrong.')
+            samples['test_sample1'].metrics['major_contamination'], 0.2, places=1, msg='Major contamination is wrong.')
