@@ -32,7 +32,7 @@ def load_extra_database_samples(args, existing_samples):
         if sample_name in existing_samples:
             continue
 
-        sample = Sample(db=args.database, is_in_db=True)
+        sample = Sample(db=args.database, is_in_db=False)
         sample.load_from_file(extraction_file=pickle_file)
 
         samples.append(sample)

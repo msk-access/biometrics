@@ -7,7 +7,7 @@ EPSILON = 1e-9
 class Genotyper:
 
     def __init__(self, args):
-        pass
+        self.no_db_comparison = args.no_db_comparison
 
     def compute_discordance(self, row, reference, query):
 
@@ -23,9 +23,13 @@ class Genotyper:
     def genotype(self, samples):
 
         data = []
+        samples_db = list(filter(lambda x: x.is_in_db, samples))
+        samples_input = list(filter(lambda x: not x.is_in_db, samples))
 
-        for i, sample1 in enumerate(samples):
-            for j, sample2 in enumerate(samples):
+        # compare all the input samples to each other
+
+        for i, sample1 in enumerate(samples_input):
+            for j, sample2 in enumerate(samples_input):
 
                 if i == j:
                     continue
@@ -34,10 +38,22 @@ class Genotyper:
                 row = self.compute_discordance(row, sample1, sample2)
                 data.append(row)
 
+        # for each input sample, compare with all the samples in the db
+
+        if not self.no_db_comparison and len(samples_db) > 0:
+            for i, sample1 in enumerate(samples_input):
+                for j, sample2 in enumerate(samples_db):
+
+                    if i == j:
+                        continue
+
+                    row = {'ReferenceSample': sample1.name, 'QuerySample': sample2.name}
+                    row = self.compute_discordance(row, sample1, sample2)
+                    data.append(row)
+
         data = pd.DataFrame(data)
+
         data['DiscordanceRate'] = data['HomozygousMismatch'] / (data['HomozygousInRef'] + EPSILON)
         data.loc[data['HomozygousInRef'] < 10, 'DiscordanceRate'] = np.nan
-
-        import pdb; pdb.set_trace()
 
         return data
