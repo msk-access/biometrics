@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 
+from utils import exit_error
+
 EPSILON = 1e-9
 DISCORDANCE_THRES = 0.05
 
@@ -20,11 +22,7 @@ class Genotyper:
         else:
             return False
 
-
     def get_sample_groups(self, samples):
-        """
-
-        """
 
         groups = {}
 
@@ -57,7 +55,12 @@ class Genotyper:
         samples_input = dict(filter(
             lambda x: not x[1].is_in_db, samples.items()))
 
-        groups = self.get_sample_groups(samples)
+        if not self.no_db_comparison:
+            if len(samples_input) <= 1:
+                exit_error("You need to specify 2 or more samples in order to compare genotypes.")
+        else:
+            if len(samples_db) <= 1:
+                exit_error("There are no samples in the database to compare with")
 
         # compare all the input samples to each other
 
@@ -92,8 +95,13 @@ class Genotyper:
 
         data = pd.DataFrame(data)
 
+        # compute discordance rate
+
         data['DiscordanceRate'] = data['HomozygousMismatch'] / (data['HomozygousInRef'] + EPSILON)
         data.loc[data['HomozygousInRef'] < 10, 'DiscordanceRate'] = np.nan
+
+        # for each comparison, indicate if the match/mismatch is expected
+        # or not expected
 
         data['Matched'] = data['DiscordanceRate'] < DISCORDANCE_THRES
         data['ExpectedMatch'] = data.apply(
