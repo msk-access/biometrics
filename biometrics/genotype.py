@@ -2,12 +2,42 @@ import pandas as pd
 import numpy as np
 
 EPSILON = 1e-9
+DISCORDANCE_THRES = 0.05
 
 
 class Genotyper:
 
     def __init__(self, args):
         self.no_db_comparison = args.no_db_comparison
+
+    def are_samples_same_group(self, sample1, sample2):
+
+        if sample1.group is None or sample2.group is None:
+            return np.nan
+
+        if sample1.group == sample2.group:
+            return True
+        else:
+            return False
+
+
+    def get_sample_groups(self, samples):
+        """
+
+        """
+
+        groups = {}
+
+        for sample_name, sample in samples.items():
+            if sample.group is None:
+                continue
+
+            if sample.group not in groups:
+                groups[sample.group] = set(sample_name)
+            else:
+                groups[sample.group].add(sample_name)
+
+        return groups
 
     def compute_discordance(self, row, reference, query):
 
@@ -23,8 +53,11 @@ class Genotyper:
     def genotype(self, samples):
 
         data = []
-        samples_db = list(filter(lambda x: x.is_in_db, samples))
-        samples_input = list(filter(lambda x: not x.is_in_db, samples))
+        samples_db = dict(filter(lambda x: x[1].is_in_db, samples.items()))
+        samples_input = dict(filter(
+            lambda x: not x[1].is_in_db, samples.items()))
+
+        groups = self.get_sample_groups(samples)
 
         # compare all the input samples to each other
 
@@ -61,5 +94,17 @@ class Genotyper:
 
         data['DiscordanceRate'] = data['HomozygousMismatch'] / (data['HomozygousInRef'] + EPSILON)
         data.loc[data['HomozygousInRef'] < 10, 'DiscordanceRate'] = np.nan
+
+        data['Matched'] = data['DiscordanceRate'] < DISCORDANCE_THRES
+        data['ExpectedMatch'] = data.apply(
+            lambda x: self.are_samples_same_group(
+                samples[x['ReferenceSample']],
+                samples[x['QuerySample']]), axis=1)
+
+        data['Status'] = ''
+        data.loc[data.Matched & data.ExpectedMatch, 'Status'] = "Expected Match"
+        data.loc[data.Matched & ~data.ExpectedMatch, 'Status'] = "Unexpected Match"
+        data.loc[~data.Matched & data.ExpectedMatch, 'Status'] = "Unexpected Mismatch"
+        data.loc[~data.Matched & ~data.ExpectedMatch, 'Status'] = "Expected Mismatch"
 
         return data
