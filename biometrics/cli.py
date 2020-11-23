@@ -47,8 +47,8 @@ def add_common_args(parser):
         '-ov', '--overwrite', action='store_true',
         help='''Overwrite any existing extraction results.''')
     parser.add_argument(
-        '-nc', '--no-db-comparison', action='store_true',
-        help='''Do not compare the sample(s) you provided to all samples in the database (--db).''')
+        '-nc', '--no-db-compare', action='store_true',
+        help='''Do not compare the sample(s) you provided to all samples in the database.''')
     parser.add_argument(
         '--fafile', required=True,
         help='''Path to reference fasta file.''')
@@ -65,10 +65,13 @@ def add_common_args(parser):
     return parser
 
 
-def add_outdir(parser):
+def add_common_tool_args(parser):
     parser.add_argument(
         '-o', '--outdir', default='.',
         help='''Output directory for results.''')
+    parser.add_argument(
+        '-j', '--json', action='store_true',
+        help='''Also output data in JSON format.''')
 
     return parser
 
@@ -118,28 +121,28 @@ def get_args():
     parser_sexmismatch = subparsers.add_parser(
         'sexmismatch', help='Check for sex mismatches.')
     parser_sexmismatch = add_common_args(parser_sexmismatch)
-    parser_sexmismatch = add_outdir(parser_sexmismatch)
+    parser_sexmismatch = add_common_tool_args(parser_sexmismatch)
 
     # minor contamination parser
 
     parser_minor = subparsers.add_parser(
         'minor', help='Check for minor contamination.')
     parser_minor = add_common_args(parser_minor)
-    parser_minor = add_outdir(parser_minor)
+    parser_minor = add_common_tool_args(parser_minor)
 
     # major contamination parser
 
     parser_major = subparsers.add_parser(
         'major', help='Check for major contamination.')
     parser_major = add_common_args(parser_major)
-    parser_major = add_outdir(parser_major)
+    parser_major = add_common_tool_args(parser_major)
 
     # genotyping parser
 
     parser_genotype = subparsers.add_parser(
         'genotype', help='Genotype a set of samples.')
     parser_genotype = add_common_args(parser_genotype)
-    parser_genotype = add_outdir(parser_genotype)
+    parser_genotype = add_common_tool_args(parser_genotype)
 
     args = parser.parse_args()
 
