@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """Console script for biometrics."""
 import sys
-import os
 import argparse
 
 from utils import exit_error
