@@ -26,7 +26,7 @@ class Sample:
 
     def save_to_file(self):
 
-        pileup_data = self.pileup.to_dict()
+        pileup_data = self.pileup.to_dict("records")
         sample_data = {
             'alignment_file': self.alignment_file,
             'name': self.name,
