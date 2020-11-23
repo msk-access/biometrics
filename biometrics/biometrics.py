@@ -22,7 +22,7 @@ def load_extra_database_samples(args, existing_samples):
 
     samples = {}
 
-    if args.no_db_comparison:
+    if args.no_db_compare:
         return samples
 
     for pickle_file in glob.glob(os.path.join(args.database, '*pk')):
