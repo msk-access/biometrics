@@ -1,8 +1,10 @@
 import pandas as pd
 import numpy as np
 
+from contamination import BaseContamination
 
-class MajorContamination:
+
+class MajorContamination(BaseContamination):
     """
     Major contamination.
     """
@@ -23,6 +25,6 @@ class MajorContamination:
                 samples[sample_name].metrics['major_contamination'] = np.nan
             else:
                 samples[sample_name].metrics['major_contamination'] = \
-                    het_sites.shape[0] / sites_notna.shape[0]
+                    round(het_sites.shape[0] / sites_notna.shape[0], 4)
 
         return samples

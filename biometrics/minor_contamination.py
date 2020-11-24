@@ -1,8 +1,10 @@
 import pandas as pd
 import numpy as np
 
+from contamination import BaseContamination
 
-class MinorContamination:
+
+class MinorContamination(BaseContamination):
     """
     Minor contamination.
     """
@@ -23,6 +25,6 @@ class MinorContamination:
                 samples[sample_name].metrics['minor_contamination'] = np.nan
             else:
                 samples[sample_name].metrics['minor_contamination'] = \
-                    hom_sites['minor_allele_freq'].mean()
+                    round(hom_sites['minor_allele_freq'].mean(), 4)
 
         return samples
