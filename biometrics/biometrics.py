@@ -70,7 +70,7 @@ def run_minor_contamination(args, samples):
     minor_contamination = MinorContamination(args)
     samples = minor_contamination.estimate(samples)
 
-    data = minor_contamination.to_dataframe(samples, 'minor_contamination')
+    data = minor_contamination.to_dataframe(samples)
     write_to_file(args, data, 'minor_contamination')
 
     return samples
@@ -80,7 +80,7 @@ def run_major_contamination(args, samples):
     major_contamination = MajorContamination(args)
     samples = major_contamination.estimate(samples)
 
-    data = major_contamination.to_dataframe(samples, 'major_contamination')
+    data = major_contamination.to_dataframe(samples)
     write_to_file(args, data, 'major_contamination')
 
     return samples
