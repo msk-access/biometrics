@@ -1,5 +1,8 @@
+import os
+
 import pandas as pd
 import numpy as np
+import plotly.graph_objects as go
 
 
 class MinorContamination():
@@ -30,6 +33,33 @@ class MinorContamination():
             data = data.append(row, ignore_index=True)
 
         return data
+
+    def plot(self, data, outdir):
+
+        ymax = max(0.0025, max(data['minor_contamination']))
+
+        fig = go.Figure()
+        fig.add_trace(
+            go.Bar(
+                x=data['sample'],
+                y=data['minor_contamination'],
+                customdata=data.to_numpy(),
+                hovertemplate='''<b>Sample group:</b> %{customdata[1]}<br><b>Sample name:</b> %{customdata[0]}<br><b>Sample sex:</b> %{customdata[2]}<br><b>Sample type:</b> %{customdata[3]}<br><b>Total homozygous sites:</b> %{customdata[5]}''',
+            ))
+        fig.update_layout(
+            yaxis_title="Minor contamination",
+            title_text="Minor contamination across samples",
+            yaxis=dict(range=[0, ymax]))
+        fig.add_shape(
+            type='line',
+            x0=-1,
+            y0=0.002,
+            x1=8,
+            y1=0.002,
+            line=dict(color='Red',),
+            xref='x',
+            yref='y')
+        fig.write_html(os.path.join(outdir, 'minor_contamination.html'))
 
     def estimate(self, samples):
 

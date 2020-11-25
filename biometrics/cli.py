@@ -70,6 +70,9 @@ def add_common_tool_args(parser):
         '-o', '--outdir', default='.',
         help='''Output directory for results.''')
     parser.add_argument(
+        '-p', '--plot', action='store_true',
+        help='''Also output plots of the data.''')
+    parser.add_argument(
         '-j', '--json', action='store_true',
         help='''Also output data in JSON format.''')
 

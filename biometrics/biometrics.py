@@ -73,6 +73,9 @@ def run_minor_contamination(args, samples):
     data = minor_contamination.to_dataframe(samples)
     write_to_file(args, data, 'minor_contamination')
 
+    if args.plot:
+        minor_contamination.plot(data, args.outdir)
+
     return samples
 
 
@@ -82,6 +85,9 @@ def run_major_contamination(args, samples):
 
     data = major_contamination.to_dataframe(samples)
     write_to_file(args, data, 'major_contamination')
+
+    if args.plot:
+        major_contamination.plot(data, args.outdir)
 
     return samples
 
