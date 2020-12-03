@@ -8,6 +8,7 @@ import pandas as pd
 # from biometrics.genotype import Genotyper
 # from biometrics.minor_contamination import MinorContamination
 # from biometrics.major_contamination import MajorContamination
+# from biometrics.sex_mismatch import SexMismatch
 # from biometrics.utils import standardize_sex_nomenclature, exit_error
 
 from sample import Sample
@@ -15,6 +16,7 @@ from extract import Extract
 from genotype import Genotyper
 from minor_contamination import MinorContamination
 from major_contamination import MajorContamination
+from sex_mismatch import SexMismatch
 from utils import standardize_sex_nomenclature, exit_error
 
 
@@ -63,7 +65,10 @@ def run_extract(args, samples):
 
 
 def run_sexmismatch(args, samples):
-    pass
+    sex_mismatch = SexMismatch(50)
+
+    results = sex_mismatch.detect_mismatch(samples)
+    write_to_file(args, results, 'sex_mismatch')
 
 
 def run_minor_contamination(args, samples):

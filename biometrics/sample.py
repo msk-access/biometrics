@@ -17,6 +17,7 @@ class Sample:
         self.group = group
         self.sample_type = sample_type
         self.pileup = None
+        self.region_counts = None
         self.extraction_file = None
         self.is_in_db = is_in_db
         self.metrics = {}
@@ -27,13 +28,15 @@ class Sample:
     def save_to_file(self):
 
         pileup_data = self.pileup.to_dict("records")
+        region_counts = self.region_counts.to_dict('records')
         sample_data = {
             'alignment_file': self.alignment_file,
             'name': self.name,
             'sex': self.sex,
             'group': self.group,
             'sample_type': self.sample_type,
-            'pileup_data': pileup_data
+            'pileup_data': pileup_data,
+            'region_counts': region_counts
         }
 
         pickle.dump(sample_data, open(self.extraction_file, "wb"))
@@ -58,3 +61,5 @@ class Sample:
         self.sex = sample_data['sex']
         self.group = sample_data['group']
         self.sample_type = sample_data['sample_type']
+        self.region_counts = pd.DataFrame(
+            sample_data['region_counts'], dtype=object)

@@ -34,7 +34,7 @@ def add_common_args(parser):
         sample name is automatically figured out from the BAM file. Must
         be in the same order as --sample-bam.''')
     parser.add_argument(
-        '--vcf', required=True,
+        '--vcf', required=False,
         help='''VCF file containing the sites to be queried.''')
     parser.add_argument(
         '--bed', required=False,
