@@ -132,6 +132,9 @@ def get_args():
         'minor', help='Check for minor contamination.')
     parser_minor = add_common_args(parser_minor)
     parser_minor = add_common_tool_args(parser_minor)
+    parser.add_argument(
+        '--minor-threshold', default=0.002, type=float,
+        help='''Minor contamination threshold for bad sample.''')
 
     # major contamination parser
 
@@ -139,6 +142,9 @@ def get_args():
         'major', help='Check for major contamination.')
     parser_major = add_common_args(parser_major)
     parser_major = add_common_tool_args(parser_major)
+    parser.add_argument(
+        '--major-threshold', default=0.6, type=float,
+        help='''Major contamination threshold for bad sample.''')
 
     # genotyping parser
 
@@ -146,6 +152,9 @@ def get_args():
         'genotype', help='Genotype a set of samples.')
     parser_genotype = add_common_args(parser_genotype)
     parser_genotype = add_common_tool_args(parser_genotype)
+    parser.add_argument(
+        '--discordance-threshold', default=0.05, type=float,
+        help='''Discordance values less than this are regarded as matching samples.''')
 
     args = parser.parse_args()
 

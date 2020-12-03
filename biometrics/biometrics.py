@@ -67,7 +67,7 @@ def run_sexmismatch(args, samples):
 
 
 def run_minor_contamination(args, samples):
-    minor_contamination = MinorContamination(args)
+    minor_contamination = MinorContamination(threshold=args.minor_threshold)
     samples = minor_contamination.estimate(samples)
 
     data = minor_contamination.to_dataframe(samples)
@@ -80,7 +80,7 @@ def run_minor_contamination(args, samples):
 
 
 def run_major_contamination(args, samples):
-    major_contamination = MajorContamination(args)
+    major_contamination = MajorContamination(threshold=args.major_threshold)
     samples = major_contamination.estimate(samples)
 
     data = major_contamination.to_dataframe(samples)
@@ -93,10 +93,13 @@ def run_major_contamination(args, samples):
 
 
 def run_genotyping(args, samples):
-    genotyper = Genotyper(args)
+    genotyper = Genotyper(args.no_db_compare, args.discordance_threshold)
     data = genotyper.genotype(samples)
 
     write_to_file(args, data, 'genotype_comparison')
+
+    if args.plot:
+        genotyper.plot(data, args.outdir)
 
     return samples
 
