@@ -38,13 +38,14 @@ class Genotyper:
                               '<br><b>Discordance rate:</b> %{customdata[8]}' +
                               '<br><b>Status:</b> %{customdata[12]}',
                 zmin=0,
-                zmax=1
+                zmax=1,
+                colorscale='Blues_r'
             ))
         fig.update_layout(
             yaxis_title="Query samples",
             xaxis_title="Reference samples",
             legend_title_text="Discordance",
-            title_text="Comparison of genotypes")
+            title_text="Discordance calculations between samples")
         fig.write_html(os.path.join(outdir, name))
 
     def plot(self, data, outdir):
