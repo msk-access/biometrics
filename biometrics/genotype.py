@@ -1,16 +1,19 @@
+import os
+
 import pandas as pd
 import numpy as np
+import plotly.graph_objects as go
 
 from utils import exit_error
 
 EPSILON = 1e-9
-DISCORDANCE_THRES = 0.05
 
 
 class Genotyper:
 
-    def __init__(self, args):
-        self.no_db_compare = args.no_db_compare
+    def __init__(self, no_db_compare, discordance_threshold=0.05):
+        self.no_db_compare = no_db_compare
+        self.discordance_threshold = discordance_threshold
 
     def are_samples_same_group(self, sample1, sample2):
 
@@ -22,20 +25,40 @@ class Genotyper:
         else:
             return False
 
-    def get_sample_groups(self, samples):
+    def _plot_heatmap(self, data, outdir, name):
+        fig = go.Figure()
+        fig.add_trace(
+            go.Heatmap(
+                x=data['ReferenceSample'],
+                y=data['QuerySample'],
+                z=data['DiscordanceRate'],
+                customdata=data.to_numpy(),
+                hovertemplate='<b>Reference sample:</b> %{customdata[0]}' +
+                              '<br><b>Query sample:</b> %{customdata[1]}' +
+                              '<br><b>Discordance rate:</b> %{customdata[8]}' +
+                              '<br><b>Status:</b> %{customdata[12]}',
+                zmin=0,
+                zmax=1
+            ))
+        fig.update_layout(
+            yaxis_title="Query samples",
+            xaxis_title="Reference samples",
+            legend_title_text="Discordance",
+            title_text="Comparison of genotypes")
+        fig.write_html(os.path.join(outdir, name))
 
-        groups = {}
+    def plot(self, data, outdir):
+        data_sub = data[~data['DatabaseComparison']].copy()
 
-        for sample_name, sample in samples.items():
-            if sample.group is None:
-                continue
+        if data_sub.shape[0] > 1:
+            self._plot_heatmap(
+                data_sub, outdir, 'genotype_comparison_input_only.html')
 
-            if sample.group not in groups:
-                groups[sample.group] = set(sample_name)
-            else:
-                groups[sample.group].add(sample_name)
+        data_sub = data[data['DatabaseComparison']].copy()
 
-        return groups
+        if data_sub.shape[0] > 1:
+            self._plot_heatmap(
+                data_sub, outdir, 'genotype_comparison_database.html')
 
     def compute_discordance(self, row, reference, query):
 
@@ -59,7 +82,7 @@ class Genotyper:
             if len(samples_input) <= 1:
                 exit_error("You need to specify 2 or more samples in order to compare genotypes.")
         else:
-            if len(samples_db) <= 1:
+            if len(samples_input) <= 1 and len(samples_db) < 1:
                 exit_error("There are no samples in the database to compare with")
 
         if len(samples_input) > 1:
@@ -73,7 +96,8 @@ class Genotyper:
 
                     row = {
                         'ReferenceSample': sample_name1,
-                        'QuerySample': sample_name2}
+                        'QuerySample': sample_name2,
+                        'DatabaseComparison': False}
                     row = self.compute_discordance(
                         row, samples[sample_name1], samples[sample_name2])
                     data.append(row)
@@ -89,7 +113,8 @@ class Genotyper:
 
                     row = {
                         'ReferenceSample': sample_name1,
-                        'QuerySample': sample_name2}
+                        'QuerySample': sample_name2,
+                        'DatabaseComparison': True}
                     row = self.compute_discordance(
                         row, samples[sample_name1], samples[sample_name2])
                     data.append(row)
@@ -104,7 +129,7 @@ class Genotyper:
         # for each comparison, indicate if the match/mismatch is expected
         # or not expected
 
-        data['Matched'] = data['DiscordanceRate'] < DISCORDANCE_THRES
+        data['Matched'] = data['DiscordanceRate'] < self.discordance_threshold
         data['ExpectedMatch'] = data.apply(
             lambda x: self.are_samples_same_group(
                 samples[x['ReferenceSample']],
@@ -115,5 +140,11 @@ class Genotyper:
         data.loc[data.Matched & ~data.ExpectedMatch, 'Status'] = "Unexpected Match"
         data.loc[~data.Matched & data.ExpectedMatch, 'Status'] = "Unexpected Mismatch"
         data.loc[~data.Matched & ~data.ExpectedMatch, 'Status'] = "Expected Mismatch"
+
+        data = data[[
+            'ReferenceSample', 'QuerySample', 'DatabaseComparison',
+            'HomozygousInRef', 'TotalMatch', 'HomozygousMatch',
+            'HeterozygousMatch', 'HomozygousMismatch', 'HeterozygousMismatch',
+            'DiscordanceRate', 'Matched', 'ExpectedMatch', 'Status']]
 
         return data
