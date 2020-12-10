@@ -75,9 +75,9 @@ class Genotyper:
     def genotype(self, samples):
 
         data = []
-        samples_db = dict(filter(lambda x: x[1].is_in_db, samples.items()))
+        samples_db = dict(filter(lambda x: x[1].query_group, samples.items()))
         samples_input = dict(filter(
-            lambda x: not x[1].is_in_db, samples.items()))
+            lambda x: not x[1].query_group, samples.items()))
 
         if self.no_db_compare:
             if len(samples_input) <= 1:

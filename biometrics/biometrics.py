@@ -38,7 +38,7 @@ def load_extra_database_samples(args, existing_samples):
         if sample_name in existing_samples:
             continue
 
-        sample = Sample(db=args.database, is_in_db=True)
+        sample = Sample(db=args.database, query_group=True)
         sample.load_from_file(extraction_file=pickle_file)
 
         samples[sample.name] = sample
@@ -129,7 +129,7 @@ def get_samples_from_input(args):
     return samples
 
 
-def get_samples_list(args):
+def get_samples_from_bam(args):
     samples = {}
 
     for i, bam in enumerate(args.sample_bam):
@@ -151,6 +151,26 @@ def get_samples_list(args):
     return samples
 
 
+def get_samples_from_name(args):
+    samples = {}
+
+    for i, name in enumerate(args.sample_name):
+
+        extraction_file = os.path.join(args.database, name + '.pk')
+
+        if not os.path.exists(extraction_file):
+            exit_error(
+                'Could not find: {}. Please rerun the extraction step.'.format(
+                    extraction_file))
+
+        sample = Sample(query_group=True)
+        sample.load_from_file(extraction_file)
+
+        samples[sample.name] = sample
+
+    return samples
+
+
 def get_samples(args):
 
     samples = {}
@@ -159,7 +179,9 @@ def get_samples(args):
         samples.update(get_samples_from_input(args))
 
     if args.sample_bam:
-        samples.update(get_samples_list(args))
+        samples.update(get_samples_from_bam(args))
+    elif args.sample_name:
+        samples.update(get_samples_from_name(args))
 
     return samples
 

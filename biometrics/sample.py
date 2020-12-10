@@ -10,7 +10,8 @@ class Sample:
     Class to hold information related to a single sample.
     """
 
-    def __init__(self, name=None, alignment_file=None, group=None, sex=None, sample_type=None, db=None, is_in_db=False):
+    def __init__(self, name=None, alignment_file=None, group=None, sex=None,
+                 sample_type=None, db=None, query_group=False):
         self.alignment_file = alignment_file
         self.name = name
         self.sex = sex
@@ -19,7 +20,7 @@ class Sample:
         self.pileup = None
         self.region_counts = None
         self.extraction_file = None
-        self.is_in_db = is_in_db
+        self.query_group = query_group
         self.metrics = {}
 
         if db is not None and self.name is not None:

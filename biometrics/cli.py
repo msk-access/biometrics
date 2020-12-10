@@ -39,7 +39,7 @@ def add_common_args(parser):
         '--bed', required=False,
         help='''BED file containing the intervals to be queried.''')
     parser.add_argument(
-        '-db', '--database',
+        '-db', '--database', required=True,
         help='''Directory to store the intermediate files after
         running the extraction step.''')
     parser.add_argument(
@@ -87,15 +87,22 @@ def check_arg_equal_len(vals1, vals2, name):
 
 def check_args(args):
 
-    if not args.input and not args.sample_bam:
-        exit_error('You must specify either --input or --sample-bam')
+    if args.subparser_name != 'extract' and \
+            not args.input and not args.sample_name:
+        exit_error('You must specify either --input or --sample-name')
 
-    if args.sample_bam:
-        check_arg_equal_len(args.sample_bam, args.sample_name, '--sample-name')
-        check_arg_equal_len(args.sample_bam, args.sample_type, '--sample-type')
+    if args.subparser_name == 'extract' and \
+            not args.input and not args.sample_bam:
+        exit_error(
+            'The extraction tool requires that you specify either ' +
+            '--input or --sample-bam')
+
+    if args.sample_name:
+        check_arg_equal_len(args.sample_name, args.sample_bam, '--sample-bam')
+        check_arg_equal_len(args.sample_name, args.sample_type, '--sample-type')
         check_arg_equal_len(
-            args.sample_bam, args.sample_group, '--sample-group')
-        check_arg_equal_len(args.sample_bam, args.sample_sex, '--sample-sex')
+            args.sample_name, args.sample_group, '--sample-group')
+        check_arg_equal_len(args.sample_name, args.sample_sex, '--sample-sex')
 
 
 def get_args():
