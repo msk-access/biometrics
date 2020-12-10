@@ -26,8 +26,8 @@ class MinorContamination():
                 'sample_group': sample.group,
                 'sample_sex': sample.sex,
                 'sample_type': sample.sample_type,
-                'minor_contamination': sample.metrics['minor_contamination'],
-                'total_homozygous_sites': sample.metrics['total_homozygous_sites']
+                'total_homozygous_sites': sample.metrics['total_homozygous_sites'],
+                'minor_contamination': sample.metrics['minor_contamination']
             }
 
             data = data.append(row, ignore_index=True)
