@@ -28,7 +28,12 @@ class Sample:
     def save_to_file(self):
 
         pileup_data = self.pileup.to_dict("records")
-        region_counts = self.region_counts.to_dict('records')
+
+        if self.region_counts is not None:
+            region_counts = self.region_counts.to_dict('records')
+        else:
+            region_counts = None
+
         sample_data = {
             'alignment_file': self.alignment_file,
             'name': self.name,
@@ -55,11 +60,15 @@ class Sample:
 
         sample_data = pickle.load(open(self.extraction_file, "rb"))
 
+        region_counts = None
+        if sample_data['region_counts'] is not None:
+            region_counts = pd.DataFrame(
+                sample_data['region_counts'], dtype=object)
+
         self.pileup = pd.DataFrame(sample_data['pileup_data'])
         self.alignment_file = sample_data['alignment_file']
         self.name = sample_data['name']
         self.sex = sample_data['sex']
         self.group = sample_data['group']
         self.sample_type = sample_data['sample_type']
-        self.region_counts = pd.DataFrame(
-            sample_data['region_counts'], dtype=object)
+        self.region_counts = region_counts
