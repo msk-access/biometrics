@@ -46,10 +46,7 @@ def add_common_args(parser):
         '-ov', '--overwrite', action='store_true',
         help='''Overwrite any existing extraction results.''')
     parser.add_argument(
-        '-nc', '--no-db-compare', action='store_true',
-        help='''Do not compare the sample(s) you provided to all samples in the database.''')
-    parser.add_argument(
-        '--fafile', required=True,
+        '-f', '--fafile', required=True,
         help='''Path to reference fasta file.''')
     parser.add_argument(
         '-q', '--min-mapping-quality', default=1, type=int,
@@ -74,6 +71,9 @@ def add_common_tool_args(parser):
     parser.add_argument(
         '-j', '--json', action='store_true',
         help='''Also output data in JSON format.''')
+    parser.add_argument(
+        '-nc', '--no-db-compare', action='store_true',
+        help='''Do not compare the sample(s) you provided to all samples in the database.''')
 
     return parser
 
