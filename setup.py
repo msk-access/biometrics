@@ -10,11 +10,18 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = ['Click>=7.0', ]
 
-setup_requirements = [ ]
+def req_file(filename):
+    """
+    We're using a requirements.txt file so that pyup.io can use this for security checks
+    :param filename:
+    :return str:
+    """
+    with open(filename) as f:
+        content = f.readlines()
+        content = filter(lambda x: not x.startswith("#"), content)
+    return [x.strip() for x in content]
 
-test_requirements = [ ]
 
 setup(
     author="Ronak Shah",
@@ -37,16 +44,17 @@ setup(
             'biometrics=biometrics.cli:main',
         ],
     },
-    install_requires=requirements,
+    install_requires=req_file("requirements.txt"),
     license="Apache Software License 2.0",
     long_description=readme + '\n\n' + history,
     include_package_data=True,
     keywords='biometrics',
     name='biometrics',
     packages=find_packages(include=['biometrics', 'biometrics.*']),
-    setup_requires=setup_requirements,
+    package_data={
+        "": ['requirements.txt', 'requirements_dev.txt'],
+    },
     test_suite='tests',
-    tests_require=test_requirements,
     url='https://github.com/rhshah/biometrics',
     version='0.1.0',
     zip_safe=False,
