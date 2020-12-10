@@ -1,4 +1,5 @@
 import os
+from multiprocessing import Pool
 
 import pandas as pd
 import numpy as np
@@ -18,6 +19,7 @@ class Extract:
 
     def __init__(self, args):
         self.db = args.database
+        self.num_threads_samples = args.num_threads_samples
         self.min_mapping_quality = args.min_mapping_quality
         self.min_base_quality = args.min_base_quality
         self.vcf = args.vcf
@@ -164,7 +166,18 @@ class Extract:
 
         return sample
 
+    def _extract(self, sample):
+        sample = self._extract_sites(sample)
+        sample = self._extract_regions(sample)
+        sample.save_to_file()
+
+        return sample
+
     def extract(self, samples):
+
+        # determine with samples need to be extracted
+
+        samples_to_extract = []
 
         for i, sample_name in enumerate(samples):
 
@@ -173,15 +186,21 @@ class Extract:
             # if extraction file exists then load it
 
             if os.path.exists(sample.extraction_file) and not self.overwrite:
-
                 samples[sample_name].load_from_file()
-
                 continue
 
-            sample = self._extract_sites(sample)
-            sample = self._extract_regions(sample)
-            sample.save_to_file()
+            samples_to_extract.append(sample)
 
-            samples[sample_name] = sample
+        # if any samples need to be extracted, then do so
+
+        if len(samples_to_extract) > 0:
+
+            thread_pool = Pool(self.num_threads_samples)
+
+            samples_processed = thread_pool.map(
+                self._extract, samples_to_extract)
+
+            for sample in samples_processed:
+                samples[sample.name] = sample
 
         return samples

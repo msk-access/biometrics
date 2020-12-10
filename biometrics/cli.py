@@ -124,6 +124,9 @@ def get_args():
         manually since it will run automatically if the necessary files
         are missing.''')
     parser_extract = add_common_args(parser_extract)
+    parser_extract.add_argument(
+        '-nts', '--num-threads-samples', default=1, type=int,
+        help='''Number of threads to use to extract the samples.''')
 
     # sex mismatch parser
 
