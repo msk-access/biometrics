@@ -24,21 +24,18 @@ def write_to_file(args, data, basename):
         data.to_json(outpath)
 
 
-def load_extra_database_samples(args, existing_samples):
+def load_database_samples(database, existing_samples):
 
     samples = {}
 
-    if args.no_db_compare:
-        return samples
-
-    for pickle_file in glob.glob(os.path.join(args.database, '*pk')):
+    for pickle_file in glob.glob(os.path.join(database, '*pk')):
 
         sample_name = os.path.basename(pickle_file).replace('.pk', '')
 
         if sample_name in existing_samples:
             continue
 
-        sample = Sample(db=args.database, query_group=True)
+        sample = Sample(db=database, query_group=True)
         sample.load_from_file(extraction_file=pickle_file)
 
         samples[sample.name] = sample
@@ -49,9 +46,6 @@ def load_extra_database_samples(args, existing_samples):
 def run_extract(args, samples):
     extractor = Extract(args=args)
     samples = extractor.extract(samples)
-    existing_samples = set([i for i in samples.keys()])
-
-    samples.update(load_extra_database_samples(args, existing_samples))
 
     return samples
 
@@ -171,17 +165,25 @@ def get_samples_from_name(args):
     return samples
 
 
-def get_samples(args):
+def get_samples(args, extraction_mode=False):
 
     samples = {}
 
     if args.input:
         samples.update(get_samples_from_input(args))
 
-    if args.sample_bam:
-        samples.update(get_samples_from_bam(args))
-    elif args.sample_name:
-        samples.update(get_samples_from_name(args))
+    if extraction_mode:
+        if args.sample_bam:
+            samples.update(get_samples_from_bam(args))
+    else:
+        if args.sample_name:
+            samples.update(get_samples_from_name(args))
+
+        existing_samples = set([i for i in samples.keys()])
+
+        if not args.no_db_compare:
+            samples.update(load_database_samples(
+                args.database, existing_samples))
 
     return samples
 
@@ -192,12 +194,14 @@ def create_outdir(outdir):
 
 def run_biometrics(args):
 
-    create_outdir(args.database)
+    extraction_mode = args.subparser_name == 'extract'
 
-    samples = get_samples(args)
-    samples = run_extract(args, samples)
+    samples = get_samples(args, extraction_mode=extraction_mode)
 
-    if args.subparser_name == 'sexmismatch':
+    if extraction_mode:
+        create_outdir(args.database)
+        run_extract(args, samples)
+    elif args.subparser_name == 'sexmismatch':
         create_outdir(args.outdir)
         run_sexmismatch(args, samples)
     elif args.subparser_name == 'minor':

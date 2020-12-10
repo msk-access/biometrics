@@ -7,7 +7,7 @@ from utils import exit_error
 from biometrics.biometrics import run_biometrics
 
 
-def add_common_args(parser):
+def add_extraction_args(parser):
 
     parser.add_argument(
         '-i', '--input', action="append", required=False,
@@ -57,11 +57,26 @@ def add_common_args(parser):
     parser.add_argument(
         '-mc', '--min-coverage', default=10, type=int,
         help='''Minimum coverage to count a site.''')
+    parser.add_argument(
+        '-nts', '--num-threads-samples', default=1, type=int,
+        help='''Number of threads to use to extract the samples.''')
 
     return parser
 
 
 def add_common_tool_args(parser):
+    parser.add_argument(
+        '-sn', '--sample-name', nargs="+", required=False,
+        help='''Space-delimited list of sample names to analyze.
+        Assumes the samples have already been extracted.''')
+    parser.add_argument(
+        '-i', '--input', action="append", required=False,
+        help='''Path to file containing sample information (one per line).
+        For example: sample_name,alignment_file,type,sex,group.''')
+    parser.add_argument(
+        '-db', '--database', required=True,
+        help='''Directory to store the intermediate files after
+        running the extraction step.''')
     parser.add_argument(
         '-o', '--outdir', default='.',
         help='''Output directory for results.''')
@@ -73,7 +88,8 @@ def add_common_tool_args(parser):
         help='''Also output data in JSON format.''')
     parser.add_argument(
         '-nc', '--no-db-compare', action='store_true',
-        help='''Do not compare the sample(s) you provided to all samples in the database.''')
+        help='''Do not compare the sample(s) you provided to all samples
+        in the database, only compare them with each other.''')
 
     return parser
 
@@ -123,23 +139,18 @@ def get_args():
         fingerprinting tools. However, you do not need to run this step
         manually since it will run automatically if the necessary files
         are missing.''')
-    parser_extract = add_common_args(parser_extract)
-    parser_extract.add_argument(
-        '-nts', '--num-threads-samples', default=1, type=int,
-        help='''Number of threads to use to extract the samples.''')
+    parser_extract = add_extraction_args(parser_extract)
 
     # sex mismatch parser
 
     parser_sexmismatch = subparsers.add_parser(
         'sexmismatch', help='Check for sex mismatches.')
-    parser_sexmismatch = add_common_args(parser_sexmismatch)
     parser_sexmismatch = add_common_tool_args(parser_sexmismatch)
 
     # minor contamination parser
 
     parser_minor = subparsers.add_parser(
         'minor', help='Check for minor contamination.')
-    parser_minor = add_common_args(parser_minor)
     parser_minor = add_common_tool_args(parser_minor)
     parser.add_argument(
         '--minor-threshold', default=0.002, type=float,
@@ -149,7 +160,6 @@ def get_args():
 
     parser_major = subparsers.add_parser(
         'major', help='Check for major contamination.')
-    parser_major = add_common_args(parser_major)
     parser_major = add_common_tool_args(parser_major)
     parser.add_argument(
         '--major-threshold', default=0.6, type=float,
@@ -159,7 +169,6 @@ def get_args():
 
     parser_genotype = subparsers.add_parser(
         'genotype', help='Genotype a set of samples.')
-    parser_genotype = add_common_args(parser_genotype)
     parser_genotype = add_common_tool_args(parser_genotype)
     parser.add_argument(
         '--discordance-threshold', default=0.05, type=float,
