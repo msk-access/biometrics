@@ -4,8 +4,7 @@ import sys
 import argparse
 
 from utils import exit_error
-# from biometrics.biometrics import run_biometrics
-from biometrics import run_biometrics
+from biometrics.biometrics import run_biometrics
 
 
 def add_common_args(parser):

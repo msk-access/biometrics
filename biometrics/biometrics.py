@@ -3,21 +3,13 @@ import glob
 
 import pandas as pd
 
-# from biometrics.sample import Sample
-# from biometrics.extract import Extract
-# from biometrics.genotype import Genotyper
-# from biometrics.minor_contamination import MinorContamination
-# from biometrics.major_contamination import MajorContamination
-# from biometrics.sex_mismatch import SexMismatch
-# from biometrics.utils import standardize_sex_nomenclature, exit_error
-
-from sample import Sample
-from extract import Extract
-from genotype import Genotyper
-from minor_contamination import MinorContamination
-from major_contamination import MajorContamination
-from sex_mismatch import SexMismatch
-from utils import standardize_sex_nomenclature, exit_error
+from biometrics.sample import Sample
+from biometrics.extract import Extract
+from biometrics.genotype import Genotyper
+from biometrics.minor_contamination import MinorContamination
+from biometrics.major_contamination import MajorContamination
+from biometrics.sex_mismatch import SexMismatch
+from biometrics.utils import standardize_sex_nomenclature, exit_error
 
 
 def write_to_file(args, data, basename):
