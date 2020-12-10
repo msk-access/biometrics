@@ -80,11 +80,9 @@ class Extract:
             else:
                 return alleles[1]
 
-    def _get_genotype_info(self, pileup_site):
+    def _get_genotype_info(self, pileup_site, ref_allele, alt_allele):
 
-        allele_counts = [
-            pileup_site[pileup_site['ref_allele'][0]][0],
-            pileup_site[pileup_site['alt_allele'][0]][0]]
+        allele_counts = [pileup_site[ref_allele][0], pileup_site[alt_allele][0]]
 
         pileup_site['minor_allele_freq'] = self._get_minor_allele_freq(
             allele_counts)
@@ -94,7 +92,7 @@ class Extract:
 
         pileup_site['genotype'] = self._get_genotype(
             pileup_site['genotype_class'][0], allele_counts,
-            [pileup_site['ref_allele'][0], pileup_site['alt_allele'][0]])
+            [ref_allele, alt_allele])
 
         return pileup_site
 
@@ -144,21 +142,21 @@ class Extract:
                 'variation', bam, chrom=site['chrom'], start=site['start'],
                 end=site['end'], truncate=True, fafile=self.fafile,
                 max_depth=30000, min_baseq=self.min_base_quality,
-                min_mapq=self.min_mapping_quality)
+                min_mapq=self.min_mapping_quality, pad=True)
 
             pileup_site = pd.DataFrame(pileup_site)
 
-            pileup_site['ref_allele'] = site['ref_allele']
-            pileup_site['alt_allele'] = site['alt_allele']
-
-            pileup_site = self._get_genotype_info(pileup_site)
+            pileup_site = self._get_genotype_info(
+                pileup_site, site['ref_allele'], site['alt_allele'])
+            pileup_site['alt'] = site['alt_allele']
 
             pileup = pd.concat([pileup, pileup_site])
 
         sample.pileup = pileup
         sample.pileup = sample.pileup[[
-            'chrom', 'pos', 'ref', 'reads_all', 'matches', 'mismatches', 'A',
-            'C', 'T', 'G', 'N', 'minor_allele_freq', 'genotype_class', 'genotype']]
+            'chrom', 'pos', 'ref', 'alt', 'reads_all', 'matches', 'mismatches',
+            'A', 'C', 'T', 'G', 'N', 'minor_allele_freq', 'genotype_class',
+            'genotype']]
 
         # because pysamstats works in 0-based coordinates. so ned to convert to
         # 1-based
