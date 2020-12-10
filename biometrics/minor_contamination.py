@@ -17,7 +17,7 @@ class MinorContamination():
 
         data = pd.DataFrame(
             columns=['sample', 'sample_group', 'sample_sex', 'sample_type',
-                     'minor_contamination', 'total_homozygous_sites'])
+                     'total_homozygous_sites', 'minor_contamination'])
 
         for sample_name, sample in samples.items():
 
