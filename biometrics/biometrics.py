@@ -122,7 +122,7 @@ def get_samples_from_input(args):
                 name=input.at[i, 'sample_name'],
                 sample_type=input.at[i, 'type'],
                 sex=standardize_sex_nomenclature(input.at[i, 'sex']),
-                db=args.db)
+                db=args.database)
 
             samples[sample.name] = sample
 
