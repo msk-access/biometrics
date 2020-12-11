@@ -36,7 +36,7 @@ class MinorContamination():
 
     def plot(self, data, outdir):
 
-        ymax = max(self.threshold * 1.05, max(data['minor_contamination']))
+        ymax = max(self.threshold, max(data['minor_contamination'])) * 1.05
 
         fig = go.Figure()
         fig.add_trace(
