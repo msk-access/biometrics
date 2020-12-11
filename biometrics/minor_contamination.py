@@ -39,30 +39,33 @@ class MinorContamination():
         ymax = max(self.threshold * 1.05, max(data['minor_contamination']))
 
         fig = go.Figure()
-        fig = go.Figure(go.Heatmap(
-            x=data['n1'],
-            y=data['n2'],
-            z=data['val'],
-            customdata=data.to_numpy(),
-            hovertemplate='<b>Sample group:</b> %{customdata[1]}' +
-                          '<br><b>Sample name:</b> %{customdata[0]}' +
-                          '<br><b>Sample sex:</b> %{customdata[2]}' +
-                          '<br><b>Sample type:</b> %{customdata[3]}' +
-                          '<br><b>Total homozygous sites:</b> %{customdata[5]}' +
-                          '<br><b>Minor contamination:</b> %{y:E}'))
+        fig.add_trace(
+            go.Bar(
+                x=data['sample'],
+                y=data['major_contamination'],
+                customdata=data.to_numpy(),
+                hovertemplate='<b>Sample group:</b> %{customdata[1]}' +
+                              '<br><b>Sample name:</b> %{customdata[0]}' +
+                              '<br><b>Sample sex:</b> %{customdata[2]}' +
+                              '<br><b>Sample type:</b> %{customdata[3]}' +
+                              '<br><b>Total homozygous sites:</b> %{customdata[4]}' +
+                              '<br><b>Minor contamination:</b> %{y:E}'))
+
         fig.update_layout(
             yaxis_title="Minor contamination",
             title_text="Minor contamination across samples",
             yaxis=dict(range=[0, ymax]))
+
         fig.add_shape(
             type='line',
             x0=-1,
             y0=self.threshold,
             x1=data.shape[0],
             y1=self.threshold,
-            line=dict(color='Red',),
+            line=dict(color='Red'),
             xref='x',
             yref='y')
+
         fig.write_html(os.path.join(outdir, 'minor_contamination.html'))
 
     def estimate(self, samples):
