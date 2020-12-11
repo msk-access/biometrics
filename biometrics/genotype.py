@@ -35,7 +35,13 @@ class Genotyper:
                 customdata=data.to_numpy(),
                 hovertemplate='<b>Reference sample:</b> %{customdata[0]}' +
                               '<br><b>Query sample:</b> %{customdata[1]}' +
-                              '<br><b>Discordance rate:</b> %{customdata[8]}' +
+                              '<br><b>Homozygous count in reference:</b> %{customdata[3]}' +
+                              '<br><b>Total match count:</b> %{customdata[4]}' +
+                              '<br><b>Homozygous match count:</b> %{customdata[5]}' +
+                              '<br><b>Heterozygous match count:</b> %{customdata[6]}' +
+                              '<br><b>Homozygous mismatch count:</b> %{customdata[7]}' +
+                              '<br><b>Heterozygous mismatch count:</b> %{customdata[8]}' +
+                              '<br><b>Discordance rate:</b> %{customdata[9]}' +
                               '<br><b>Status:</b> %{customdata[12]}',
                 zmin=0,
                 zmax=1,
@@ -47,6 +53,12 @@ class Genotyper:
             legend_title_text="Discordance",
             title_text="Discordance calculations between samples")
         fig.write_html(os.path.join(outdir, name))
+
+        data = data[[
+            'ReferenceSample', 'QuerySample', 'DatabaseComparison',
+            'HomozygousInRef', 'TotalMatch', 'HomozygousMatch',
+            'HeterozygousMatch', 'HomozygousMismatch', 'HeterozygousMismatch',
+            'DiscordanceRate', 'Matched', 'ExpectedMatch', 'Status']]
 
     def plot(self, data, outdir):
         data_sub = data[~data['DatabaseComparison']].copy()
@@ -92,9 +104,6 @@ class Genotyper:
             for i, sample_name1 in enumerate(samples_input):
                 for j, sample_name2 in enumerate(samples_input):
 
-                    if i == j:
-                        continue
-
                     row = {
                         'ReferenceSample': sample_name1,
                         'QuerySample': sample_name2,
@@ -108,9 +117,6 @@ class Genotyper:
         if not self.no_db_compare and len(samples_db) > 0:
             for i, sample_name1 in enumerate(samples_input):
                 for j, sample_name2 in enumerate(samples_db):
-
-                    if i == j:
-                        continue
 
                     row = {
                         'ReferenceSample': sample_name1,
