@@ -42,7 +42,7 @@ class MinorContamination():
         fig.add_trace(
             go.Bar(
                 x=data['sample'],
-                y=data['major_contamination'],
+                y=data['minor_contamination'],
                 customdata=data.to_numpy(),
                 hovertemplate='<b>Sample group:</b> %{customdata[1]}' +
                               '<br><b>Sample name:</b> %{customdata[0]}' +
