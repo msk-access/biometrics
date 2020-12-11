@@ -69,7 +69,7 @@ class MinorContamination():
 
         for sample_name, sample in samples.items():
 
-            sites = samples[sample_name].pileup
+            sites = sample.pileup
             sites_notna = sites[~pd.isna(sites['genotype_class'])]
 
             hom_sites = sites_notna[sites_notna['genotype_class'] == 'Hom']

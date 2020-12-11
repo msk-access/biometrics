@@ -179,6 +179,10 @@ def get_samples(args, extraction_mode=False):
         if args.sample_name:
             samples.update(get_samples_from_name(args))
 
+        for sample_name in samples.keys():
+            extration_file = os.path.join(args.database, sample_name + '.pk')
+            samples[sample_name].load_from_file(extration_file)
+
         existing_samples = set([i for i in samples.keys()])
 
         if not args.no_db_compare:
