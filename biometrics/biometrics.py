@@ -65,7 +65,10 @@ def run_minor_contamination(args, samples):
     write_to_file(args, data, 'minor_contamination')
 
     if args.plot:
-        minor_contamination.plot(data, args.outdir)
+        if len(samples) > 1000:
+            print('WARNING - Turning off plotting functionality. You are trying to plot more than 1000 samples, which is too cumbersome.')
+        else:
+            minor_contamination.plot(data, args.outdir)
 
     return samples
 
@@ -78,7 +81,10 @@ def run_major_contamination(args, samples):
     write_to_file(args, data, 'major_contamination')
 
     if args.plot:
-        major_contamination.plot(data, args.outdir)
+        if len(samples) > 1000:
+            print('WARNING - Turning off plotting functionality. You are trying to plot more than 1000 samples, which is too cumbersome.')
+        else:
+            major_contamination.plot(data, args.outdir)
 
     return samples
 
@@ -90,7 +96,10 @@ def run_genotyping(args, samples):
     write_to_file(args, data, 'genotype_comparison')
 
     if args.plot:
-        genotyper.plot(data, args.outdir)
+        if len(samples) > 1000:
+            print('WARNING - Turning off plotting functionality. You are trying to plot more than 1000 samples, which is too cumbersome.')
+        else:
+            genotyper.plot(data, args.outdir)
 
     return samples
 
@@ -201,6 +210,9 @@ def run_biometrics(args):
     extraction_mode = args.subparser_name == 'extract'
 
     samples = get_samples(args, extraction_mode=extraction_mode)
+
+    if not extraction_mode and args.plot:
+
 
     if extraction_mode:
         create_outdir(args.database)
