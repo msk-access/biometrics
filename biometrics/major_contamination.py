@@ -52,7 +52,8 @@ class MajorContamination():
                               '<br><b>Sample type:</b> %{customdata[3]}' +
                               '<br><b>Total sites:</b> %{customdata[5]}' +
                               '<br><b>Total heterozygous sites:</b> %{customdata[6]}' +
-                              '<br><b>Major contamination:</b> %{y:E}',
+                              '<br><b>Major contamination:</b> %{y:E}' +
+                              '<extra></extra>',
             ))
         fig.update_layout(
             yaxis_title="Major contamination",

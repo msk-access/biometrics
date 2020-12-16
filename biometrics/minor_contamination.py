@@ -49,7 +49,8 @@ class MinorContamination():
                               '<br><b>Sample sex:</b> %{customdata[2]}' +
                               '<br><b>Sample type:</b> %{customdata[3]}' +
                               '<br><b>Total homozygous sites:</b> %{customdata[4]}' +
-                              '<br><b>Minor contamination:</b> %{y:E}'))
+                              '<br><b>Minor contamination:</b> %{y:E}' +
+                              '<extra></extra>'))
 
         fig.update_layout(
             yaxis_title="Minor contamination",

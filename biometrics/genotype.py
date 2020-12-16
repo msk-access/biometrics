@@ -42,7 +42,8 @@ class Genotyper:
                               '<br><b>Homozygous mismatch count:</b> %{customdata[7]}' +
                               '<br><b>Heterozygous mismatch count:</b> %{customdata[8]}' +
                               '<br><b>Discordance rate:</b> %{customdata[9]}' +
-                              '<br><b>Status:</b> %{customdata[12]}',
+                              '<br><b>Status:</b> %{customdata[12]}' +
+                              '<extra></extra>',
                 zmin=0,
                 zmax=1,
                 colorscale='Blues_r'
