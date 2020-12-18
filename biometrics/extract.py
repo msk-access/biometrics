@@ -229,6 +229,10 @@ class Extract:
             'chrom', 'pos', 'ref', 'alt', 'reads_all', 'matches', 'mismatches',
             'A', 'C', 'T', 'G', 'minor_allele_freq', 'genotype_class',
             'genotype']]
+
+        for col in ['pos', 'A', 'C', 'T', 'G', 'matches', 'mismatches', 'reads_all']:
+            pileup[col] = pileup[col].astype(int)
+
         sample.pileup = pileup
 
         # because pysamstats works in 0-based coordinates. so ned to convert to
