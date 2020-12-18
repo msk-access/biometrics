@@ -233,8 +233,6 @@ class Extract:
             'genotype']]
         sample.pileup = pileup
 
-        import pdb; pdb.set_trace()
-
         # because pysamstats works in 0-based coordinates. so ned to convert to
         # 1-based
         sample.pileup['pos'] = sample.pileup['pos'] + 1
@@ -266,18 +264,16 @@ class Extract:
 
             samples_to_extract.append(sample)
 
-            sample = self._extract(sample)
-
         # if any samples need to be extracted, then do so
 
-        # if len(samples_to_extract) > 0:
-        #
-        #     thread_pool = Pool(self.num_threads_samples)
-        #
-        #     samples_processed = thread_pool.map(
-        #         self._extract, samples_to_extract)
-        #
-        #     for sample in samples_processed:
-        #         samples[sample.name] = sample
+        if len(samples_to_extract) > 0:
+
+            thread_pool = Pool(self.num_threads_samples)
+
+            samples_processed = thread_pool.map(
+                self._extract, samples_to_extract)
+
+            for sample in samples_processed:
+                samples[sample.name] = sample
 
         return samples
