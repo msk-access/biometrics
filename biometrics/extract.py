@@ -262,7 +262,6 @@ class Extract:
                 continue
 
             samples_to_extract.append(sample)
-            self._extract(sample)
 
         # if any samples need to be extracted, then do so
 
