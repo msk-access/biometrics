@@ -137,6 +137,7 @@ class Extract:
 
         read_quals = {}
         read_bases = {}
+        allele_counts = {'A': 0, 'C': 0, 'G': 0, 'T': 0}
 
         for pileupcolumn in bam.pileup(
                 contig=site['chrom'], start=site['start'], end=site['end'],
@@ -169,8 +170,6 @@ class Extract:
                     read_bases[read_name].append(base)
                 else:
                     read_bases[read_name] = [base]
-
-            allele_counts = {'A': 0, 'C': 0, 'G': 0, 'T': 0}
 
         total = 0
         matches = 0
