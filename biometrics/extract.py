@@ -135,12 +135,12 @@ class Extract:
         ignore_overlap = True
         min_baseq = chr(self.min_base_quality + 33)
 
+        read_quals = {}
+        read_bases = {}
+
         for pileupcolumn in bam.pileup(
                 contig=site['chrom'], start=site['start'], end=site['end'],
                 truncate=True, max_depth=30000, stepper='nofilter'):
-
-            read_quals = {}
-            read_bases = {}
 
             for pileupread in pileupcolumn.pileups:
 
@@ -213,7 +213,7 @@ class Extract:
 
             pileup_site = self._pileup_pysam(bam, site)
 
-            # pileup_site = pysamstats.load_pileup(
+            # pileup_site1 = pysamstats.load_pileup(
             #     'variation', bam, chrom=site['chrom'], start=site['start'],
             #     end=site['end'], truncate=True, fafile=self.fafile,
             #     max_depth=30000, min_baseq=self.min_base_quality,
@@ -263,6 +263,7 @@ class Extract:
                 continue
 
             samples_to_extract.append(sample)
+            self._extract(sample)
 
         # if any samples need to be extracted, then do so
 
