@@ -145,12 +145,11 @@ class Extract:
 
             for pileupread in pileupcolumn.pileups:
 
-                mapq = pileupread.alignment.mapping_quality
-                read_name = pileupread.alignment.qname
-
                 if pileupread.query_position is None:
                     continue
 
+                mapq = pileupread.alignment.mapping_quality
+                read_name = pileupread.alignment.qname
                 base_qual = pileupread.alignment.qual[pileupread.query_position]
                 base = pileupread.alignment.query_sequence[pileupread.query_position]
 
@@ -234,7 +233,7 @@ class Extract:
 
         # because pysamstats works in 0-based coordinates. so ned to convert to
         # 1-based
-        sample.pileup['pos'] = sample.pileup['pos'] + 1
+        # sample.pileup['pos'] = sample.pileup['pos'] + 1
 
         return sample
 
