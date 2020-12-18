@@ -211,8 +211,7 @@ def run_biometrics(args):
 
     samples = get_samples(args, extraction_mode=extraction_mode)
 
-    if not extraction_mode and args.plot:
-
+    # if not extraction_mode and args.plot:
 
     if extraction_mode:
         create_outdir(args.database)
