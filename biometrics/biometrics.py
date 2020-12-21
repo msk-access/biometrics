@@ -104,14 +104,45 @@ def run_genotyping(args, samples):
     return samples
 
 
-def get_samples_from_input(args):
+def load_sample_from_db(sample_name, database):
+
+    extraction_file = os.path.join(database, sample_name + '.pk')
+
+    if not os.path.exists(extraction_file):
+        exit_error(
+            'Could not find: {}. Please rerun the extraction step.'.format(
+                extraction_file))
+
+    sample = Sample(query_group=True)
+    sample.load_from_file(extraction_file)
+
+    return sample
+
+
+def get_samples_from_input(input, database, extraction_mode):
     samples = {}
 
-    for fpath in args.input:
+    for fpath in input:
 
         input = pd.read_csv(fpath, sep=',')
 
+        if 'sample_name' not in input.columns:
+            exit_error('Input does not have \'sample_name\' column.')
+
         for i in input.index:
+
+            if not extraction_mode:
+                # if not running extract tool, then just need to get
+                # the sample name
+
+                sample_name = input.at[i, 'sample_name']
+
+                sample = load_sample_from_db(sample_name, database)
+                samples[sample.name] = sample
+
+                continue
+
+            # if running extract mode
 
             alignment_file = input.at[i, 'alignment_file']
 
@@ -125,7 +156,7 @@ def get_samples_from_input(args):
                 name=input.at[i, 'sample_name'],
                 sample_type=input.at[i, 'type'],
                 sex=standardize_sex_nomenclature(input.at[i, 'sex']),
-                db=args.database)
+                db=database)
 
             samples[sample.name] = sample
 
@@ -154,21 +185,11 @@ def get_samples_from_bam(args):
     return samples
 
 
-def get_samples_from_name(args):
+def get_samples_from_name(samples, database):
     samples = {}
 
-    for i, name in enumerate(args.sample_name):
-
-        extraction_file = os.path.join(args.database, name + '.pk')
-
-        if not os.path.exists(extraction_file):
-            exit_error(
-                'Could not find: {}. Please rerun the extraction step.'.format(
-                    extraction_file))
-
-        sample = Sample(query_group=True)
-        sample.load_from_file(extraction_file)
-
+    for i, sample_name in enumerate(samples):
+        sample = load_sample_from_db(sample_name, database)
         samples[sample.name] = sample
 
     return samples
@@ -179,14 +200,16 @@ def get_samples(args, extraction_mode=False):
     samples = {}
 
     if args.input:
-        samples.update(get_samples_from_input(args))
+        samples.update(get_samples_from_input(
+            args.input, args.database, extraction_mode))
 
     if extraction_mode:
         if args.sample_bam:
             samples.update(get_samples_from_bam(args))
     else:
         if args.sample_name:
-            samples.update(get_samples_from_name(args))
+            samples.update(get_samples_from_name(
+                args.sample_name, args.database))
 
         for sample_name in samples.keys():
             extration_file = os.path.join(args.database, sample_name + '.pk')
