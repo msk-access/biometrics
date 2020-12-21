@@ -3,7 +3,7 @@ description: Step for preparing the BAM file(s)
 ---
 
 ## Extract
-Running this step is a **prerequisite** before running any of the other tools. This preprocesses your BAM file(s) and stores the result into a python pickle file (which contains JSON data). This allows for much faster analyses that make repeated use of your samples. The output of this extraction step is stored in a folder that you specify with `-db` argument.
+Running this step is a **prerequisite** before running any of the other tools. This step extracts the pileup and coverage information from your BAM file(s) and stores the result in a Python pickle file (which contains JSON data). You can determine where to store the output files by specifying `-db` argument. This allows for much faster analyses that make repeated use of your samples.
 
 There are two main types of required input:
 
