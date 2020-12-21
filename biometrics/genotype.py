@@ -132,7 +132,7 @@ class Genotyper:
         # compute discordance rate
 
         data['DiscordanceRate'] = data['HomozygousMismatch'] / (data['HomozygousInRef'] + EPSILON)
-        data['DiscordanceRate'] = data['DiscordanceRate'].map(lambda x: round(x, 4))
+        data['DiscordanceRate'] = data['DiscordanceRate'].map(lambda x: round(x, 6))
         data.loc[data['HomozygousInRef'] < 10, 'DiscordanceRate'] = np.nan
 
         # for each comparison, indicate if the match/mismatch is expected

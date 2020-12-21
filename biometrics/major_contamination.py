@@ -89,6 +89,6 @@ class MajorContamination():
                 sample.metrics['major_contamination'] = np.nan
             else:
                 sample.metrics['major_contamination'] = \
-                    round(het_sites.shape[0] / sites_notna.shape[0], 4)
+                    round(het_sites.shape[0] / sites_notna.shape[0], 6)
 
         return samples
