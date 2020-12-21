@@ -57,10 +57,13 @@ class Extract:
         self.regions.columns = range(self.regions.shape[1])
 
     def _get_minor_allele_freq(self, allele_counts):
-        if sum(allele_counts) <= self.min_coverage:
+
+        coverage = allele_counts
+
+        if coverage <= self.min_coverage or coverage == 0:
             return np.nan
         else:
-            return min(allele_counts) / sum(allele_counts)
+            return min(allele_counts) / coverage
 
     def _get_genotype_class(self, minor_allele_freq):
         if pd.isna(minor_allele_freq):
