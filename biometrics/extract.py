@@ -58,7 +58,7 @@ class Extract:
 
     def _get_minor_allele_freq(self, allele_counts):
 
-        coverage = allele_counts
+        coverage = sum(allele_counts)
 
         if coverage <= self.min_coverage or coverage == 0:
             return np.nan
