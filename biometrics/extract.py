@@ -1,11 +1,9 @@
 import os
-import time
 from multiprocessing import Pool
 
 import pandas as pd
 import numpy as np
 import vcf
-import pysamstats
 from pysam import AlignmentFile
 
 
