@@ -136,7 +136,6 @@ class Extract:
     def _pileup_pysam(self, bam, site):
 
         ignore_overlap = True
-        min_baseq = chr(self.min_base_quality + 33)
 
         read_quals = {}
         read_bases = {}
@@ -144,7 +143,8 @@ class Extract:
 
         for pileupcolumn in bam.pileup(
                 contig=site['chrom'], start=site['start'], end=site['end'],
-                truncate=True, max_depth=30000, stepper='nofilter'):
+                truncate=True, max_depth=30000, stepper='nofilter',
+                min_base_quality=self.min_base_quality):
 
             for pileupread in pileupcolumn.pileups:
 
@@ -157,7 +157,6 @@ class Extract:
                 base = pileupread.alignment.query_sequence[pileupread.query_position]
 
                 if (mapq < self.min_mapping_quality) or \
-                        (base_qual < min_baseq) or \
                         (pileupread.is_del or pileupread.is_refskip):
                     continue
 
@@ -214,18 +213,9 @@ class Extract:
 
             pileup_site = self._pileup_pysam(bam, site)
 
-            # pileup_site1 = pysamstats.load_pileup(
-            #     'variation', bam, chrom=site['chrom'], start=site['start'],
-            #     end=site['end'], truncate=True, fafile=self.fafile,
-            #     max_depth=30000, min_baseq=self.min_base_quality,
-            #     min_mapq=self.min_mapping_quality, pad=True)
-
-            # pileup_site = pd.DataFrame(pileup_site)
-
             pileup_site = self._get_genotype_info(
                 pileup_site, site['ref_allele'], site['alt_allele'])
 
-            # pileup = pd.concat([pileup, pileup_site])
             pileup = pileup.append(pileup_site, ignore_index=True)
 
         pileup = pileup[[
@@ -237,10 +227,6 @@ class Extract:
             pileup[col] = pileup[col].astype(int)
 
         sample.pileup = pileup
-
-        # because pysamstats works in 0-based coordinates. so ned to convert to
-        # 1-based
-        # sample.pileup['pos'] = sample.pileup['pos'] + 1
 
         return sample
 
