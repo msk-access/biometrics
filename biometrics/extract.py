@@ -137,7 +137,7 @@ class Extract:
 
         read_quals = {}
         read_bases = {}
-        allele_counts = {'A': 0, 'C': 0, 'G': 0, 'T': 0}
+        allele_counts = {'A': 0, 'C': 0, 'G': 0, 'T': 0, 'N': 0}
 
         for pileupcolumn in bam.pileup(
                 contig=site['chrom'], start=site['start'], end=site['end'],
@@ -199,7 +199,8 @@ class Extract:
             'A': allele_counts['A'],
             'C': allele_counts['C'],
             'T': allele_counts['T'],
-            'G': allele_counts['G']
+            'G': allele_counts['G'],
+            'N': allele_counts['N']
         }
 
     def _extract_sites(self, sample):
@@ -223,10 +224,10 @@ class Extract:
 
         pileup = pileup[[
             'chrom', 'pos', 'ref', 'alt', 'reads_all', 'matches', 'mismatches',
-            'A', 'C', 'T', 'G', 'minor_allele_freq', 'genotype_class',
+            'A', 'C', 'T', 'G', 'N', 'minor_allele_freq', 'genotype_class',
             'genotype']]
 
-        for col in ['pos', 'A', 'C', 'T', 'G', 'matches', 'mismatches', 'reads_all']:
+        for col in ['pos', 'A', 'C', 'T', 'G', 'N', 'matches', 'mismatches', 'reads_all']:
             pileup[col] = pileup[col].astype(int)
 
         sample.pileup = pileup
