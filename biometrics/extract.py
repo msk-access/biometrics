@@ -158,6 +158,8 @@ class Extract:
 
                 if (mapq < self.min_mapping_quality) or \
                         (pileupread.is_del or pileupread.is_refskip):
+                    # skip the read if its mapping quality is too low
+                    # or if the site is part of an indel
                     continue
 
                 if ignore_overlap and \
@@ -166,7 +168,6 @@ class Extract:
                     # if the read's mate pair has already been counted,
                     # then skip the current read if its base quality is less
                     # than the base quality of its mate pair
-
                     continue
 
                 read_quals[read_name] = base_qual
