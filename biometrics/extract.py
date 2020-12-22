@@ -162,7 +162,11 @@ class Extract:
 
                 if ignore_overlap and \
                         read_name in read_quals and \
-                        read_quals[read_name] < base_qual:
+                        read_quals[read_name] > base_qual:
+                    # if the read's mate pair has already been counted,
+                    # then skip the current read if its base quality is less
+                    # than the base quality of its mate pair
+
                     continue
 
                 read_quals[read_name] = base_qual
