@@ -86,6 +86,6 @@ class MinorContamination():
                 sample.metrics['minor_contamination'] = np.nan
             else:
                 sample.metrics['minor_contamination'] = \
-                    round(hom_sites['minor_allele_freq'].mean(), 6)
+                    hom_sites['minor_allele_freq'].mean()
 
         return samples
