@@ -86,7 +86,6 @@ class Extract:
 
     def _get_genotype_info(self, pileup_site, ref_allele, alt_allele):
 
-        # allele_counts = [pileup_site[ref_allele][0], pileup_site[alt_allele][0]]
         allele_counts = [pileup_site[ref_allele], pileup_site[alt_allele]]
 
         pileup_site['minor_allele_freq'] = self._get_minor_allele_freq(
@@ -158,6 +157,9 @@ class Extract:
                         (pileupread.is_del or pileupread.is_refskip):
                     # skip the read if its mapping quality is too low
                     # or if the site is part of an indel
+                    continue
+
+                if ignore_overlap and read_name in read_bases and read_bases[read_name][0] == 'N':
                     continue
 
                 if ignore_overlap and \
