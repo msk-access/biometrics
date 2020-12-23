@@ -130,6 +130,94 @@ class Extract:
 
         return sample
 
+    def _add_base(self, site, old_base, old_base_qual, new_base, new_base_qual):
+
+        if old_base is None:
+            return [new_base, new_base_qual]
+
+        if old_base == new_base:
+            return [old_base, old_base_qual]
+
+        if old_base != 'N' and new_base != 'N':
+            if new_base == site['ref_allele']:
+                return [new_base, new_base_qual]
+            else:
+                return [old_base, old_base_qual]
+
+        if old_base == site['ref_allele']:
+            return [old_base, old_base_qual]
+        elif new_base == site['ref_allele']:
+            return [new_base, new_base_qual]
+        elif old_base == site['alt_allele'] and old_base_qual >= '!':
+            return [old_base, old_base_qual]
+        elif new_base == site['alt_allele'] and new_base_qual >= '!':
+            return [new_base, new_base_qual]
+        else:
+            return ['N', '&']
+
+    def _pileup_pysam_test(self, bam, site):
+
+        read_data = {}
+        allele_counts = {'A': 0, 'C': 0, 'G': 0, 'T': 0, 'N': 0}
+
+        for pileupcolumn in bam.pileup(
+                contig=site['chrom'], start=site['start'], end=site['end'],
+                truncate=True, max_depth=30000, stepper='nofilter',
+                min_base_quality=self.min_base_quality):
+
+            for pileupread in pileupcolumn.pileups:
+
+                if pileupread.query_position is None:
+                    continue
+
+                mapq = pileupread.alignment.mapping_quality
+                read_name = pileupread.alignment.qname
+                base_qual = pileupread.alignment.qual[pileupread.query_position]
+                base = pileupread.alignment.query_sequence[pileupread.query_position]
+
+                if (mapq < self.min_mapping_quality) or pileupread.is_refskip or pileupread.is_del:
+                    # skip the read if its mapping quality is too low
+                    # or if the site is part of an indel
+                    continue
+
+                if read_name in read_data and read_data[read_name][0] == 'N':
+                    continue
+                elif read_name in read_data:
+                    vals = self._add_base(
+                        site, read_data[read_name][0],
+                        read_data[read_name][1], base, base_qual)
+                    read_data[read_name] = vals[0:2]
+                else:
+                    read_data[read_name] = [base, base_qual]
+
+        total = 0
+        matches = 0
+        mismatches = 0
+        for read, base_data in read_data.items():
+
+            allele_counts[base_data[0]] += 1
+            total += 1
+
+            if base_data[0] == site['ref_allele']:
+                matches += 1
+            else:
+                mismatches += 1
+
+        return {
+            'chrom': site['chrom'],
+            'pos': site['end'],
+            'ref': site['ref_allele'],
+            'alt': site['alt_allele'],
+            'reads_all': total,
+            'matches': matches,
+            'mismatches': mismatches,
+            'A': allele_counts['A'],
+            'C': allele_counts['C'],
+            'T': allele_counts['T'],
+            'G': allele_counts['G'],
+            'N': allele_counts['N']
+        }
+
     def _pileup_pysam(self, bam, site):
 
         ignore_overlap = True
@@ -217,7 +305,8 @@ class Extract:
 
         for site in self.sites:
 
-            pileup_site = self._pileup_pysam(bam, site)
+            # pileup_site = self._pileup_pysam(bam, site)
+            pileup_site = self._pileup_pysam_test(bam, site)
 
             pileup_site = self._get_genotype_info(
                 pileup_site, site['ref_allele'], site['alt_allele'])
