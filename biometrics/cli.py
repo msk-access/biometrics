@@ -58,7 +58,7 @@ def add_extraction_args(parser):
         '-mc', '--min-coverage', default=10, type=int,
         help='''Minimum coverage to count a site.''')
     parser.add_argument(
-        '-nts', '--num-threads-samples', default=1, type=int,
+        '-t', '--threads', default=1, type=int,
         help='''Number of threads to use to extract the samples.''')
 
     return parser
@@ -170,9 +170,12 @@ def get_args():
     parser_genotype = subparsers.add_parser(
         'genotype', help='Genotype a set of samples.')
     parser_genotype = add_common_tool_args(parser_genotype)
-    parser.add_argument(
+    parser_genotype.add_argument(
         '--discordance-threshold', default=0.05, type=float,
         help='''Discordance values less than this are regarded as matching samples.''')
+    parser_genotype.add_argument(
+        '-t', '--threads', default=1, type=int,
+        help='''Number of threads to use to extract the samples.''')
 
     args = parser.parse_args()
 

@@ -18,7 +18,7 @@ class Extract:
 
     def __init__(self, args):
         self.db = args.database
-        self.num_threads_samples = args.num_threads_samples
+        self.threads = args.threads
         self.min_mapping_quality = args.min_mapping_quality
         self.min_base_quality = args.min_base_quality
         self.vcf = args.vcf
@@ -249,7 +249,12 @@ class Extract:
 
         return sample
 
-    def _extract(self, sample):
+    def _extraction_job(self, sample):
+        """
+        function to do the extraction steps for a single sample.
+        supposed to be called by multiprocessing functions to parallelize it
+        """
+
         sample = self._extract_sites(sample)
         sample = self._extract_regions(sample)
         sample.save_to_file()
@@ -278,10 +283,10 @@ class Extract:
 
         if len(samples_to_extract) > 0:
 
-            thread_pool = Pool(self.num_threads_samples)
+            thread_pool = Pool(self.threads)
 
             samples_processed = thread_pool.map(
-                self._extract, samples_to_extract)
+                self._extraction_job, samples_to_extract)
 
             for sample in samples_processed:
                 samples[sample.name] = sample
