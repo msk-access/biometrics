@@ -140,6 +140,7 @@ class Genotyper:
             data += results
 
         data = pd.DataFrame(data)
+        import pdb; pdb.set_trace()
 
         # compute discordance rate
 

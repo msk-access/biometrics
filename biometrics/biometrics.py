@@ -24,25 +24,6 @@ def write_to_file(args, data, basename):
         data.to_json(outpath)
 
 
-def load_database_samples(database, existing_samples):
-
-    samples = {}
-
-    for pickle_file in glob.glob(os.path.join(database, '*pk')):
-
-        sample_name = os.path.basename(pickle_file).replace('.pk', '')
-
-        if sample_name in existing_samples:
-            continue
-
-        sample = Sample(db=database, query_group=True)
-        sample.load_from_file(extraction_file=pickle_file)
-
-        samples[sample.name] = sample
-
-    return samples
-
-
 def run_extract(args, samples):
     extractor = Extract(args=args)
     samples = extractor.extract(samples)
@@ -107,7 +88,7 @@ def run_genotyping(args, samples):
     return samples
 
 
-def load_sample_from_db(sample_name, database):
+def load_input_sample_from_db(sample_name, database):
 
     extraction_file = os.path.join(database, sample_name + '.pk')
 
@@ -116,10 +97,29 @@ def load_sample_from_db(sample_name, database):
             'Could not find: {}. Please rerun the extraction step.'.format(
                 extraction_file))
 
-    sample = Sample(query_group=True)
+    sample = Sample(query_group=False)
     sample.load_from_file(extraction_file)
 
     return sample
+
+
+def load_database_samples(database, existing_samples):
+
+    samples = {}
+
+    for pickle_file in glob.glob(os.path.join(database, '*pk')):
+
+        sample_name = os.path.basename(pickle_file).replace('.pk', '')
+
+        if sample_name in existing_samples:
+            continue
+
+        sample = Sample(db=database, query_group=True)
+        sample.load_from_file(extraction_file=pickle_file)
+
+        samples[sample.name] = sample
+
+    return samples
 
 
 def get_samples_from_input(input, database, extraction_mode):
@@ -140,7 +140,7 @@ def get_samples_from_input(input, database, extraction_mode):
 
                 sample_name = input.at[i, 'sample_name']
 
-                sample = load_sample_from_db(sample_name, database)
+                sample = load_input_sample_from_db(sample_name, database)
                 samples[sample.name] = sample
 
                 continue
@@ -192,7 +192,7 @@ def get_samples_from_name(samples, database):
     samples = {}
 
     for i, sample_name in enumerate(samples):
-        sample = load_sample_from_db(sample_name, database)
+        sample = load_input_sample_from_db(sample_name, database)
         samples[sample.name] = sample
 
     return samples
