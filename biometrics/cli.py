@@ -58,6 +58,9 @@ def add_extraction_args(parser):
         '-mc', '--min-coverage', default=10, type=int,
         help='''Minimum coverage to count a site.''')
     parser.add_argument(
+        '--default-genotype', default=None,
+        help='''Default genotype if coverage is too low (options are Het or Hom).''')
+    parser.add_argument(
         '-t', '--threads', default=1, type=int,
         help='''Number of threads to use to extract the samples.''')
 

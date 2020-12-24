@@ -21,6 +21,7 @@ class Extract:
         self.threads = args.threads
         self.min_mapping_quality = args.min_mapping_quality
         self.min_base_quality = args.min_base_quality
+        self.default_genotype = args.default_genotype
         self.vcf = args.vcf
         self.bed = args.bed
         self.fafile = args.fafile
@@ -58,13 +59,17 @@ class Extract:
 
         coverage = sum(allele_counts)
 
-        if coverage <= self.min_coverage or coverage == 0:
+        if coverage < self.min_coverage or coverage == 0:
             return np.nan
         else:
             return min(allele_counts) / coverage
 
     def _get_genotype_class(self, minor_allele_freq):
         if pd.isna(minor_allele_freq):
+
+            if self.default_genotype is not None:
+                return self.default_genotype
+
             return np.nan
         else:
             if minor_allele_freq <= HETEROZYGOUS_THRESHOLD:
