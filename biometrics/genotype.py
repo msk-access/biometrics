@@ -88,7 +88,7 @@ class Genotyper:
         row['TotalMatch'] = sum(reference_sample.pileup['genotype_class'] == query_sample.pileup['genotype_class'])
         row['HomozygousMatch'] = sum((reference_sample.pileup['genotype_class'] == query_sample.pileup['genotype_class']) & (reference_sample.pileup['genotype_class'] == 'Hom'))
         row['HeterozygousMatch'] = sum((reference_sample.pileup['genotype_class'] == query_sample.pileup['genotype_class']) & (reference_sample.pileup['genotype_class'] == 'Het'))
-        row['HomozygousMismatch'] = sum((reference_sample.pileup['genotype'] != query_sample.pileup['genotype']) & (reference_sample.pileup['genotype_class'] == 'Hom'))
+        row['HomozygousMismatch'] = sum((reference_sample.pileup['genotype'] != query_sample.pileup['genotype']) & ((reference_sample.pileup['genotype_class'] == 'Hom') & (query_sample.pileup['genotype_class'] == 'Hom')))
         row['HeterozygousMismatch'] = sum((reference_sample.pileup['genotype_class'] != query_sample.pileup['genotype_class']) & ((reference_sample.pileup['genotype_class'] == 'Het') | (query_sample.pileup['genotype_class'] == 'Het')))
 
         return row
