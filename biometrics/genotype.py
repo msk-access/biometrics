@@ -76,12 +76,13 @@ class Genotyper:
             self._plot_heatmap(
                 data_sub, outdir, 'genotype_comparison_database.html')
 
-    def _compute_discordance(self, reference_sample, query_sample):
+    def _compute_discordance(self, samples):
+
+        reference_sample, query_sample = samples
 
         row = {
             'ReferenceSample': reference_sample.name,
-            'QuerySample': query_sample.name,
-            'DatabaseComparison': False}
+            'QuerySample': query_sample.name}
 
         row['HomozygousInRef'] = sum(reference_sample.pileup['genotype_class'] == 'Hom')
         row['TotalMatch'] = sum(reference_sample.pileup['genotype_class'] == query_sample.pileup['genotype_class'])

@@ -90,7 +90,10 @@ def run_major_contamination(args, samples):
 
 
 def run_genotyping(args, samples):
-    genotyper = Genotyper(args.no_db_compare, args.discordance_threshold)
+    genotyper = Genotyper(
+        no_db_compare=args.no_db_compare,
+        discordance_threshold=args.discordance_threshold,
+        threads=args.threads)
     data = genotyper.genotype(samples)
 
     write_to_file(args, data, 'genotype_comparison')
