@@ -46,8 +46,8 @@ class Genotyper:
                               '<br><b>Discordance rate:</b> %{customdata[9]}' +
                               '<br><b>Status:</b> %{customdata[12]}' +
                               '<extra></extra>',
-                zmin=0,
-                zmax=1,
+                # zmin=0,
+                # zmax=1,
                 colorscale='Blues_r'
             ))
         fig.update_layout(
