@@ -303,7 +303,7 @@ class Extract:
         if type(samples) != list:
             samples = [samples]
 
-        # determine with samples need to be extracted
+        # determine with samples need to be extracted, and put them in a list
 
         samples_to_extract = []
 
@@ -320,6 +320,7 @@ class Extract:
             samples_to_extract.append(sample)
 
         # if any samples need to be extracted, then do so
+        # (using multiprocessing)
 
         if len(samples_to_extract) > 0:
 
