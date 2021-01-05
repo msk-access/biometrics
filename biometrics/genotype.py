@@ -12,10 +12,12 @@ EPSILON = 1e-9
 
 class Genotyper:
 
-    def __init__(self, no_db_compare, discordance_threshold=0.05, threads=1):
+    def __init__(self, no_db_compare, discordance_threshold=0.05, threads=1, zmin=None, zmax=None):
         self.no_db_compare = no_db_compare
         self.discordance_threshold = discordance_threshold
         self.threads = threads
+        self.zmax = zmax
+        self.zmin = zmin
 
     def are_samples_same_group(self, sample1, sample2):
 
@@ -46,8 +48,8 @@ class Genotyper:
                               '<br><b>Discordance rate:</b> %{customdata[9]}' +
                               '<br><b>Status:</b> %{customdata[12]}' +
                               '<extra></extra>',
-                # zmin=0,
-                # zmax=1,
+                zmin=self.zmin,
+                zmax=self.zmax,
                 colorscale='Blues_r'
             ))
         fig.update_layout(

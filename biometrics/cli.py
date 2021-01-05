@@ -179,6 +179,12 @@ def get_args():
     parser_genotype.add_argument(
         '-t', '--threads', default=1, type=int,
         help='''Number of threads to use to extract the samples.''')
+    parser_genotype.add_argument(
+        '--zmin', type=float,
+        help='''Minimum z value for the colorscale on the heatmap.''')
+    parser_genotype.add_argument(
+        '--zmax', type=float,
+        help='''Maximum z value for the colorscale on the heatmap.''')
 
     args = parser.parse_args()
 
