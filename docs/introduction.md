@@ -27,5 +27,6 @@ Major contamination check is done to see if a patient’s sample is contaminated
 Click [here](major-contamination.md) to read more about this tool.
 
 #### Sex mismatch
+Used to determine if the predicted sex mismatches the expected sex for a given sample.
 
 Click [here](sex-mismatch.md) to read more about this tool.
