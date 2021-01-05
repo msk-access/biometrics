@@ -98,7 +98,9 @@ def run_genotyping(args, samples):
     genotyper = Genotyper(
         no_db_compare=args.no_db_compare,
         discordance_threshold=args.discordance_threshold,
-        threads=args.threads)
+        threads=args.threads,
+        zmin=args.zmin,
+        zmax=args.zmax)
     data = genotyper.genotype(samples)
 
     write_to_file(args, data, 'genotype_comparison')
