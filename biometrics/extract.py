@@ -55,57 +55,11 @@ class Extract:
         self.regions = pd.read_csv(self.bed, sep='\t')
         self.regions.columns = range(self.regions.shape[1])
 
-    def _get_minor_allele_freq(self, allele_counts):
-
-        coverage = sum(allele_counts)
-
-        if coverage < self.min_coverage or coverage == 0:
-            return np.nan
-        else:
-            return min(allele_counts) / coverage
-
-    def _get_genotype_class(self, minor_allele_freq):
-        if pd.isna(minor_allele_freq):
-
-            if self.default_genotype is not None:
-                return self.default_genotype
-
-            return np.nan
-        else:
-            if minor_allele_freq <= HETEROZYGOUS_THRESHOLD:
-                return 'Hom'
-            else:
-                return 'Het'
-
-    def _get_genotype(self, genotype, allele_counts, alleles):
-
-        if pd.isna(genotype):
-            return np.nan
-        elif genotype == 'Het':
-            return ''.join(alleles)
-        else:
-            if allele_counts[0] > allele_counts[1]:
-                return alleles[0]
-            else:
-                return alleles[1]
-
-    def _get_genotype_info(self, pileup_site, ref_allele, alt_allele):
-
-        allele_counts = [pileup_site[ref_allele], pileup_site[alt_allele]]
-
-        pileup_site['minor_allele_freq'] = self._get_minor_allele_freq(
-            allele_counts)
-
-        pileup_site['genotype_class'] = self._get_genotype_class(
-            pileup_site['minor_allele_freq'])
-
-        pileup_site['genotype'] = self._get_genotype(
-            pileup_site['genotype_class'], allele_counts,
-            [ref_allele, alt_allele])
-
-        return pileup_site
-
     def _extract_regions(self, sample):
+        """
+        Code to extract the coverage information for the regions listed
+        in the BED file.
+        """
 
         if self.regions is None:
             return sample
@@ -135,7 +89,75 @@ class Extract:
 
         return sample
 
-    def _add_base(self, site, old_base, old_base_qual, new_base, new_base_qual):
+    def _get_minor_allele_freq(self, allele_counts):
+
+        coverage = sum(allele_counts)
+
+        if coverage < self.min_coverage or coverage == 0:
+            return np.nan
+        else:
+            return min(allele_counts) / coverage
+
+    def _get_genotype_class(self, minor_allele_freq):
+        """
+        Determine if Het, Hom, or unknown/NA.
+        """
+
+        if pd.isna(minor_allele_freq):
+
+            if self.default_genotype is not None:
+                return self.default_genotype
+
+            return np.nan
+        else:
+            if minor_allele_freq <= HETEROZYGOUS_THRESHOLD:
+                return 'Hom'
+            else:
+                return 'Het'
+
+    def _get_genotype(self, genotype, allele_counts, alleles):
+        """
+        Get the genotype in terms of the allele(s) (e.g. A, T, AT, GC, etc.)
+        """
+
+        if pd.isna(genotype):
+            return np.nan
+        elif genotype == 'Het':
+            return ''.join(alleles)
+        else:
+            if allele_counts[0] > allele_counts[1]:
+                return alleles[0]
+            else:
+                return alleles[1]
+
+    def _get_genotype_info(self, pileup_site, ref_allele, alt_allele):
+        """
+        Plot minor contamination data.
+        """
+
+        allele_counts = [pileup_site[ref_allele], pileup_site[alt_allele]]
+
+        pileup_site['minor_allele_freq'] = self._get_minor_allele_freq(
+            allele_counts)
+
+        pileup_site['genotype_class'] = self._get_genotype_class(
+            pileup_site['minor_allele_freq'])
+
+        pileup_site['genotype'] = self._get_genotype(
+            pileup_site['genotype_class'], allele_counts,
+            [ref_allele, alt_allele])
+
+        return pileup_site
+
+    def _add_base(self, site, old_base, old_base_qual, new_base,
+                  new_base_qual):
+        """
+        This function is for dealing with the various scenarios that can
+        arise when a read pair overlaps and how to handle when the
+        bases mismatch. The 'old_base' refers to the first base observed when
+        computing pileup information (usually the forward read). Then the
+        'new_base' is from the second read in the overlaping pair.
+        """
 
         if old_base is None:
             return [new_base, new_base_qual]
@@ -161,6 +183,9 @@ class Extract:
             return ['N', '&']
 
     def _pileup(self, bam, site):
+        """
+        Get the per-site pileup information.
+        """
 
         read_data = {}
         allele_counts = {'A': 0, 'C': 0, 'G': 0, 'T': 0, 'N': 0}
@@ -224,6 +249,9 @@ class Extract:
         }
 
     def _extract_sites(self, sample):
+        """
+        Loop through all positions and get pileup information.
+        """
 
         if not self.sites:
             return sample
@@ -256,8 +284,8 @@ class Extract:
 
     def _extraction_job(self, sample):
         """
-        function to do the extraction steps for a single sample.
-        supposed to be called by multiprocessing functions to parallelize it
+        Function to do the extraction steps for a single sample.
+        Supposed to be called by multiprocessing functions to parallelize it.
         """
 
         sample = self._extract_sites(sample)
@@ -267,6 +295,13 @@ class Extract:
         return sample
 
     def extract(self, samples):
+        """
+        Function to call to extract the pileup and region information
+        for the given samples.
+        """
+
+        if type(samples) != list:
+            samples = [samples]
 
         # determine with samples need to be extracted
 

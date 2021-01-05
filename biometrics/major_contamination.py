@@ -37,6 +37,9 @@ class MajorContamination():
         return data
 
     def plot(self, data, outdir):
+        """
+        Plot minor contamination data.
+        """
 
         ymax = max(self.threshold, max(data['major_contamination'])) * 1.05
 
@@ -72,6 +75,9 @@ class MajorContamination():
         fig.write_html(os.path.join(outdir, 'major_contamination.html'))
 
     def estimate(self, samples):
+        """
+        Estimate major contamination.
+        """
 
         for sample_name, sample in samples.items():
 

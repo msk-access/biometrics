@@ -13,6 +13,9 @@ from biometrics.utils import standardize_sex_nomenclature, exit_error
 
 
 def write_to_file(args, data, basename):
+    """
+    Generic function to save output to a file.
+    """
 
     outdir = os.path.abspath(args.outdir)
 
@@ -25,6 +28,11 @@ def write_to_file(args, data, basename):
 
 
 def run_extract(args, samples):
+    """
+    Extract the pileup and region information from the samples. Then
+    save to the database.
+    """
+
     extractor = Extract(args=args)
     samples = extractor.extract(samples)
 
@@ -32,6 +40,10 @@ def run_extract(args, samples):
 
 
 def run_sexmismatch(args, samples):
+    """
+    Find and sex mismatches and save the output
+    """
+
     sex_mismatch = SexMismatch(50)
 
     results = sex_mismatch.detect_mismatch(samples)
@@ -39,6 +51,10 @@ def run_sexmismatch(args, samples):
 
 
 def run_minor_contamination(args, samples):
+    """
+    Compute minor contamination and save the output and figure
+    """
+
     minor_contamination = MinorContamination(threshold=args.minor_threshold)
     samples = minor_contamination.estimate(samples)
 
@@ -55,6 +71,10 @@ def run_minor_contamination(args, samples):
 
 
 def run_major_contamination(args, samples):
+    """
+    Compute major contamination and save the output and figure.
+    """
+
     major_contamination = MajorContamination(threshold=args.major_threshold)
     samples = major_contamination.estimate(samples)
 
@@ -71,6 +91,10 @@ def run_major_contamination(args, samples):
 
 
 def run_genotyping(args, samples):
+    """
+    Run the genotyper and save the output and figure.
+    """
+
     genotyper = Genotyper(
         no_db_compare=args.no_db_compare,
         discordance_threshold=args.discordance_threshold,
@@ -89,6 +113,10 @@ def run_genotyping(args, samples):
 
 
 def load_input_sample_from_db(sample_name, database):
+    """
+    Loads any the given (that the user specified via the CLI) from the
+    database.
+    """
 
     extraction_file = os.path.join(database, sample_name + '.pk')
 
@@ -104,6 +132,10 @@ def load_input_sample_from_db(sample_name, database):
 
 
 def load_database_samples(database, existing_samples):
+    """
+    Loads any samples that are already present in the database AND
+    which were not specified as input via the CLI.
+    """
 
     samples = {}
 
@@ -123,6 +155,10 @@ def load_database_samples(database, existing_samples):
 
 
 def get_samples_from_input(input, database, extraction_mode):
+    """
+    Parse the sample information from the user-supplied CSV file.
+    """
+
     samples = {}
 
     for fpath in input:
@@ -167,6 +203,10 @@ def get_samples_from_input(input, database, extraction_mode):
 
 
 def get_samples_from_bam(args):
+    """
+    Parse the sample information the user supplied via the CLI.
+    """
+
     samples = {}
 
     for i, bam in enumerate(args.sample_bam):
@@ -189,6 +229,10 @@ def get_samples_from_bam(args):
 
 
 def get_samples_from_name(samples, database):
+    """
+    Parse the sample information the user supplied via the CLI.
+    """
+
     samples = {}
 
     for i, sample_name in enumerate(samples):
@@ -199,6 +243,9 @@ def get_samples_from_name(samples, database):
 
 
 def get_samples(args, extraction_mode=False):
+    """
+    Parse the sample information the user supplied via the CLI.
+    """
 
     samples = {}
 
@@ -232,6 +279,9 @@ def create_outdir(outdir):
 
 
 def run_biometrics(args):
+    """
+    Decide what tool to run based in CLI input.
+    """
 
     extraction_mode = args.subparser_name == 'extract'
 
