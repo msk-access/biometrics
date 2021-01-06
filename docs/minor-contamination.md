@@ -3,11 +3,10 @@ description: Calculate minor contamination
 ---
 
 # Minor contamination
-Minor contamination is a metric to see if a sample is contaminated with small amounts of DNA from another unrelated sample. The metric requires the extracted pileup information.
-
+Minor contamination is a metric to see if a sample is contaminated with small amounts of DNA from another unrelated sample. The metric requires the extracted pileup information from running the `extract` tool.
 
 ### How to run the tool
-You need one or more samples to run this analysis. The two required inputs are the list of sample names and the database (biometrics will automatically load all sample data from the database). Below is an example command:
+You can run this tool with one or more samples. The two required inputs are the list of sample names and the database (biometrics will automatically load all sample data from the database). Below is an example command:
 
 ```shell
 biometrics minor \
@@ -28,7 +27,7 @@ biometrics minor \
 All analyses output a CSV file containing the metrics for each sample. An interactive bar graph can also optionally be produced by supplying the `--plot` flag. These outputs are saved either to the current working directory or to a folder you specify via `--outdir`.
 
 ##### CSV file
-The CSV file contains metrics for each pair of samples compared (one on each line). Table 1 below provides a description on each column.
+The CSV file contains metrics for each pair of samples compared (one per line). The table below describes each column in the CSV output:
 
 | Column Name | Description |
 | :--- | :--- |
