@@ -52,7 +52,7 @@ class Extract:
         if self.bed is None:
             return
 
-        self.regions = pd.read_csv(self.bed, sep='\t')
+        self.regions = pd.read_csv(self.bed, sep='\t', header=None)
         self.regions.columns = range(self.regions.shape[1])
 
     def _extract_regions(self, sample):
@@ -300,21 +300,19 @@ class Extract:
         for the given samples.
         """
 
-        if type(samples) != list:
-            samples = [samples]
+        if type(samples) != dict:
+            samples = {samples.sample_name: samples}
 
         # determine with samples need to be extracted, and put them in a list
 
         samples_to_extract = []
 
-        for i, sample_name in enumerate(samples):
-
-            sample = samples[sample_name]
+        for sample_name, sample in samples.items():
 
             # if extraction file exists then load it
 
             if os.path.exists(sample.extraction_file) and not self.overwrite:
-                samples[sample_name].load_from_file()
+                sample.load_from_file()
                 continue
 
             samples_to_extract.append(sample)

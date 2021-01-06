@@ -233,14 +233,14 @@ def get_samples_from_bam(args):
     return samples
 
 
-def get_samples_from_name(samples, database):
+def get_samples_from_name(sample_names, database):
     """
     Parse the sample information the user supplied via the CLI.
     """
 
     samples = {}
 
-    for i, sample_name in enumerate(samples):
+    for i, sample_name in enumerate(sample_names):
         sample = load_input_sample_from_db(sample_name, database)
         samples[sample.sample_name] = sample
 
