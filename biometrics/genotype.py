@@ -22,10 +22,10 @@ class Genotyper:
 
     def are_samples_same_group(self, sample1, sample2):
 
-        if sample1.group is None or sample2.group is None:
+        if sample1.sample_group is None or sample2.sample_group is None:
             return np.nan
 
-        if sample1.group == sample2.group:
+        if sample1.sample_group == sample2.sample_group:
             return True
         else:
             return False
@@ -125,8 +125,8 @@ class Genotyper:
         reference_sample, query_sample = samples
 
         row = {
-            'ReferenceSample': reference_sample.name,
-            'QuerySample': query_sample.name}
+            'ReferenceSample': reference_sample.sample_name,
+            'QuerySample': query_sample.sample_name}
 
         row['HomozygousInRef'] = sum(reference_sample.pileup['genotype_class'] == 'Hom')
         row['TotalMatch'] = sum(reference_sample.pileup['genotype_class'] == query_sample.pileup['genotype_class'])

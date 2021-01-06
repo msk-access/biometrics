@@ -151,7 +151,7 @@ def load_database_samples(database, existing_samples):
         sample = Sample(db=database, query_group=True)
         sample.load_from_file(extraction_file=pickle_file)
 
-        samples[sample.name] = sample
+        samples[sample.sample_name] = sample
 
     return samples
 
@@ -167,39 +167,41 @@ def get_samples_from_input(input, database, extraction_mode):
 
         input = pd.read_csv(fpath, sep=',')
 
+        # check if some required columns are present
+
+        if 'sample_bam' not in input.columns:
+            exit_error(
+                'Input file does not have the \'sample_bam\' column.')
+
         if 'sample_name' not in input.columns:
             exit_error('Input does not have \'sample_name\' column.')
 
-        for i in input.index:
+        input = input.to_dict(orient='records')
+
+        for row in input:
 
             if not extraction_mode:
                 # if not running extract tool, then just need to get
                 # the sample name
 
-                sample_name = input.at[i, 'sample_name']
+                sample_name = row['sample_name']
 
                 sample = load_input_sample_from_db(sample_name, database)
-                samples[sample.name] = sample
+                samples[sample.sample_name] = sample
 
                 continue
 
-            # if running extract mode
-
-            alignment_file = input.at[i, 'alignment_file']
-
-            if not os.path.exists(alignment_file):
-                exit_error('Alignment file does not exist: {}.'.format(
-                    alignment_file))
+            # parse in the input
 
             sample = Sample(
-                alignment_file=alignment_file,
-                group=input.at[i, 'group'],
-                name=input.at[i, 'sample_name'],
-                sample_type=input.at[i, 'type'],
-                sex=standardize_sex_nomenclature(input.at[i, 'sex']),
+                sample_bam=row['sample_bam'],
+                sample_group=row.get('sample_group'),
+                sample_name=row['sample_name'],
+                sample_type=row.get('sample_type'),
+                sample_sex=standardize_sex_nomenclature(input.get('sample_sex')),
                 db=database)
 
-            samples[sample.name] = sample
+            samples[sample.sample_name] = sample
 
     return samples
 
@@ -211,21 +213,21 @@ def get_samples_from_bam(args):
 
     samples = {}
 
-    for i, bam in enumerate(args.sample_bam):
+    for i, sample_bam in enumerate(args.sample_bam):
 
-        sex = standardize_sex_nomenclature(
+        sample_sex = standardize_sex_nomenclature(
             args.sample_sex[i] if args.sample_sex is not None else None)
-        name = args.sample_name[i] if args.sample_name is not None else None
-        group = args.sample_group[i] \
+        sample_name = args.sample_name[i] if args.sample_name is not None else None
+        sample_group = args.sample_group[i] \
             if args.sample_group is not None else None
         sample_type = args.sample_type[i] \
             if args.sample_type is not None else None
 
         sample = Sample(
-            alignment_file=bam, group=group, name=name,
-            sample_type=sample_type, sex=sex, db=args.database)
+            sample_bam=sample_bam, sample_group=sample_group, sample_name=sample_name,
+            sample_type=sample_type, sample_sex=sample_sex, db=args.database)
 
-        samples[sample.name] = sample
+        samples[sample.sample_name] = sample
 
     return samples
 
@@ -239,7 +241,7 @@ def get_samples_from_name(samples, database):
 
     for i, sample_name in enumerate(samples):
         sample = load_input_sample_from_db(sample_name, database)
-        samples[sample.name] = sample
+        samples[sample.sample_name] = sample
 
     return samples
 

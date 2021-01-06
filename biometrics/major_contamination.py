@@ -16,16 +16,16 @@ class MajorContamination():
     def to_dataframe(self, samples):
 
         data = pd.DataFrame(
-            columns=['sample', 'sample_group', 'sample_sex', 'sample_type',
+            columns=['sample_name', 'sample_group', 'sample_sex', 'sample_type',
                      'total_sites', 'total_heterozygous_sites',
                      'major_contamination'])
 
         for sample_name, sample in samples.items():
 
             row = {
-                'sample': sample_name,
-                'sample_group': sample.group,
-                'sample_sex': sample.sex,
+                'sample_name': sample.sample_name,
+                'sample_group': sample.sample_group,
+                'sample_sex': sample.sample_sex,
                 'sample_type': sample.sample_type,
                 'total_sites': sample.metrics['total_sites'],
                 'total_heterozygous_sites': sample.metrics['total_heterozygous_sites'],
@@ -48,7 +48,7 @@ class MajorContamination():
         fig = go.Figure()
         fig.add_trace(
             go.Bar(
-                x=data['sample'],
+                x=data['sample_name'],
                 y=data['major_contamination'],
                 customdata=data.to_numpy(),
                 hovertemplate='<b>Sample group:</b> %{customdata[1]}' +

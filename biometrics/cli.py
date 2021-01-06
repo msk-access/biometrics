@@ -75,7 +75,7 @@ def add_common_tool_args(parser):
     parser.add_argument(
         '-i', '--input', action="append", required=False,
         help='''Path to file containing sample information (one per line).
-        For example: sample_name,alignment_file,type,sex,group.''')
+        For example: sample_name,sample_bam,sample_type,sample_sex,sample_group.''')
     parser.add_argument(
         '-db', '--database', required=True,
         help='''Directory to store the intermediate files after

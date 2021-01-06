@@ -10,21 +10,22 @@ class Sample:
     Class to hold information related to a single sample.
     """
 
-    def __init__(self, name=None, alignment_file=None, group=None, sex=None,
-                 sample_type=None, db=None, query_group=False):
-        self.alignment_file = alignment_file
-        self.name = name
-        self.sex = sex
-        self.group = group
+    def __init__(self, sample_name=None, sample_bam=None, sample_group=None,
+                 sample_sex=None, sample_type=None, db=None, query_group=False):
+        self.sample_bam = sample_bam
+        self.sample_name = sample_name
+        self.sample_sex = sample_sex
+        self.sample_group = sample_group
         self.sample_type = sample_type
+
         self.pileup = None
         self.region_counts = None
         self.extraction_file = None
         self.query_group = query_group
         self.metrics = {}
 
-        if db is not None and self.name is not None:
-            self.extraction_file = os.path.join(db, self.name + '.pk')
+        if db is not None and self.sample_name is not None:
+            self.extraction_file = os.path.join(db, self.sample_name + '.pk')
 
     def save_to_file(self):
 
@@ -36,10 +37,10 @@ class Sample:
             region_counts = None
 
         sample_data = {
-            'alignment_file': self.alignment_file,
-            'name': self.name,
-            'sex': self.sex,
-            'group': self.group,
+            'sample_bam': self.sample_bam,
+            'sample_name': self.sample_name,
+            'sample_sex': self.sample_sex,
+            'sample_group': self.sample_group,
             'sample_type': self.sample_type,
             'pileup_data': pileup_data,
             'region_counts': region_counts
@@ -67,9 +68,9 @@ class Sample:
                 sample_data['region_counts'], dtype=object)
 
         self.pileup = pd.DataFrame(sample_data['pileup_data'])
-        self.alignment_file = sample_data['alignment_file']
-        self.name = sample_data['name']
-        self.sex = sample_data['sex']
-        self.group = sample_data['group']
+        self.sample_bam = sample_data['sample_bam']
+        self.sample_name = sample_data['sample_name']
+        self.sample_sex = sample_data['sample_sex']
+        self.sample_group = sample_data['sample_group']
         self.sample_type = sample_data['sample_type']
         self.region_counts = region_counts

@@ -66,7 +66,7 @@ class Extract:
 
         # get the pileup
 
-        bam = AlignmentFile(sample.alignment_file)
+        bam = AlignmentFile(sample.sample_bam)
         region_counts = []
 
         for i in self.regions.index:
@@ -258,7 +258,7 @@ class Extract:
 
         # get the pileup
 
-        bam = AlignmentFile(sample.alignment_file)
+        bam = AlignmentFile(sample.sample_bam)
         pileup = pd.DataFrame()
 
         for site in self.sites:
@@ -330,6 +330,6 @@ class Extract:
                 self._extraction_job, samples_to_extract)
 
             for sample in samples_processed:
-                samples[sample.name] = sample
+                samples[sample.sample_name] = sample
 
         return samples

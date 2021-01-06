@@ -33,7 +33,7 @@ class SexMismatch:
 
             results.append({
                 'sample': sample_name,
-                'expected_sex': sample.sex,
+                'expected_sex': sample.sample_sex,
                 'predicted_sex': predicted_sex
             })
 
