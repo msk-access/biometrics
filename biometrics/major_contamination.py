@@ -88,15 +88,13 @@ class MajorContamination():
 
             het_sites = sites_notna[sites_notna['genotype_class'] == 'Het']
 
-            sample.metrics = {
-                'total_sites': sites_notna.shape[0],
-                'total_heterozygous_sites': het_sites.shape[0]
-            }
+            sample.metrics['total_sites'] = len(sites_notna)
+            sample.metrics['total_heterozygous_sites'] = len(het_sites)
 
-            if sites_notna.shape[0] == 0:
+            if sample.metrics['total_sites'] == 0:
                 sample.metrics['major_contamination'] = np.nan
             else:
                 sample.metrics['major_contamination'] = \
-                    het_sites.shape[0] / sites_notna.shape[0]
+                    len(het_sites) / len(sites_notna)
 
         return samples

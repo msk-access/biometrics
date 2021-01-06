@@ -86,11 +86,9 @@ class MinorContamination():
 
             hom_sites = sites_notna[sites_notna['genotype_class'] == 'Hom']
 
-            sample.metrics = {
-                'total_homozygous_sites': len(hom_sites)
-            }
+            sample.metrics['total_homozygous_sites'] = len(hom_sites)
 
-            if hom_sites.shape[0] == 0:
+            if sample.metrics['total_homozygous_sites'] == 0:
                 sample.metrics['minor_contamination'] = np.nan
             else:
                 sample.metrics['minor_contamination'] = \
