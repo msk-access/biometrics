@@ -7,6 +7,10 @@ def exit_error(msg):
 
 
 def standardize_sex_nomenclature(val):
+
+    if val is None:
+        return None
+
     # Potential inputs
     female = ['female', 'f', 'Female', 'F']
     male = ['Male', 'M', 'male', 'm']
@@ -16,4 +20,4 @@ def standardize_sex_nomenclature(val):
     elif val in male:
         return 'M'
 
-    return ''
+    return None
