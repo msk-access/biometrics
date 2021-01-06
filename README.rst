@@ -14,24 +14,15 @@ biometrics
         :alt: Documentation Status
 
 
-
-
 Package to generate sample based biometrics
 
 
 * Free software: Apache Software License 2.0
-* Documentation: https://biometrics.readthedocs.io.
+* Documentation: https://msk-access.gitbook.io/biometrics/
 
 
-Features
---------
+## Installation
 
-* TODO
+From pypi:
 
-Credits
--------
-
-This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
-
-.. _Cookiecutter: https://github.com/audreyr/cookiecutter
-.. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+`pip install sequence_qc`
