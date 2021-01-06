@@ -17,12 +17,12 @@ Compares each each sample against each other to verify expected sample matches a
 Click [here](genotype.md) to read more about this tool.
 
 #### Minor contamination
-Minor contamination check is done to see if a patient’s sample is contaminated with little DNA from another unrelated individual.
+Minor contamination check is done to see if a patient’s sample is contaminated with a little DNA from unrelated individuals.
 
 Click [here](minor-contamination.md) to read more about this tool.
 
 #### Major contamination
-Major contamination check is done to see if a patient’s sample is contaminated with DNA from an unrelated individual.
+Major contamination check is done to see if a patient’s sample is contaminated with DNA from unrelated individuals.
 
 Click [here](major-contamination.md) to read more about this tool.
 
