@@ -63,7 +63,7 @@ class Sample:
         sample_data = pickle.load(open(self.extraction_file, "rb"))
 
         region_counts = None
-        if sample_data['region_counts'] is not None:
+        if sample_data.get('region_counts') is not None:
             region_counts = pd.DataFrame(
                 sample_data['region_counts'], dtype=object)
 
