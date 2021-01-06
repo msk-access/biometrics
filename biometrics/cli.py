@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """Console script for biometrics."""
+
 import sys
 import argparse
 
@@ -11,7 +12,8 @@ def add_extraction_args(parser):
 
     parser.add_argument(
         '-i', '--input', action="append", required=False,
-        help='''Path to file containing sample information (one per line). For example: sample_name,alignment_file,type,sex,group''')
+        help='''Path to file containing sample information (one per line).
+        For example: sample_name,sample_bam,sample_type,sample_sex,sample_group''')
     parser.add_argument(
         '-sb', '--sample-bam', nargs="+", required=False,
         help='''Space-delimited list of BAM files.''')
@@ -181,7 +183,8 @@ def get_args():
     parser_genotype = add_common_tool_args(parser_genotype)
     parser_genotype.add_argument(
         '--discordance-threshold', default=0.05, type=float,
-        help='''Discordance values less than this are regarded as matching samples.''')
+        help='''Discordance values less than this are regarded
+        as matching samples.''')
     parser_genotype.add_argument(
         '-t', '--threads', default=1, type=int,
         help='''Number of threads to use to extract the samples.''')

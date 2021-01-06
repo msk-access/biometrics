@@ -194,9 +194,9 @@ def get_samples_from_input(input, database, extraction_mode):
             # parse in the input
 
             sample = Sample(
+                sample_name=row['sample_name'],
                 sample_bam=row['sample_bam'],
                 sample_group=row.get('sample_group'),
-                sample_name=row['sample_name'],
                 sample_type=row.get('sample_type'),
                 sample_sex=standardize_sex_nomenclature(input.get('sample_sex')),
                 db=database)
@@ -224,8 +224,9 @@ def get_samples_from_bam(args):
             if args.sample_type is not None else None
 
         sample = Sample(
-            sample_bam=sample_bam, sample_group=sample_group, sample_name=sample_name,
-            sample_type=sample_type, sample_sex=sample_sex, db=args.database)
+            sample_bam=sample_bam, sample_group=sample_group,
+            sample_name=sample_name, sample_type=sample_type,
+            sample_sex=sample_sex, db=args.database)
 
         samples[sample.sample_name] = sample
 
