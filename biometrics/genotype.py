@@ -30,14 +30,14 @@ class Genotyper:
         else:
             return False
 
-    def _plot_heatmap(self, data, outdir, name, size_ratio=None):
+    def _plot_heatmap(self, data, outdir, name, title="Discordance calculations between samples", size_ratio=None):
 
         width = None
         height = None
 
         if size_ratio is not None and size_ratio != 1:
-            width = 2000
-            height = (width * size_ratio)/2
+            width = 1400
+            height = (width * size_ratio)/4
 
         fig = go.Figure()
         fig.add_trace(
@@ -45,6 +45,8 @@ class Genotyper:
                 x=data['ReferenceSample'],
                 y=data['QuerySample'],
                 z=data['DiscordanceRate'],
+                legendgroup="Discordance",
+                name='Discordance',
                 customdata=data.to_numpy(),
                 hovertemplate='<b>Reference sample:</b> %{customdata[0]}' +
                               '<br><b>Query sample:</b> %{customdata[1]}' +
@@ -61,11 +63,29 @@ class Genotyper:
                 zmax=self.zmax,
                 colorscale='Blues_r'
             ))
+
+        # add red dots to sample pairs that are unexpected match/mismatch
+
+        data_sub = data[(data['Status']=='Unexpected Match') | (data['Status']=='Unexpected Mismatch')].copy()
+
+        if len(data_sub) > 0:
+            fig.add_trace(
+                go.Scatter(
+                    mode="markers",
+                    x=data_sub['ReferenceSample'],
+                    y=data_sub['QuerySample'],
+                    marker_symbol=[17],
+                    marker_color="red",
+                    marker_line_width=0,
+                    marker_size=10,
+                    customdata=data_sub.to_numpy(),
+                    hovertemplate='%{customdata[12]}<extra></extra>'))
+
         fig.update_layout(
             yaxis_title="Query samples",
             xaxis_title="Reference samples",
             legend_title_text="Discordance",
-            title_text="Discordance calculations between samples",
+            title_text=title,
             width=width, height=height)
         fig.write_html(os.path.join(outdir, name))
 
@@ -80,14 +100,16 @@ class Genotyper:
 
         if data_sub.shape[0] > 1:
             self._plot_heatmap(
-                data_sub, outdir, 'genotype_comparison_input_only.html')
+                data_sub, outdir, name='genotype_comparison_input_only.html',
+                title="Discordance calculations between input samples")
 
         data_sub = data[data['DatabaseComparison']].copy()
 
         if data_sub.shape[0] > 1:
             self._plot_heatmap(
-                data_sub, outdir, 'genotype_comparison_database.html',
-                self.sample_type_ratio)
+                data_sub, outdir, name='genotype_comparison_database.html',
+                title="Discordance calculations between input samples and database samples",
+                size_ratio=self.sample_type_ratio)
 
     def _compute_discordance(self, samples):
 
