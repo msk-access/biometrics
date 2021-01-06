@@ -11,4 +11,4 @@ Package to generate sample based biometrics
 
 From pypi:
 
-`pip install sequence_qc`
+`pip install biometrics`
