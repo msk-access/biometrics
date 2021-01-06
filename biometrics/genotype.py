@@ -36,8 +36,8 @@ class Genotyper:
         height = None
 
         if size_ratio is not None and size_ratio != 1:
-            width = 1000
-            height = width * size_ratio
+            width = 2000
+            height = (width * size_ratio)/2
 
         fig = go.Figure()
         fig.add_trace(
