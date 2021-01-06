@@ -18,6 +18,7 @@ class Genotyper:
         self.threads = threads
         self.zmax = zmax
         self.zmin = zmin
+        self.sample_type_ratio = 1
 
     def are_samples_same_group(self, sample1, sample2):
 
@@ -29,7 +30,15 @@ class Genotyper:
         else:
             return False
 
-    def _plot_heatmap(self, data, outdir, name):
+    def _plot_heatmap(self, data, outdir, name, size_ratio=None):
+
+        width = None
+        height = None
+
+        if size_ratio is not None:
+            width = 1000
+            height = width * size_ratio
+
         fig = go.Figure()
         fig.add_trace(
             go.Heatmap(
@@ -56,7 +65,8 @@ class Genotyper:
             yaxis_title="Query samples",
             xaxis_title="Reference samples",
             legend_title_text="Discordance",
-            title_text="Discordance calculations between samples")
+            title_text="Discordance calculations between samples",
+            width=width, height=height)
         fig.write_html(os.path.join(outdir, name))
 
         data = data[[
@@ -102,7 +112,18 @@ class Genotyper:
         samples_input = dict(filter(
             lambda x: not x[1].query_group, samples.items()))
 
-        thread_pool = Pool(self.threads)
+        # get the number of each type of sample and compute a ratio
+        # this is used to plot the heatmap when comparing with database
+        # samples
+
+        sample_n_db = len(samples_db)
+        sample_n_input = len(samples_input)
+
+        if sample_n_db > 0 and sample_n_input > 0 and sample_n_db > sample_n_input:
+            self.sample_type_ratio = sample_n_db / sample_n_input
+
+        # check to see if there are appropriate number of samples to
+        # do the analysis
 
         if self.no_db_compare:
             if len(samples_input) <= 1:
@@ -111,7 +132,9 @@ class Genotyper:
             if len(samples_input) <= 1 and len(samples_db) < 1:
                 exit_error("There are no samples in the database to compare with")
 
-        if len(samples_input) > 1:
+        thread_pool = Pool(self.threads)
+
+        if sample_n_input > 1:
             # compare all the input samples to each other
 
             jobs = []
@@ -128,7 +151,7 @@ class Genotyper:
 
         # for each input sample, compare with all the samples in the db
 
-        if not self.no_db_compare and len(samples_db) > 0:
+        if not self.no_db_compare and sample_n_db > 0:
 
             jobs = []
 
