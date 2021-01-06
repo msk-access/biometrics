@@ -31,7 +31,7 @@ The CSV file contains metrics for each pair of samples compared (one per line). 
 
 | Column Name | Description |
 | :--- | :--- |
-| sample | Sample name. |
+| sample_name | Sample name. |
 | sample_group | Sample group (if available). |
 | sample_sex | Sample sex (if available). |
 | sample_type | Sample type (if available). |

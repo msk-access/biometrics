@@ -28,7 +28,7 @@ All analyses output a CSV file containing the metrics for each sample. It will b
 
 | Column Name | Description |
 | :--- | :--- |
-| sample | Sample name. |
+| sample_name | Sample name. |
 | expected_sex | The sample's expected sex. |
 | predicted_sex | The sample's predicted sex. |
 | sex_mismatch | True if expected and predicted sex mismatch. |

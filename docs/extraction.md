@@ -13,10 +13,10 @@ There are two main types of required input:
 Moreover, there are two ways to provide the sample information: (1) provide a CSV file, or (2) specify via the command line arguments.
 
 #### CSV input
-This method is easier for when you have many samples. Just provide a CSV file with five columns: sammple name, sample group, sample type, sample sex, and path to the sample's BAM file. An example with three samples is below:
+This method is easier for when you have many samples. Just provide a CSV file with five columns: sample name, sample group, sample type, sample sex, and path to the sample's BAM file. An example with three samples is below:
 
 ```text
-sample_name,group,type,sex,alignment_file
+sample_name,sample_group,sample_type,sample_sex,sample_bam
 C-48665L-N001-d,C-48665L,Normal,F,/path/to/C-48665L-N001-d.bam
 C-PCYP90-N001-d,C-PCYP90,Normal,M,/path/to/C-PCYP90-N001-d.bam
 C-MH6AL9-N001-d,C-MH6AL9,Normal,F,/path/to/C-MH6AL9-N001-d.bam
