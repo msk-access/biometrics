@@ -44,7 +44,7 @@ def run_sexmismatch(args, samples):
     Find and sex mismatches and save the output
     """
 
-    sex_mismatch = SexMismatch(50)
+    sex_mismatch = SexMismatch(args.coverage_threshold)
 
     results = sex_mismatch.detect_mismatch(samples)
     write_to_file(args, results, 'sex_mismatch')

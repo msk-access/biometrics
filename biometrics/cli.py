@@ -84,9 +84,6 @@ def add_common_tool_args(parser):
         '-o', '--outdir', default='.',
         help='''Output directory for results.''')
     parser.add_argument(
-        '-p', '--plot', action='store_true',
-        help='''Also output plots of the data.''')
-    parser.add_argument(
         '-j', '--json', action='store_true',
         help='''Also output data in JSON format.''')
     parser.add_argument(
@@ -149,12 +146,18 @@ def get_args():
     parser_sexmismatch = subparsers.add_parser(
         'sexmismatch', help='Check for sex mismatches.')
     parser_sexmismatch = add_common_tool_args(parser_sexmismatch)
+    parser_sexmismatch.add_argument(
+        '--coverage-threshold', default=50, type=int,
+        help='''Samples with Y chromosome above this value will be considered male.''')
 
     # minor contamination parser
 
     parser_minor = subparsers.add_parser(
         'minor', help='Check for minor contamination.')
     parser_minor = add_common_tool_args(parser_minor)
+    parser_minor.add_argument(
+        '-p', '--plot', action='store_true',
+        help='''Also output plots of the data.''')
     parser_minor.add_argument(
         '--minor-threshold', default=0.002, type=float,
         help='''Minor contamination threshold for bad sample.''')
@@ -164,6 +167,9 @@ def get_args():
     parser_major = subparsers.add_parser(
         'major', help='Check for major contamination.')
     parser_major = add_common_tool_args(parser_major)
+    parser_major.add_argument(
+        '-p', '--plot', action='store_true',
+        help='''Also output plots of the data.''')
     parser_major.add_argument(
         '--major-threshold', default=0.6, type=float,
         help='''Major contamination threshold for bad sample.''')
