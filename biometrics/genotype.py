@@ -35,7 +35,7 @@ class Genotyper:
         width = None
         height = None
 
-        if size_ratio is not None:
+        if size_ratio is not None and size_ratio != 1:
             width = 1000
             height = width * size_ratio
 
@@ -86,7 +86,8 @@ class Genotyper:
 
         if data_sub.shape[0] > 1:
             self._plot_heatmap(
-                data_sub, outdir, 'genotype_comparison_database.html')
+                data_sub, outdir, 'genotype_comparison_database.html',
+                self.self.sample_type_ratio)
 
     def _compute_discordance(self, samples):
 
