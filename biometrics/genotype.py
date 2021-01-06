@@ -87,7 +87,7 @@ class Genotyper:
         if data_sub.shape[0] > 1:
             self._plot_heatmap(
                 data_sub, outdir, 'genotype_comparison_database.html',
-                self.self.sample_type_ratio)
+                self.sample_type_ratio)
 
     def _compute_discordance(self, samples):
 
