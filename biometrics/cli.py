@@ -155,7 +155,7 @@ def get_args():
     parser_minor = subparsers.add_parser(
         'minor', help='Check for minor contamination.')
     parser_minor = add_common_tool_args(parser_minor)
-    parser.add_argument(
+    parser_minor.add_argument(
         '--minor-threshold', default=0.002, type=float,
         help='''Minor contamination threshold for bad sample.''')
 
@@ -164,7 +164,7 @@ def get_args():
     parser_major = subparsers.add_parser(
         'major', help='Check for major contamination.')
     parser_major = add_common_tool_args(parser_major)
-    parser.add_argument(
+    parser_major.add_argument(
         '--major-threshold', default=0.6, type=float,
         help='''Major contamination threshold for bad sample.''')
 
