@@ -17,8 +17,8 @@ class MajorContamination():
 
         data = pd.DataFrame(
             columns=['sample', 'sample_group', 'sample_sex', 'sample_type',
-                     'major_contamination', 'total_sites',
-                     'total_heterozygous_sites'])
+                     'total_sites', 'total_heterozygous_sites',
+                     'major_contamination'])
 
         for sample_name, sample in samples.items():
 
@@ -27,9 +27,9 @@ class MajorContamination():
                 'sample_group': sample.group,
                 'sample_sex': sample.sex,
                 'sample_type': sample.sample_type,
-                'major_contamination': sample.metrics['major_contamination'],
                 'total_sites': sample.metrics['total_sites'],
-                'total_heterozygous_sites': sample.metrics['total_heterozygous_sites']
+                'total_heterozygous_sites': sample.metrics['total_heterozygous_sites'],
+                'major_contamination': sample.metrics['major_contamination']
             }
 
             data = data.append(row, ignore_index=True)
@@ -42,6 +42,8 @@ class MajorContamination():
         """
 
         ymax = max(self.threshold, max(data['major_contamination'])) * 1.05
+        data['major_contamination'] = data['major_contamination'].map(
+            lambda x: round(x, 4))
 
         fig = go.Figure()
         fig.add_trace(

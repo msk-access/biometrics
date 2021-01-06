@@ -96,14 +96,23 @@ class Genotyper:
             'DiscordanceRate', 'Matched', 'ExpectedMatch', 'Status']]
 
     def plot(self, data, outdir):
+
+        # make plot for comparing input samples with each other
+
         data_sub = data[~data['DatabaseComparison']].copy()
+        data_sub['DiscordanceRate'] = data_sub['DiscordanceRate'].map(
+            lambda x: round(x, 4))
 
         if data_sub.shape[0] > 1:
             self._plot_heatmap(
                 data_sub, outdir, name='genotype_comparison_input_only.html',
                 title="Discordance calculations between input samples")
 
+        # make plot for comparing input samples with database samples
+
         data_sub = data[data['DatabaseComparison']].copy()
+        data_sub['DiscordanceRate'] = data_sub['DiscordanceRate'].map(
+            lambda x: round(x, 4))
 
         if data_sub.shape[0] > 1:
             self._plot_heatmap(

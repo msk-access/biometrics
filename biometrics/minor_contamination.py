@@ -40,6 +40,8 @@ class MinorContamination():
         """
 
         ymax = max(self.threshold, max(data['minor_contamination'])) * 1.05
+        data['minor_contamination'] = data['minor_contamination'].map(
+            lambda x: round(x, 4))
 
         fig = go.Figure()
         fig.add_trace(
