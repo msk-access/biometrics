@@ -182,6 +182,9 @@ def get_args():
         'genotype', help='Genotype a set of samples.')
     parser_genotype = add_common_tool_args(parser_genotype)
     parser_genotype.add_argument(
+        '-p', '--plot', action='store_true',
+        help='''Also output plots of the data.''')
+    parser_genotype.add_argument(
         '--discordance-threshold', default=0.05, type=float,
         help='''Discordance values less than this are regarded
         as matching samples.''')
