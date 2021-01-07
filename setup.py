@@ -28,7 +28,7 @@ setup(
     author_email='rons.shah@gmail.com',
     python_requires='>=3.5',
     classifiers=[
-        'Development Status :: 2 - Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Natural Language :: English',
