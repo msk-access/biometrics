@@ -62,9 +62,7 @@ The CSV file contains metrics for each pair of samples compared (one on each lin
 
 Below are the two figures that are outputted from the two types of comparisons that are done. Samples that are unexpected matches or mismatches will be marked with a red star in the heatmap.
 
-![](.gitbook/assets/genotype_comparison_input_only.html)
-
-![](.gitbook/assets/genotype_comparison_database.html)
+![](.gitbook/assets/genotype_comparison_input_only.png)
 
 ### Algorithm details
 

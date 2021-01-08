@@ -42,7 +42,7 @@ The CSV file contains metrics for each pair of samples compared (one per line). 
 ##### Interactive plot
 Below is an example bar plot showing the per-sample minor contamination metrics. You can hover over each bar to get more information about the sample. You can also control the minor contamination threshold (the horizontal red line) via the `--minor-threshold` flag.
 
-![](.gitbook/assets/minor_contamination.html)
+![](.gitbook/assets/minor_contamination.png)
 
 ### Algorithm details
 
