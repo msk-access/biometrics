@@ -69,9 +69,7 @@ Below are the two figures that are outputted from the two types of comparisons t
 Any samples with a discordance rate of 5% or higher are considered mismatches.
 
 $$
-\[\\
-Discordance\ Rate = \frac{Number of matching homozygous sites in Reference but not Query}{Number of SNP sites homozygous in Reference}\\
-\]\\
+Discordance\ Rate = \frac{Number\ of\ matching\ homozygous\ SNPs\ in\ Reference\ but\ not\ Query}{Number\ of\ homozygous\ SNPs\ in\ Reference}\\
 $$
 
 {% hint style="info" %}
