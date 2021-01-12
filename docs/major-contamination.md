@@ -43,7 +43,7 @@ The CSV file contains metrics for each pair of samples compared (one per line). 
 ##### Interactive plot
 Below is an example bar plot showing the per-sample major contamination metrics. You can hover over each bar to get more information about the sample. You can also control the major contamination threshold (the horizontal red line) via the `--major-threshold` flag.
 
-![](.gitbook/assets/major_contamination.html)
+![](.gitbook/assets/major_contamination.png)
 
 ### Algorithm details
 

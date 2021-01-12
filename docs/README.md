@@ -1,4 +1,4 @@
-# sequence\_qc
+# biometrics
 
 Python package for calculating sample contamination metrics and sample sex verification.
 
