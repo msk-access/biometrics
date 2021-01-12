@@ -198,7 +198,7 @@ def get_samples_from_input(input, database, extraction_mode):
                 sample_bam=row['sample_bam'],
                 sample_group=row.get('sample_group'),
                 sample_type=row.get('sample_type'),
-                sample_sex=standardize_sex_nomenclature(input.get('sample_sex')),
+                sample_sex=standardize_sex_nomenclature(row.get('sample_sex')),
                 db=database)
 
             samples[sample.sample_name] = sample
