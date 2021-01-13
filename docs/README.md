@@ -1,12 +1,11 @@
 # biometrics
 
-Package to generate sample based biometrics
+Python package for calculating sample contamination metrics and sample sex verification.
 
 [![Build Status](https://travis-ci.com/msk-access/biometrics.svg?branch=master)](https://travis-ci.com/msk-access/biometrics) [![PyPi](https://img.shields.io/pypi/v/biometrics.svg?)](https://pypi.python.org/pypi/biometrics)
 
 * Free software: Apache Software License 2.0
-* Documentation: https://msk-access.gitbook.io/biometrics/
-* GitHub: https://github.com/msk-access/biometrics/
+* Documentation: [https://msk-access.gitbook.io/biometrics/](https://msk-access.gitbook.io/biometrics/)
 
 ## Installation
 
