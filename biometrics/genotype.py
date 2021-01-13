@@ -157,7 +157,7 @@ class Genotyper:
 
     def _compute_discordance_batch_job(self, batch_sample_pairs):
         """
-        Compute discordance between a batch of sample pairs
+        batch job to take a batch of pairs of samples to compute discordance
         """
         rows = []
 
@@ -222,8 +222,9 @@ class Genotyper:
             if len(samples_input) <= 1 and len(samples_db) < 1:
                 exit_error("There are no samples in the database to compare with")
 
+        # compare all the input samples to each other
+        
         if sample_n_input > 1:
-            # compare all the input samples to each other
             results = self._compare_sample_lists(
                 samples_input, samples_input, samples)
 
@@ -231,8 +232,9 @@ class Genotyper:
                 results[i]['DatabaseComparison'] = True
             data += results
 
+        # for each input sample, compare with all the samples in the db
+
         if not self.no_db_compare and sample_n_db > 0:
-            # for each input sample, compare with all the samples in the db
             results = self._compare_sample_lists(
                 samples_input, samples_db, samples)
 
