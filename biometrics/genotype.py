@@ -143,6 +143,7 @@ class Genotyper:
             row['HeterozygousMatch'] = sum((pileup_ref['genotype_class'] == pileup_query['genotype_class']) & (pileup_ref['genotype_class'] == 'Het'))
             row['HomozygousMismatch'] = sum((pileup_ref['genotype'] != pileup_query['genotype']) & ((pileup_ref['genotype_class'] == 'Hom') & (pileup_query['genotype_class'] == 'Hom')))
             row['HeterozygousMismatch'] = sum((pileup_ref['genotype_class'] != pileup_query['genotype_class']) & ((pileup_ref['genotype_class'] == 'Het') | (pileup_query['genotype_class'] == 'Het')))
+            row['CountOfCommonSites'] = len(pileup_query)
         else:
             # if there are no regions with enough coverage
 
@@ -152,6 +153,7 @@ class Genotyper:
             row['HeterozygousMatch'] = np.nan
             row['HomozygousMismatch'] = np.nan
             row['HeterozygousMismatch'] = np.nan
+            row['CountOfCommonSites'] = 0
 
         return row
 
@@ -223,7 +225,7 @@ class Genotyper:
                 exit_error("There are no samples in the database to compare with")
 
         # compare all the input samples to each other
-        
+
         if sample_n_input > 1:
             results = self._compare_sample_lists(
                 samples_input, samples_input, samples)
