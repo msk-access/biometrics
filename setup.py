@@ -56,6 +56,6 @@ setup(
     },
     test_suite='tests',
     url='https://github.com/msk-access/biometrics',
-    version='0.1.11',
+    version='0.1.12',
     zip_safe=False,
 )
