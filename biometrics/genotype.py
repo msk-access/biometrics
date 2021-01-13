@@ -137,12 +137,12 @@ class Genotyper:
             'QuerySample': query_sample.sample_name}
 
         if len(pileup_query) > 0:
-            row['HomozygousInRef'] = sum(reference_sample.pileup['genotype_class'] == 'Hom')
-            row['TotalMatch'] = sum(reference_sample.pileup['genotype_class'] == query_sample.pileup['genotype_class'])
-            row['HomozygousMatch'] = sum((reference_sample.pileup['genotype_class'] == query_sample.pileup['genotype_class']) & (reference_sample.pileup['genotype_class'] == 'Hom'))
-            row['HeterozygousMatch'] = sum((reference_sample.pileup['genotype_class'] == query_sample.pileup['genotype_class']) & (reference_sample.pileup['genotype_class'] == 'Het'))
-            row['HomozygousMismatch'] = sum((reference_sample.pileup['genotype'] != query_sample.pileup['genotype']) & ((reference_sample.pileup['genotype_class'] == 'Hom') & (query_sample.pileup['genotype_class'] == 'Hom')))
-            row['HeterozygousMismatch'] = sum((reference_sample.pileup['genotype_class'] != query_sample.pileup['genotype_class']) & ((reference_sample.pileup['genotype_class'] == 'Het') | (query_sample.pileup['genotype_class'] == 'Het')))
+            row['HomozygousInRef'] = sum(pileup_ref['genotype_class'] == 'Hom')
+            row['TotalMatch'] = sum(pileup_ref['genotype_class'] == pileup_query['genotype_class'])
+            row['HomozygousMatch'] = sum((pileup_ref['genotype_class'] == pileup_query['genotype_class']) & (pileup_ref['genotype_class'] == 'Hom'))
+            row['HeterozygousMatch'] = sum((pileup_ref['genotype_class'] == pileup_query['genotype_class']) & (pileup_ref['genotype_class'] == 'Het'))
+            row['HomozygousMismatch'] = sum((pileup_ref['genotype'] != pileup_query['genotype']) & ((pileup_ref['genotype_class'] == 'Hom') & (pileup_query['genotype_class'] == 'Hom')))
+            row['HeterozygousMismatch'] = sum((pileup_ref['genotype_class'] != pileup_query['genotype_class']) & ((pileup_ref['genotype_class'] == 'Het') | (pileup_query['genotype_class'] == 'Het')))
         else:
             # if there are no regions with enough coverage
 
@@ -187,6 +187,8 @@ class Genotyper:
                 if len(current_batch) >= parallel_batch_size:
                     jobs.append(current_batch)
                     current_batch = []
+
+        # analyze, collect results, and flatten the lists
 
         results = thread_pool.map(self._compute_discordance_batch_job, jobs)
         results = [item for sublist in results for item in sublist]
