@@ -6,6 +6,7 @@ Package to generate sample based biometrics
 
 * Free software: Apache Software License 2.0
 * Documentation: https://msk-access.gitbook.io/biometrics/
+* GitHub: https://github.com/msk-access/biometrics/
 
 ## Installation
 

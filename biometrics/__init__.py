@@ -1,5 +1,5 @@
 """Top-level package for biometrics."""
 
-__author__ = """Ronak Shah"""
-__email__ = 'rons.shah@gmail.com'
-__version__ = '0.1.1'
+__author__ = """Charlie Murphy"""
+__email__ = 'murphyc4@mskcc.org'
+__version__ = '0.1.12'

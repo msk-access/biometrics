@@ -24,8 +24,8 @@ def req_file(filename):
 
 
 setup(
-    author="Ronak Shah",
-    author_email='rons.shah@gmail.com',
+    author="Charlie Murphy",
+    author_email='murphyc4@mskcc.org',
     python_requires='>=3.5',
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -56,6 +56,6 @@ setup(
     },
     test_suite='tests',
     url='https://github.com/msk-access/biometrics',
-    version='0.1.1',
+    version='0.1.12',
     zip_safe=False,
 )
