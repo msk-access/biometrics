@@ -120,22 +120,78 @@ class Genotyper:
                 title="Discordance calculations between input samples and database samples",
                 size_ratio=self.sample_type_ratio)
 
-    def _compute_discordance(self, samples):
+    def _compute_discordance(self, reference_sample, query_sample):
+        """
+        Compute discordance between two samples
+        """
 
-        reference_sample, query_sample = samples
+        pileup_ref = reference_sample.pileup
+        pileup_query = query_sample.pileup
+
+        common_covered = ~pd.isna(pileup_ref['genotype_class']) & ~pd.isna(pileup_query['genotype_class'])
+        pileup_ref = pileup_ref[common_covered]
+        pileup_query = pileup_query[common_covered]
 
         row = {
             'ReferenceSample': reference_sample.sample_name,
             'QuerySample': query_sample.sample_name}
 
-        row['HomozygousInRef'] = sum(reference_sample.pileup['genotype_class'] == 'Hom')
-        row['TotalMatch'] = sum(reference_sample.pileup['genotype_class'] == query_sample.pileup['genotype_class'])
-        row['HomozygousMatch'] = sum((reference_sample.pileup['genotype_class'] == query_sample.pileup['genotype_class']) & (reference_sample.pileup['genotype_class'] == 'Hom'))
-        row['HeterozygousMatch'] = sum((reference_sample.pileup['genotype_class'] == query_sample.pileup['genotype_class']) & (reference_sample.pileup['genotype_class'] == 'Het'))
-        row['HomozygousMismatch'] = sum((reference_sample.pileup['genotype'] != query_sample.pileup['genotype']) & ((reference_sample.pileup['genotype_class'] == 'Hom') & (query_sample.pileup['genotype_class'] == 'Hom')))
-        row['HeterozygousMismatch'] = sum((reference_sample.pileup['genotype_class'] != query_sample.pileup['genotype_class']) & ((reference_sample.pileup['genotype_class'] == 'Het') | (query_sample.pileup['genotype_class'] == 'Het')))
+        if len(pileup_query) > 0:
+            row['HomozygousInRef'] = sum(reference_sample.pileup['genotype_class'] == 'Hom')
+            row['TotalMatch'] = sum(reference_sample.pileup['genotype_class'] == query_sample.pileup['genotype_class'])
+            row['HomozygousMatch'] = sum((reference_sample.pileup['genotype_class'] == query_sample.pileup['genotype_class']) & (reference_sample.pileup['genotype_class'] == 'Hom'))
+            row['HeterozygousMatch'] = sum((reference_sample.pileup['genotype_class'] == query_sample.pileup['genotype_class']) & (reference_sample.pileup['genotype_class'] == 'Het'))
+            row['HomozygousMismatch'] = sum((reference_sample.pileup['genotype'] != query_sample.pileup['genotype']) & ((reference_sample.pileup['genotype_class'] == 'Hom') & (query_sample.pileup['genotype_class'] == 'Hom')))
+            row['HeterozygousMismatch'] = sum((reference_sample.pileup['genotype_class'] != query_sample.pileup['genotype_class']) & ((reference_sample.pileup['genotype_class'] == 'Het') | (query_sample.pileup['genotype_class'] == 'Het')))
+        else:
+            # if there are no regions with enough coverage
+
+            row['HomozygousInRef'] = np.nan
+            row['TotalMatch'] = np.nan
+            row['HomozygousMatch'] = np.nan
+            row['HeterozygousMatch'] = np.nan
+            row['HomozygousMismatch'] = np.nan
+            row['HeterozygousMismatch'] = np.nan
 
         return row
+
+    def _compute_discordance_batch_job(self, batch_sample_pairs):
+        """
+        Compute discordance between a batch of sample pairs
+        """
+        rows = []
+
+        for reference_sample, query_sample in batch_sample_pairs:
+            rows.append(self._compute_discordance(
+                reference_sample, query_sample))
+
+        return rows
+
+    def _compare_sample_lists(self, sample_set1, sample_set2, samples):
+        """
+        Compare two lists of samples. Does so by first grouping the sample
+        comparisons into batches for parallel processing
+        """
+
+        jobs = []
+        thread_pool = Pool(self.threads)
+        total_comparisons = len(sample_set1) * len(sample_set2)
+        parallel_batch_size = max(int(total_comparisons / self.threads), 1)
+
+        current_batch = []
+
+        for i, sample_name1 in enumerate(sample_set1):
+            for j, sample_name2 in enumerate(sample_set2):
+                current_batch.append([samples[sample_name1], samples[sample_name2]])
+
+                if len(current_batch) >= parallel_batch_size:
+                    jobs.append(current_batch)
+                    current_batch = []
+
+        results = thread_pool.map(self._compute_discordance_batch_job, jobs)
+        results = [item for sublist in results for item in sublist]
+
+        return results
 
     def genotype(self, samples):
 
@@ -164,34 +220,20 @@ class Genotyper:
             if len(samples_input) <= 1 and len(samples_db) < 1:
                 exit_error("There are no samples in the database to compare with")
 
-        thread_pool = Pool(self.threads)
-
         if sample_n_input > 1:
             # compare all the input samples to each other
-
-            jobs = []
-
-            for i, sample_name1 in enumerate(samples_input):
-                for j, sample_name2 in enumerate(samples_input):
-                    jobs.append([samples[sample_name1], samples[sample_name2]])
-
-            results = thread_pool.map(self._compute_discordance, jobs)
+            results = self._compare_sample_lists(
+                samples_input, samples_input, samples)
 
             for i in range(len(results)):
-                results[i]['DatabaseComparison'] = False
+                results[i]['DatabaseComparison'] = True
             data += results
 
-        # for each input sample, compare with all the samples in the db
-
         if not self.no_db_compare and sample_n_db > 0:
+            # for each input sample, compare with all the samples in the db
+            results = self._compare_sample_lists(
+                samples_input, samples_db, samples)
 
-            jobs = []
-
-            for i, sample_name1 in enumerate(samples_input):
-                for j, sample_name2 in enumerate(samples_db):
-                    jobs.append([samples[sample_name1], samples[sample_name2]])
-
-            results = thread_pool.map(self._compute_discordance, jobs)
             for i in range(len(results)):
                 results[i]['DatabaseComparison'] = True
             data += results
