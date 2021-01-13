@@ -268,9 +268,10 @@ class Genotyper:
         data.loc[~data.Matched & ~data.ExpectedMatch, 'Status'] = "Expected Mismatch"
 
         data = data[[
-            'ReferenceSample', 'QuerySample', 'DatabaseComparison',
+            'ReferenceSample', 'QuerySample', 'CountOfCommonSites',
             'HomozygousInRef', 'TotalMatch', 'HomozygousMatch',
-            'HeterozygousMatch', 'HomozygousMismatch', 'HeterozygousMismatch',
-            'DiscordanceRate', 'Matched', 'ExpectedMatch', 'Status']]
+            'HeterozygousMatch', 'HomozygousMismatch',
+            'HeterozygousMismatch', 'DiscordanceRate', 'Matched',
+            'ExpectedMatch', 'Status']]
 
         return data
