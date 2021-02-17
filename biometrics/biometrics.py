@@ -101,9 +101,11 @@ def run_genotyping(args, samples):
         threads=args.threads,
         zmin=args.zmin,
         zmax=args.zmax)
-    data = genotyper.compare_samples(samples)
+    comparisons = genotyper.compare_samples(samples)
+    write_to_file(args, comparisons, 'genotype_comparison')
 
-    write_to_file(args, data, 'genotype_comparison')
+    predictions = genotyper.predict_group(samples)
+    write_to_file(args, predictions, 'group_predictions')
 
     if args.plot:
         if len(samples) > 1000:
