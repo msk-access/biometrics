@@ -101,7 +101,7 @@ def run_genotyping(args, samples):
         threads=args.threads,
         zmin=args.zmin,
         zmax=args.zmax)
-    data = genotyper.genotype(samples)
+    data = genotyper.compare_samples(samples)
 
     write_to_file(args, data, 'genotype_comparison')
 
