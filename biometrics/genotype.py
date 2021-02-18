@@ -218,6 +218,7 @@ class Genotyper:
                 # 'major_contamination': sample.metrics['major_contamination'],
                 'expected_group': sample.sample_group,
                 'predicted_group': '',
+                'avg_discordance': '',
                 'n_sample_matches': '',
                 'sample_matches': '',
                 # 'sample_matches_minor_contamination': '',
@@ -243,6 +244,7 @@ class Genotyper:
                 sample_matches = [samples[i] for i in sample_matches]
 
                 row['predicted_group'] = group_name
+                row['avg_discordance'] = potential_matches_group['DiscordanceRate'].mean()
                 row['n_sample_matches'] = len(sample_matches)
                 row['sample_matches'] = ','.join(
                     [i.sample_name for i in sample_matches])
