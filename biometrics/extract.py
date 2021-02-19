@@ -7,9 +7,6 @@ import vcf
 from pysam import AlignmentFile
 
 
-HETEROZYGOUS_THRESHOLD = 0.1
-
-
 class Extract:
     """
     Class for extracting genotype information from alignment file using
@@ -27,6 +24,7 @@ class Extract:
         self.fafile = args.fafile
         self.overwrite = args.overwrite
         self.min_coverage = args.min_coverage
+        self.min_homozygous_thresh = args.min_homozygous_thresh
         self.sites = []
         self.regions = None
 
@@ -110,7 +108,7 @@ class Extract:
 
             return np.nan
         else:
-            if minor_allele_freq <= HETEROZYGOUS_THRESHOLD:
+            if minor_allele_freq <= self.min_homozygous_thresh:
                 return 'Hom'
             else:
                 return 'Het'
