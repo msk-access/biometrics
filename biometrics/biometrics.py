@@ -47,7 +47,12 @@ def run_sexmismatch(args, samples):
     sex_mismatch = SexMismatch(args.coverage_threshold)
 
     results = sex_mismatch.detect_mismatch(samples)
-    write_to_file(args, results, 'sex_mismatch')
+
+    basename = 'sex_mismatch'
+    if args.prefix:
+        basename = args.prefix + '_' + basename
+
+    write_to_file(args, results, basename)
 
 
 def run_minor_contamination(args, samples):
@@ -59,7 +64,12 @@ def run_minor_contamination(args, samples):
     samples = minor_contamination.estimate(samples)
 
     data = minor_contamination.to_dataframe(samples)
-    write_to_file(args, data, 'minor_contamination')
+
+    basename = 'minor_contamination'
+    if args.prefix:
+        basename = args.prefix + '_' + basename
+
+    write_to_file(args, data, basename)
 
     if args.plot:
         if len(samples) > 1000:
@@ -79,7 +89,12 @@ def run_major_contamination(args, samples):
     samples = major_contamination.estimate(samples)
 
     data = major_contamination.to_dataframe(samples)
-    write_to_file(args, data, 'major_contamination')
+
+    basename = 'major_contamination'
+    if args.prefix:
+        basename = args.prefix + '_' + basename
+
+    write_to_file(args, data, basename)
 
     if args.plot:
         if len(samples) > 1000:
@@ -102,10 +117,20 @@ def run_genotyping(args, samples):
         zmin=args.zmin,
         zmax=args.zmax)
     comparisons = genotyper.compare_samples(samples)
-    write_to_file(args, comparisons, 'genotype_comparison')
+
+    basename = 'genotype_comparison'
+    if args.prefix:
+        basename = args.prefix + '_' + basename
+
+    write_to_file(args, comparisons, basename)
 
     predictions = genotyper.predict_group(samples)
-    write_to_file(args, predictions, 'group_predictions')
+
+    basename = 'group_predictions'
+    if args.prefix:
+        basename = args.prefix + '_' + basename
+
+    write_to_file(args, predictions, basename)
 
     if args.plot:
         if len(samples) > 1000:

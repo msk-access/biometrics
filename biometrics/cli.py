@@ -89,6 +89,9 @@ def add_common_tool_args(parser):
         '-o', '--outdir', default='.',
         help='''Output directory for results.''')
     parser.add_argument(
+        '--prefix', default=None,
+        help='''Output file prefix.''')
+    parser.add_argument(
         '-j', '--json', action='store_true',
         help='''Also output data in JSON format.''')
     parser.add_argument(
