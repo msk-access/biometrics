@@ -118,7 +118,7 @@ def check_args(args):
             'The extraction tool requires that you specify either ' +
             '--input or --sample-bam')
 
-    if args.sample_name:
+    if args.subparser_name == 'extract' and not args.input:
         check_arg_equal_len(args.sample_name, args.sample_bam, '--sample-bam')
         check_arg_equal_len(args.sample_name, args.sample_type, '--sample-type')
         check_arg_equal_len(
