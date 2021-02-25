@@ -2,7 +2,7 @@ import pickle
 import os
 
 import pandas as pd
-from utils import exit_error
+from biometrics.utils import exit_error
 
 
 class Sample:
