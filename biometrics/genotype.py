@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 
-from utils import exit_error
+from biometrics.utils import exit_error
 
 EPSILON = 1e-9
 
