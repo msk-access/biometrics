@@ -4,7 +4,7 @@
 import sys
 import argparse
 
-from utils import exit_error
+from biometrics.utils import exit_error
 from biometrics.biometrics import run_biometrics
 
 
