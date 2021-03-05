@@ -286,16 +286,22 @@ class Genotyper:
 
             for i, sample_i in enumerate(samples_group):
 
-                avg_discordance = data[
+                data_i = data[
                     (data['ReferenceSample']==sample_i) &
-                    (data['QuerySample'].isin(samples_group))]['DiscordanceRate'].mean()
+                    (data['QuerySample'].isin(samples_group))]
+
+                match_type_counts = data_i['Status'].value_counts()
 
                 row = {
                     'sample_name': sample_i,
                     'expected_sample_group': samples_input[sample_i].sample_group,
                     'cluster_index': cluster_idx,
-                    'avg_discordance': avg_discordance,
-                    'cluster_size': len(samples_group)
+                    'avg_discordance': data_i['DiscordanceRate'].mean(),
+                    'cluster_size': len(samples_group),
+                    'count_expected_matches': match_type_counts['Expected Match'],
+                    'count_unexpected_matches': match_type_counts['Unexpected Match'],
+                    'count_expected_mismatches': match_type_counts['Unexpected Mismatch'],
+                    'count_unexpected_mismatches': match_type_counts['Expected Mismatch']
                 }
                 clusters.append(row)
 
