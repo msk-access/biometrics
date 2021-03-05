@@ -242,8 +242,8 @@ class Genotyper:
                     'cluster_size': len(samples_group),
                     'count_expected_matches': cluster_status_counts.get('Expected Match', 0) - 1,
                     'count_unexpected_matches': cluster_status_counts.get('Unexpected Match', 0),
-                    'count_expected_mismatches': sample_status_counts.get('Unexpected Mismatch', 0),
-                    'count_unexpected_mismatches': sample_status_counts.get('Expected Mismatch', 0)
+                    'count_expected_mismatches': sample_status_counts.get('Expected Mismatch', 0),
+                    'count_unexpected_mismatches': sample_status_counts.get('Unexpected Mismatch', 0)
                 }
                 clusters.append(row)
 
