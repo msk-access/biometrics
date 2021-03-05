@@ -139,6 +139,8 @@ def run_genotyping(args, samples):
     comparisons_input = comparisons[
         (comparisons['ReferenceSample'].isin(samples_names)) &
         (comparisons['QuerySample'].isin(samples_names))].copy()
+
+    logger.info('Clustering input samples...')
     clusters = cluster_handler.cluster(comparisons_input)
 
     if clusters is not None:
@@ -158,6 +160,7 @@ def run_genotyping(args, samples):
             logger.warning(
                 'The set of database and input samples are the same. Will only cluster the samples once.')
         else:
+            logger.info('Clustering input and database samples...')
             clusters = cluster_handler.cluster(comparisons)
 
             if clusters is not None:

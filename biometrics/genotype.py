@@ -281,6 +281,7 @@ class Genotyper:
             'HeterozygousMismatch', 'DiscordanceRate', 'Matched',
             'ExpectedMatch', 'Status']]
 
+        logger.info('Total comparisons: {}'.format(len(comparisons)))
         logger.info('Count of expected matches: {}'.format(
             len(comparisons[comparisons['Status']=="Expected Match"])))
         logger.info('Count of unexpected matches: {}'.format(
