@@ -66,7 +66,7 @@ class Cluster:
         clusters = pd.DataFrame(clusters)
 
         logger.info(
-            'Clustering finished. Grouped the {} samples into {} clusters. Expected {} clusters.'.format(
+            'Clustering finished. Grouped {} samples into {} clusters. Expected {} clusters.'.format(
             len(sample2group), cluster_idx + 1, len(set(clusters['expected_sample_group']))))
 
         return clusters
