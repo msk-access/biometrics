@@ -39,14 +39,22 @@ biometrics genotype \
 
 All analyses output a CSV file containing the metrics from comparing each sample. An interactive heatmap can also optionally be produced by supplying the `--plot` flag. These outputs are saved either to the current working directory or to a folder you specify via `--outdir`.
 
-##### CSV file
-The CSV file contains metrics for each pair of samples compared (one on each line). Table 1 below provides a description on each column.
+{% hint style="info" %}
+It also automatically outputs two sets of clustering results: (1) the first set just clusters your input samples, and (2) the second set clusters your input samples and samples in the database. Please see the [cluster](cluster.md) documentation to understand the output files.
+{% endhint %}
+
+##### CSV files
+
+###### genotype_comparison.csv
+Contains metrics for each pair of samples compared (one on each line). The table below provides a description on each column.
 
 | Column Name | Description |
 | :--- | :--- |
 | ReferenceSample | First sample in the comparison. |
+| ReferenceSampleGroup | Group for the first sample in the comparison. |
 | QuerySample | Second sample in the comparison. |
-| DatabaseComparison | True if the comparison was between one of your input samples and one in the database. |
+| QuerySampleGroup | Group for the second sample in the comparison. |
+| CountOfCommonSites | Count of common SNP sites with enough coverage. |
 | HomozygousInRef | Number of homozygous sites in the ReferenceSample. |
 | TotalMatch | Total sites that match (homozygous and heterozygous). |
 | HomozygousMatch | Number of homozygous sites that match. |
