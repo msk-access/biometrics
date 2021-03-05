@@ -153,13 +153,15 @@ def get_args():
         samples. The output from this step is required for the rest of the
         fingerprinting tools. However, you do not need to run this step
         manually since it will run automatically if the necessary files
-        are missing.''')
+        are missing.''',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_extract = add_extraction_args(parser_extract)
 
     # sex mismatch parser
 
     parser_sexmismatch = subparsers.add_parser(
-        'sexmismatch', help='Check for sex mismatches.')
+        'sexmismatch', help='Check for sex mismatches.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_sexmismatch = add_common_tool_args(parser_sexmismatch)
     parser_sexmismatch.add_argument(
         '--coverage-threshold', default=50, type=int,
@@ -168,7 +170,8 @@ def get_args():
     # minor contamination parser
 
     parser_minor = subparsers.add_parser(
-        'minor', help='Check for minor contamination.')
+        'minor', help='Check for minor contamination.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_minor = add_common_tool_args(parser_minor)
     parser_minor.add_argument(
         '-p', '--plot', action='store_true',
@@ -180,7 +183,8 @@ def get_args():
     # major contamination parser
 
     parser_major = subparsers.add_parser(
-        'major', help='Check for major contamination.')
+        'major', help='Check for major contamination.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_major = add_common_tool_args(parser_major)
     parser_major.add_argument(
         '-p', '--plot', action='store_true',
@@ -192,7 +196,8 @@ def get_args():
     # genotyping parser
 
     parser_genotype = subparsers.add_parser(
-        'genotype', help='Compare sample genotypes to find matches/mismatches.')
+        'genotype', help='Compare sample genotypes to find matches/mismatches.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_genotype = add_common_tool_args(parser_genotype)
     parser_genotype.add_argument(
         '-p', '--plot', action='store_true',
@@ -214,7 +219,8 @@ def get_args():
     # cluster parser
 
     parser_cluster = subparsers.add_parser(
-        'cluster', help='Cluster genotype comparison results.')
+        'cluster', help='Cluster genotype comparison results.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_cluster.add_argument(
         '-i', '--input', action="append", required=True,
         help='''Path to file containing output form \'biometrics genotype\' tool.''')
