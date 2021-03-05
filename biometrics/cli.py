@@ -4,8 +4,10 @@
 import sys
 import argparse
 
-from biometrics.utils import exit_error
+from biometrics.utils import get_logger
 from biometrics.biometrics import run_biometrics
+
+logger = get_logger()
 
 
 def add_extraction_args(parser):
@@ -103,23 +105,25 @@ def add_common_tool_args(parser):
 
 
 def check_arg_equal_len(vals1, vals2, name):
+
     if vals2 is not None and len(vals1) != len(vals2):
-        exit_error(
-            '{} does not have the same number of items as --sample-bam'.format(
-                name))
+        logger.error(
+            '{} does not have the same number of items as --sample-bam'.format(name))
+        sys.exit(1)
 
 
 def check_args(args):
 
     if args.subparser_name != 'extract' and \
             not args.input and not args.sample_name:
-        exit_error('You must specify either --input or --sample-name')
+        logger.error('You must specify either --input or --sample-name')
+        sys.exit(1)
 
     if args.subparser_name == 'extract' and \
             not args.input and not args.sample_bam:
-        exit_error(
-            'The extraction tool requires that you specify either ' +
-            '--input or --sample-bam')
+        logger.error(
+            'The extraction tool requires that you specify either --input or --sample-bam')
+        sys.exit(1)
 
     if args.subparser_name == 'extract' and not args.input:
         check_arg_equal_len(args.sample_name, args.sample_bam, '--sample-bam')
