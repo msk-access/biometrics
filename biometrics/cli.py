@@ -114,6 +114,9 @@ def check_arg_equal_len(vals1, vals2, name):
 
 def check_args(args):
 
+    if args.subparser_name == 'cluster':
+        return
+
     if args.subparser_name != 'extract' and \
             not args.input and not args.sample_name:
         logger.error('You must specify either --input or --sample-name')
@@ -207,6 +210,21 @@ def get_args():
     parser_genotype.add_argument(
         '--zmax', type=float,
         help='''Maximum z value for the colorscale on the heatmap.''')
+
+    # cluster parser
+
+    parser_cluster = subparsers.add_parser(
+        'cluster', help='Cluster genotype comparison results.')
+    parser_cluster.add_argument(
+        '-i', '--input', action="append", required=True,
+        help='''Path to file containing output form \'biometrics genotype\' tool.''')
+    parser_cluster.add_argument(
+        '-o', '--output', default='genotype_clusters.csv',
+        help='''Output filename.''')
+    parser_cluster.add_argument(
+        '--discordance-threshold', default=0.05, type=float,
+        help='''Discordance values less than this are regarded
+        as matching samples.''')
 
     args = parser.parse_args()
 

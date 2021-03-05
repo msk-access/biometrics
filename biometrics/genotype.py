@@ -5,7 +5,6 @@ from multiprocessing import Pool
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
-import networkx as nx
 
 from biometrics.utils import get_logger
 
@@ -202,60 +201,6 @@ class Genotyper:
 
         return results
 
-
-    def cluster(self, samples):
-
-        assert self.comparisons is not None, "There is no fingerprint comparison data available."
-
-        if len(samples) < 1:
-            logger.warning('There are not enough samples to cluster.')
-            return None
-
-        samples_names = [i.sample_name for i in samples.values()]
-
-        comparisons = self.comparisons[self.comparisons['ReferenceSample'].isin(samples_names)]
-        comparisons['is_same_group'] = comparisons['DiscordanceRate'].map(
-            lambda x: 1 if x <= self.discordance_threshold else 0)
-
-        graph = nx.from_pandas_edgelist(
-            comparisons[comparisons['is_same_group']==1], 'ReferenceSample', 'QuerySample')
-
-        clusters = []
-
-        for cluster_idx, group in enumerate(nx.connected_components(graph)):
-            samples_group = list(group)
-
-            for i, sample in enumerate(samples_group):
-
-                comparisons_sample = comparisons[
-                    (comparisons['ReferenceSample']==sample) &
-                    (comparisons['QuerySample']!=sample)]
-                comparisons_cluster = comparisons_sample[
-                    comparisons_sample['QuerySample'].isin(samples_group)]
-
-                sample_status_counts = comparisons_sample['Status'].value_counts()
-                cluster_status_counts = comparisons_cluster['Status'].value_counts()
-
-                mean_discordance = 'NA'
-                if len(comparisons_cluster) > 0:
-                    mean_discordance = comparisons_cluster['DiscordanceRate'].mean()
-
-                row = {
-                    'sample_name': sample,
-                    'expected_sample_group': samples[sample].sample_group,
-                    'cluster_index': cluster_idx,
-                    'cluster_size': len(samples_group),
-                    'avg_discordance': mean_discordance,
-                    'count_expected_matches': cluster_status_counts.get('Expected Match', 0),
-                    'count_unexpected_matches': cluster_status_counts.get('Unexpected Match', 0),
-                    'count_expected_mismatches': sample_status_counts.get('Expected Mismatch', 0),
-                    'count_unexpected_mismatches': sample_status_counts.get('Unexpected Mismatch', 0)
-                }
-                clusters.append(row)
-
-        clusters = pd.DataFrame(clusters)
-
-        return clusters
 
     def compare_samples(self, samples):
 

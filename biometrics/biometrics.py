@@ -6,6 +6,7 @@ import pandas as pd
 from biometrics.sample import Sample
 from biometrics.extract import Extract
 from biometrics.genotype import Genotyper
+from biometrics.cluster import Cluster
 from biometrics.minor_contamination import MinorContamination
 from biometrics.major_contamination import MajorContamination
 from biometrics.sex_mismatch import SexMismatch
@@ -118,6 +119,7 @@ def run_genotyping(args, samples):
         threads=args.threads,
         zmin=args.zmin,
         zmax=args.zmax)
+    cluster_handler = Cluster(args.discordance_threshold)
     comparisons = genotyper.compare_samples(samples)
 
     # save genotyping output
@@ -133,7 +135,11 @@ def run_genotyping(args, samples):
     samples_input = dict(filter(
         lambda x: not x[1].query_group, samples.items()))
 
-    clusters = genotyper.cluster(samples_input)
+    samples_names = [i.sample_name for i in samples_input.values()]
+    comparisons_input = comparisons[
+        (comparisons['ReferenceSample'].isin(samples_names)) &
+        (comparisons['QuerySample'].isin(samples_names))].copy()
+    clusters = cluster_handler.cluster(comparisons_input)
 
     if clusters is not None:
         basename = 'genotype_clusters_input'
@@ -152,7 +158,7 @@ def run_genotyping(args, samples):
             logger.info(
                 'The set of database and input samples are the same. Will only cluster the samples once.')
         else:
-            clusters = genotyper.cluster(samples)
+            clusters = cluster_handler.cluster(comparisons)
 
             if clusters is not None:
                 basename = 'genotype_clusters_database'
@@ -170,6 +176,21 @@ def run_genotyping(args, samples):
             genotyper.plot(comparisons, args.outdir)
 
     return samples
+
+
+def run_cluster(args):
+
+    comparisons = pd.read_csv(args.input)
+
+    cluster_handler = Cluster(args.discordance_threshold)
+    clusters = cluster_handler.cluster(comparisons)
+
+    if clusters is not None:
+        basename = 'genotype_clusters_input'
+        if args.prefix:
+            basename = args.prefix + '_' + basename
+
+        write_to_file(args, clusters, basename)
 
 
 def load_input_sample_from_db(sample_name, database):
@@ -339,6 +360,10 @@ def run_biometrics(args):
     """
     Decide what tool to run based in CLI input.
     """
+
+    if args.subparser_name == 'cluster':
+        run_cluster(args)
+        return
 
     extraction_mode = args.subparser_name == 'extract'
 
