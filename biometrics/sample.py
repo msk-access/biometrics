@@ -2,7 +2,6 @@ import pickle
 import os
 
 import pandas as pd
-from biometrics.utils import exit_error
 
 
 class Sample:
@@ -53,12 +52,9 @@ class Sample:
         if extraction_file is not None:
             self.extraction_file = extraction_file
 
-        if self.extraction_file is None:
-            exit_error('Extraction file path is None.')
-
-        if not os.path.exists(self.extraction_file):
-            exit_error('Extraction file does not exist: {}'.format(
-                self.extraction_file))
+        assert self.extraction_file is not None, 'Extraction file path is None.'
+        assert os.path.exists(self.extraction_file), 'Extraction file does not exist: {}'.format(
+            self.extraction_file)
 
         sample_data = pickle.load(open(self.extraction_file, "rb"))
 
