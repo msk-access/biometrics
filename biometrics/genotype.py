@@ -227,20 +227,26 @@ class Genotyper:
 
             for i, sample in enumerate(samples_group):
 
-                comparisons_sample = comparisons[comparisons['ReferenceSample']==sample]
+                comparisons_sample = comparisons[
+                    (comparisons['ReferenceSample']==sample) &
+                    (comparisons['QuerySample']!=sample)]
                 comparisons_cluster = comparisons_sample[
                     comparisons_sample['QuerySample'].isin(samples_group)]
 
                 sample_status_counts = comparisons_sample['Status'].value_counts()
                 cluster_status_counts = comparisons_cluster['Status'].value_counts()
 
+                mean_discordance = 'NA'
+                if len(comparisons_cluster) > 0:
+                    mean_discordance = comparisons_cluster['DiscordanceRate'].mean()
+
                 row = {
                     'sample_name': sample,
                     'expected_sample_group': samples_input[sample].sample_group,
                     'cluster_index': cluster_idx,
-                    'avg_discordance': comparisons_cluster['DiscordanceRate'].mean(),
+                    'avg_discordance': mean_discordance,
                     'cluster_size': len(samples_group),
-                    'count_expected_matches': cluster_status_counts.get('Expected Match', 0) - 1,
+                    'count_expected_matches': cluster_status_counts.get('Expected Match', 0),
                     'count_unexpected_matches': cluster_status_counts.get('Unexpected Match', 0),
                     'count_expected_mismatches': sample_status_counts.get('Expected Mismatch', 0),
                     'count_unexpected_mismatches': sample_status_counts.get('Unexpected Mismatch', 0)
