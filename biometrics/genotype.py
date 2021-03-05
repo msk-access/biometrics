@@ -1,3 +1,4 @@
+import sys
 import os
 from multiprocessing import Pool
 
@@ -6,9 +7,10 @@ import numpy as np
 import plotly.graph_objects as go
 import networkx as nx
 
-from biometrics.utils import exit_error
+from biometrics.utils import get_logger
 
 EPSILON = 1e-9
+logger = get_logger()
 
 
 class Genotyper:
@@ -212,7 +214,7 @@ class Genotyper:
         assert self.comparisons is not None, "There is no fingerprint comparison data available."
 
         if len(samples) < 1:
-            print('There are not enough samples to cluster.')
+            logger.warning('There are not enough samples to cluster.')
             return None
 
         samples_names = [i.sample_name for i in samples.values()]
@@ -283,10 +285,12 @@ class Genotyper:
 
         if self.no_db_compare:
             if len(samples_input) <= 1:
-                exit_error("You need to specify 2 or more samples in order to compare genotypes.")
+                logger.error("You need to specify 2 or more samples in order to compare genotypes.")
+                sys.exit(1)
         else:
             if len(samples_input) <= 1 and len(samples_db) < 1:
-                exit_error("There are no samples in the database to compare with")
+                logger.error("There are no samples in the database to compare with")
+                sys.exit(1)
 
         # compare all the input samples to each other
 
