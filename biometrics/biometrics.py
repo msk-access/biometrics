@@ -126,14 +126,32 @@ def run_genotyping(args, samples):
 
     write_to_file(args, comparisons, basename)
 
-    # cluster the samples
+    # cluster just the input samples
 
-    clusters = genotyper.cluster_samples(samples)
-    basename = 'genotype_clusters'
-    if args.prefix:
-        basename = args.prefix + '_' + basename
+    samples_input = dict(filter(
+        lambda x: not x[1].query_group, samples.items()))
 
-    write_to_file(args, clusters, basename)
+    clusters = genotyper.cluster(samples_input)
+
+    if clusters is not None:
+        basename = 'genotype_clusters_input'
+        if args.prefix:
+            basename = args.prefix + '_' + basename
+
+        write_to_file(args, clusters, basename)
+
+    # cluster all the samples
+
+    if not args.no_db_compare:
+
+        clusters = genotyper.cluster(samples)
+
+        if clusters is not None:
+            basename = 'genotype_clusters_database'
+            if args.prefix:
+                basename = args.prefix + '_' + basename
+
+            write_to_file(args, clusters, basename)
 
     # save plots
 

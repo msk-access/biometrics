@@ -21,7 +21,6 @@ class Genotyper:
         self.zmin = zmin
         self.sample_type_ratio = 1
         self.comparisons = None
-        self.clusters = None
 
     def are_samples_same_group(self, sample1, sample2):
 
@@ -208,17 +207,17 @@ class Genotyper:
         return results
 
 
-    def cluster_samples(self, samples):
+    def cluster(self, samples):
 
-        samples_input = dict(filter(
-            lambda x: not x[1].query_group, samples.items()))
+        assert self.comparisons is not None, "There is no fingerprint comparison data available."
 
-        if len(samples_input) == 0 or self.comparisons is None:
-            return
+        if len(samples) < 1:
+            print('There are not enough samples to cluster.')
+            return None
 
-        samples_input_names = [i.sample_name for i in samples_input.values()]
+        samples_names = [i.sample_name for i in samples.values()]
 
-        comparisons = self.comparisons[self.comparisons['ReferenceSample'].isin(samples_input_names)]
+        comparisons = self.comparisons[self.comparisons['ReferenceSample'].isin(samples_names)]
         comparisons['is_same_group'] = comparisons['DiscordanceRate'].map(
             lambda x: 1 if x <= self.discordance_threshold else 0)
 
@@ -247,7 +246,7 @@ class Genotyper:
 
                 row = {
                     'sample_name': sample,
-                    'expected_sample_group': samples_input[sample].sample_group,
+                    'expected_sample_group': samples[sample].sample_group,
                     'cluster_index': cluster_idx,
                     'cluster_size': len(samples_group),
                     'avg_discordance': mean_discordance,
@@ -258,8 +257,9 @@ class Genotyper:
                 }
                 clusters.append(row)
 
-        self.clusters = pd.DataFrame(clusters)
-        return self.clusters
+        clusters = pd.DataFrame(clusters)
+
+        return clusters
 
     def compare_samples(self, samples):
 
