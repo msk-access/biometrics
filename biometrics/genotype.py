@@ -336,4 +336,13 @@ class Genotyper:
             'HeterozygousMismatch', 'DiscordanceRate', 'Matched',
             'ExpectedMatch', 'Status']]
 
+        logger.info('Count of expected matches: {}'.format(
+            len(comparisons[comparisons['Status']=="Expected Match"])))
+        logger.info('Count of unexpected matches: {}'.format(
+            len(comparisons[comparisons['Status']=="Unexpected Match"])))
+        logger.info('Count of unexpected mismatches: {}'.format(
+            len(comparisons[comparisons['Status']=="Unexpected Mismatch"])))
+        logger.info('Count of expected mismatches: {}'.format(
+            len(comparisons[comparisons['Status']=="Expected Mismatch"])))
+
         return self.comparisons
