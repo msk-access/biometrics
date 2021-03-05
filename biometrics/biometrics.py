@@ -124,13 +124,21 @@ def run_genotyping(args, samples):
 
     write_to_file(args, comparisons, basename)
 
-    predictions = genotyper.predict_group(samples)
+    # predictions = genotyper.predict_group(samples)
+    #
+    # basename = 'group_predictions'
+    # if args.prefix:
+    #     basename = args.prefix + '_' + basename
+    #
+    # write_to_file(args, predictions, basename)
 
-    basename = 'group_predictions'
+    clusters = genotyper.cluster_samples(samples)
+    basename = 'genotype_clusters'
     if args.prefix:
         basename = args.prefix + '_' + basename
 
-    write_to_file(args, predictions, basename)
+    write_to_file(args, clusters, basename)
+
 
     if args.plot:
         if len(samples) > 1000:

@@ -4,6 +4,7 @@ from multiprocessing import Pool
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
+import networkx as nx
 
 from biometrics.utils import exit_error
 
@@ -21,6 +22,7 @@ class Genotyper:
         self.sample_type_ratio = 1
         self.comparisons = None
         self.prediction_groups = None
+        self.clusters = None
 
     def are_samples_same_group(self, sample1, sample2):
 
@@ -258,6 +260,49 @@ class Genotyper:
         self.prediction_groups = pd.DataFrame(predictions)
         self.prediction_groups = self.prediction_groups.sort_values(['sample', 'n_sample_matches'])
         return self.prediction_groups
+
+    def cluster_samples(self, samples):
+
+        samples_input = dict(filter(
+            lambda x: not x[1].query_group, samples.items()))
+
+        if len(samples_input) == 0 or self.comparisons is None:
+            return
+
+        samples_input_names = [i.sample_name for i in samples_input.values()]
+
+        data = self.comparisons[self.comparisons['ReferenceSample'].isin(samples_input_names)]
+        data['is_same_group'] = data['DiscordanceRate'].map(
+            lambda x: 1 if x <= self.discordance_threshold else 0)
+
+        graph = nx.from_pandas_edgelist(
+            data[data['is_same_group']==1], 'ReferenceSample', 'QuerySample')
+
+        clusters = []
+        cluster_idx = 0
+
+        for group in nx.connected_components(graph):
+            samples_group = list(group)
+
+            for i, sample_i in enumerate(samples_group):
+
+                avg_discordance = data[
+                    (data['ReferenceSample']==sample_i) &
+                    (data['QuerySample'].isin(samples_group))]['DiscordanceRate'].mean()
+
+                row = {
+                    'sample_name': sample_i,
+                    'expected_sample_group': samples_input[sample_i].sample_group,
+                    'cluster_index': cluster_idx,
+                    'avg_discordance': avg_discordance,
+                    'cluster_size': len(samples_group)
+                }
+                clusters.append(row)
+
+            cluster_idx += 1
+
+        self.clusters = pd.DataFrame(clusters)
+        return self.clusters
 
     def compare_samples(self, samples):
 
