@@ -192,7 +192,7 @@ def get_args():
     # genotyping parser
 
     parser_genotype = subparsers.add_parser(
-        'genotype', help='Genotype a set of samples.')
+        'genotype', help='Compare sample genotypes to find matches/mismatches.')
     parser_genotype = add_common_tool_args(parser_genotype)
     parser_genotype.add_argument(
         '-p', '--plot', action='store_true',
