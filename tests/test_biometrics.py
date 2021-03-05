@@ -43,6 +43,7 @@ class TestBiometrics(TestCase):
             major_threshold=0.6,
             discordance_threshold=0.05,
             coverage_threshold=50,
+            min_homozygous_thresh=0.1,
             zmin=None,
             zmax=None,
             outdir='.',
@@ -51,6 +52,7 @@ class TestBiometrics(TestCase):
             default_genotype=None,
             overwrite=True,
             no_db_compare=False,
+            prefix='test',
             threads=1))
     def setUp(self, mock_args):
         """Set up test fixtures, if any."""
@@ -112,7 +114,7 @@ class TestBiometrics(TestCase):
             threads=self.args.threads,
             zmin=self.args.zmin,
             zmax=self.args.zmax)
-        data = genotyper.genotype(samples)
+        data = genotyper.compare_samples(samples)
 
         self.assertEqual(len(data), 4, msg='There were not four comparisons done.')
         self.assertEqual(set(data['Status']), set(['Expected Match']), msg='All sample comparisons were expected to match.')

@@ -6,10 +6,13 @@ import pandas as pd
 from biometrics.sample import Sample
 from biometrics.extract import Extract
 from biometrics.genotype import Genotyper
+from biometrics.cluster import Cluster
 from biometrics.minor_contamination import MinorContamination
 from biometrics.major_contamination import MajorContamination
 from biometrics.sex_mismatch import SexMismatch
-from biometrics.utils import standardize_sex_nomenclature, exit_error
+from biometrics.utils import standardize_sex_nomenclature, get_logger
+
+logger = get_logger()
 
 
 def write_to_file(args, data, basename):
@@ -47,7 +50,12 @@ def run_sexmismatch(args, samples):
     sex_mismatch = SexMismatch(args.coverage_threshold)
 
     results = sex_mismatch.detect_mismatch(samples)
-    write_to_file(args, results, 'sex_mismatch')
+
+    basename = 'sex_mismatch'
+    if args.prefix:
+        basename = args.prefix + '_' + basename
+
+    write_to_file(args, results, basename)
 
 
 def run_minor_contamination(args, samples):
@@ -59,11 +67,16 @@ def run_minor_contamination(args, samples):
     samples = minor_contamination.estimate(samples)
 
     data = minor_contamination.to_dataframe(samples)
-    write_to_file(args, data, 'minor_contamination')
+
+    basename = 'minor_contamination'
+    if args.prefix:
+        basename = args.prefix + '_' + basename
+
+    write_to_file(args, data, basename)
 
     if args.plot:
         if len(samples) > 1000:
-            print('WARNING - Turning off plotting functionality. You are trying to plot more than 1000 samples, which is too cumbersome.')
+            logger.warning('Turning off plotting functionality. You are trying to plot more than 1000 samples, which is too cumbersome.')
         else:
             minor_contamination.plot(data, args.outdir)
 
@@ -79,11 +92,16 @@ def run_major_contamination(args, samples):
     samples = major_contamination.estimate(samples)
 
     data = major_contamination.to_dataframe(samples)
-    write_to_file(args, data, 'major_contamination')
+
+    basename = 'major_contamination'
+    if args.prefix:
+        basename = args.prefix + '_' + basename
+
+    write_to_file(args, data, basename)
 
     if args.plot:
         if len(samples) > 1000:
-            print('WARNING - Turning off plotting functionality. You are trying to plot more than 1000 samples, which is too cumbersome.')
+            logger.warning('Turning off plotting functionality. You are trying to plot more than 1000 samples, which is too cumbersome.')
         else:
             major_contamination.plot(data, args.outdir)
 
@@ -101,17 +119,85 @@ def run_genotyping(args, samples):
         threads=args.threads,
         zmin=args.zmin,
         zmax=args.zmax)
-    data = genotyper.genotype(samples)
+    cluster_handler = Cluster(args.discordance_threshold)
+    comparisons = genotyper.compare_samples(samples)
 
-    write_to_file(args, data, 'genotype_comparison')
+    # save genotyping output
+
+    basename = 'genotype_comparison'
+    if args.prefix:
+        basename = args.prefix + '_' + basename
+
+    write_to_file(args, comparisons, basename)
+
+    # cluster just the input samples
+
+    samples_input = dict(filter(
+        lambda x: not x[1].query_group, samples.items()))
+
+    samples_names = [i.sample_name for i in samples_input.values()]
+    comparisons_input = comparisons[
+        (comparisons['ReferenceSample'].isin(samples_names)) &
+        (comparisons['QuerySample'].isin(samples_names))].copy()
+
+    logger.info('Clustering input samples...')
+    clusters = cluster_handler.cluster(comparisons_input)
+
+    if clusters is not None:
+        basename = 'genotype_clusters_input'
+        if args.prefix:
+            basename = args.prefix + '_' + basename
+
+        write_to_file(args, clusters, basename)
+
+    # cluster all the samples
+
+    if not args.no_db_compare:
+
+        are_there_db_samples = len(samples_input) != len(samples)
+
+        if not are_there_db_samples:
+            logger.warning(
+                'The set of database and input samples are the same. Will only cluster the samples once.')
+        else:
+            logger.info('Clustering input and database samples...')
+            clusters = cluster_handler.cluster(comparisons)
+
+            if clusters is not None:
+                basename = 'genotype_clusters_database'
+                if args.prefix:
+                    basename = args.prefix + '_' + basename
+
+                write_to_file(args, clusters, basename)
+
+    # save plots
 
     if args.plot:
         if len(samples) > 1000:
-            print('WARNING - Turning off plotting functionality. You are trying to plot more than 1000 samples, which is too cumbersome.')
+            logger.warning('Turning off plotting functionality. You are trying to plot more than 1000 samples, which is too cumbersome.')
         else:
-            genotyper.plot(data, args.outdir)
+            genotyper.plot(comparisons, args.outdir)
 
     return samples
+
+
+def run_cluster(args):
+
+    comparisons = []
+    for input in args.input:
+        comparisons.append(
+            pd.read_csv(input)
+        )
+    comparisons = pd.concat(comparisons)
+    comparisons = comparisons.drop_duplicates(['ReferenceSample', 'QuerySample'])
+
+    cluster_handler = Cluster(args.discordance_threshold)
+
+    logger.info('Clustering input samples...')
+    clusters = cluster_handler.cluster(comparisons)
+
+    if clusters is not None:
+        clusters.to_csv(args.output, index=False)
 
 
 def load_input_sample_from_db(sample_name, database):
@@ -122,10 +208,8 @@ def load_input_sample_from_db(sample_name, database):
 
     extraction_file = os.path.join(database, sample_name + '.pk')
 
-    if not os.path.exists(extraction_file):
-        exit_error(
-            'Could not find: {}. Please rerun the extraction step.'.format(
-                extraction_file))
+    assert os.path.exists(extraction_file), 'Could not find: {}. Please rerun the extraction step.'.format(
+        extraction_file)
 
     sample = Sample(query_group=False)
     sample.load_from_file(extraction_file)
@@ -169,12 +253,8 @@ def get_samples_from_input(input, database, extraction_mode):
 
         # check if some required columns are present
 
-        if 'sample_bam' not in input.columns:
-            exit_error(
-                'Input file does not have the \'sample_bam\' column.')
-
-        if 'sample_name' not in input.columns:
-            exit_error('Input does not have \'sample_name\' column.')
+        assert 'sample_bam' in input.columns, 'Input file does not have the \'sample_bam\' column.'
+        assert 'sample_name' in input.columns, 'Input does not have \'sample_name\' column.'
 
         input = input.to_dict(orient='records')
 
@@ -287,6 +367,10 @@ def run_biometrics(args):
     """
     Decide what tool to run based in CLI input.
     """
+
+    if args.subparser_name == 'cluster':
+        run_cluster(args)
+        return
 
     extraction_mode = args.subparser_name == 'extract'
 

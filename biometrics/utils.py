@@ -1,9 +1,17 @@
-import sys
+import logging
 
 
-def exit_error(msg):
-    print("ERROR: {}".format(msg))
-    sys.exit(1)
+def get_logger(debug=False):
+    FORMAT = '%(levelname)s - %(asctime)-15s: %(message)s'
+    logging.basicConfig(format=FORMAT)
+    logger = logging.getLogger("biometrics")
+
+    if debug:
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
+
+    return logger
 
 
 def standardize_sex_nomenclature(val):

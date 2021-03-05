@@ -4,8 +4,10 @@
 import sys
 import argparse
 
-from utils import exit_error
+from biometrics.utils import get_logger
 from biometrics.biometrics import run_biometrics
+
+logger = get_logger()
 
 
 def add_extraction_args(parser):
@@ -60,6 +62,9 @@ def add_extraction_args(parser):
         '-mc', '--min-coverage', default=10, type=int,
         help='''Minimum coverage to count a site.''')
     parser.add_argument(
+        '-mht', '--min-homozygous-thresh', default=0.1, type=float,
+        help='''Minimum threshold to define homozygous.''')
+    parser.add_argument(
         '--default-genotype', default=None,
         help='''Default genotype if coverage is too low (options are Het or Hom).''')
     parser.add_argument(
@@ -86,6 +91,9 @@ def add_common_tool_args(parser):
         '-o', '--outdir', default='.',
         help='''Output directory for results.''')
     parser.add_argument(
+        '--prefix', default=None,
+        help='''Output file prefix.''')
+    parser.add_argument(
         '-j', '--json', action='store_true',
         help='''Also output data in JSON format.''')
     parser.add_argument(
@@ -97,25 +105,30 @@ def add_common_tool_args(parser):
 
 
 def check_arg_equal_len(vals1, vals2, name):
+
     if vals2 is not None and len(vals1) != len(vals2):
-        exit_error(
-            '{} does not have the same number of items as --sample-bam'.format(
-                name))
+        logger.error(
+            '{} does not have the same number of items as --sample-bam'.format(name))
+        sys.exit(1)
 
 
 def check_args(args):
 
+    if args.subparser_name == 'cluster':
+        return
+
     if args.subparser_name != 'extract' and \
             not args.input and not args.sample_name:
-        exit_error('You must specify either --input or --sample-name')
+        logger.error('You must specify either --input or --sample-name')
+        sys.exit(1)
 
     if args.subparser_name == 'extract' and \
             not args.input and not args.sample_bam:
-        exit_error(
-            'The extraction tool requires that you specify either ' +
-            '--input or --sample-bam')
+        logger.error(
+            'The extraction tool requires that you specify either --input or --sample-bam')
+        sys.exit(1)
 
-    if args.sample_name:
+    if args.subparser_name == 'extract' and not args.input:
         check_arg_equal_len(args.sample_name, args.sample_bam, '--sample-bam')
         check_arg_equal_len(args.sample_name, args.sample_type, '--sample-type')
         check_arg_equal_len(
@@ -140,13 +153,15 @@ def get_args():
         samples. The output from this step is required for the rest of the
         fingerprinting tools. However, you do not need to run this step
         manually since it will run automatically if the necessary files
-        are missing.''')
+        are missing.''',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_extract = add_extraction_args(parser_extract)
 
     # sex mismatch parser
 
     parser_sexmismatch = subparsers.add_parser(
-        'sexmismatch', help='Check for sex mismatches.')
+        'sexmismatch', help='Check for sex mismatches.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_sexmismatch = add_common_tool_args(parser_sexmismatch)
     parser_sexmismatch.add_argument(
         '--coverage-threshold', default=50, type=int,
@@ -155,7 +170,8 @@ def get_args():
     # minor contamination parser
 
     parser_minor = subparsers.add_parser(
-        'minor', help='Check for minor contamination.')
+        'minor', help='Check for minor contamination.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_minor = add_common_tool_args(parser_minor)
     parser_minor.add_argument(
         '-p', '--plot', action='store_true',
@@ -167,7 +183,8 @@ def get_args():
     # major contamination parser
 
     parser_major = subparsers.add_parser(
-        'major', help='Check for major contamination.')
+        'major', help='Check for major contamination.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_major = add_common_tool_args(parser_major)
     parser_major.add_argument(
         '-p', '--plot', action='store_true',
@@ -179,7 +196,8 @@ def get_args():
     # genotyping parser
 
     parser_genotype = subparsers.add_parser(
-        'genotype', help='Genotype a set of samples.')
+        'genotype', help='Compare sample genotypes to find matches/mismatches.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_genotype = add_common_tool_args(parser_genotype)
     parser_genotype.add_argument(
         '-p', '--plot', action='store_true',
@@ -198,6 +216,23 @@ def get_args():
         '--zmax', type=float,
         help='''Maximum z value for the colorscale on the heatmap.''')
 
+    # cluster parser
+
+    parser_cluster = subparsers.add_parser(
+        'cluster', help='Cluster genotype comparison results.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser_cluster.add_argument(
+        '-i', '--input', action="append", required=True,
+        help='''Path to file containing output form \'biometrics genotype\' tool.
+        Can be specified more than once.''')
+    parser_cluster.add_argument(
+        '-o', '--output', default='genotype_clusters.csv',
+        help='''Output filename.''')
+    parser_cluster.add_argument(
+        '--discordance-threshold', default=0.05, type=float,
+        help='''Discordance values less than this are regarded
+        as matching samples.''')
+
     args = parser.parse_args()
 
     check_args(args)
@@ -210,6 +245,8 @@ def main():
     args = get_args()
 
     run_biometrics(args)
+
+    return 0
 
 
 if __name__ == "__main__":

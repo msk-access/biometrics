@@ -1,3 +1,4 @@
+import sys
 import os
 from multiprocessing import Pool
 
@@ -5,9 +6,10 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 
-from utils import exit_error
+from biometrics.utils import get_logger
 
 EPSILON = 1e-9
+logger = get_logger()
 
 
 class Genotyper:
@@ -19,6 +21,7 @@ class Genotyper:
         self.zmax = zmax
         self.zmin = zmin
         self.sample_type_ratio = 1
+        self.comparisons = None
 
     def are_samples_same_group(self, sample1, sample2):
 
@@ -89,12 +92,6 @@ class Genotyper:
             width=width, height=height)
         fig.write_html(os.path.join(outdir, name))
 
-        data = data[[
-            'ReferenceSample', 'QuerySample', 'DatabaseComparison',
-            'HomozygousInRef', 'TotalMatch', 'HomozygousMatch',
-            'HeterozygousMatch', 'HomozygousMismatch', 'HeterozygousMismatch',
-            'DiscordanceRate', 'Matched', 'ExpectedMatch', 'Status']]
-
     def plot(self, data, outdir):
 
         # make plot for comparing input samples with each other
@@ -134,7 +131,9 @@ class Genotyper:
 
         row = {
             'ReferenceSample': reference_sample.sample_name,
-            'QuerySample': query_sample.sample_name}
+            'ReferenceSampleGroup': reference_sample.sample_group,
+            'QuerySample': query_sample.sample_name,
+            'QuerySampleGroup': query_sample.sample_group}
 
         if len(pileup_query) > 0:
             row['HomozygousInRef'] = sum(pileup_ref['genotype_class'] == 'Hom')
@@ -190,6 +189,11 @@ class Genotyper:
                     jobs.append(current_batch)
                     current_batch = []
 
+        # add any remaining jobs
+
+        if len(current_batch) > 0:
+            jobs.append(current_batch)
+
         # analyze, collect results, and flatten the lists
 
         results = thread_pool.map(self._compute_discordance_batch_job, jobs)
@@ -197,9 +201,10 @@ class Genotyper:
 
         return results
 
-    def genotype(self, samples):
 
-        data = []
+    def compare_samples(self, samples):
+
+        comparisons = []
         samples_db = dict(filter(lambda x: x[1].query_group, samples.items()))
         samples_input = dict(filter(
             lambda x: not x[1].query_group, samples.items()))
@@ -219,10 +224,12 @@ class Genotyper:
 
         if self.no_db_compare:
             if len(samples_input) <= 1:
-                exit_error("You need to specify 2 or more samples in order to compare genotypes.")
+                logger.error("You need to specify 2 or more samples in order to compare genotypes.")
+                sys.exit(1)
         else:
             if len(samples_input) <= 1 and len(samples_db) < 1:
-                exit_error("There are no samples in the database to compare with")
+                logger.error("There are no samples in the database to compare with")
+                sys.exit(1)
 
         # compare all the input samples to each other
 
@@ -232,7 +239,7 @@ class Genotyper:
 
             for i in range(len(results)):
                 results[i]['DatabaseComparison'] = True
-            data += results
+            comparisons += results
 
         # for each input sample, compare with all the samples in the db
 
@@ -242,36 +249,46 @@ class Genotyper:
 
             for i in range(len(results)):
                 results[i]['DatabaseComparison'] = True
-            data += results
+            comparisons += results
 
-        data = pd.DataFrame(data)
+        comparisons = pd.DataFrame(comparisons)
 
         # compute discordance rate
 
-        data['DiscordanceRate'] = data['HomozygousMismatch'] / (data['HomozygousInRef'] + EPSILON)
+        comparisons['DiscordanceRate'] = comparisons['HomozygousMismatch'] / (comparisons['HomozygousInRef'] + EPSILON)
         # data['DiscordanceRate'] = data['DiscordanceRate'].map(lambda x: round(x, 6))
-        data.loc[data['HomozygousInRef'] < 10, 'DiscordanceRate'] = np.nan
+        comparisons.loc[comparisons['HomozygousInRef'] < 10, 'DiscordanceRate'] = np.nan
 
         # for each comparison, indicate if the match/mismatch is expected
         # or not expected
 
-        data['Matched'] = data['DiscordanceRate'] < self.discordance_threshold
-        data['ExpectedMatch'] = data.apply(
+        comparisons['Matched'] = comparisons['DiscordanceRate'] < self.discordance_threshold
+        comparisons['ExpectedMatch'] = comparisons.apply(
             lambda x: self.are_samples_same_group(
                 samples[x['ReferenceSample']],
                 samples[x['QuerySample']]), axis=1)
 
-        data['Status'] = ''
-        data.loc[data.Matched & data.ExpectedMatch, 'Status'] = "Expected Match"
-        data.loc[data.Matched & ~data.ExpectedMatch, 'Status'] = "Unexpected Match"
-        data.loc[~data.Matched & data.ExpectedMatch, 'Status'] = "Unexpected Mismatch"
-        data.loc[~data.Matched & ~data.ExpectedMatch, 'Status'] = "Expected Mismatch"
+        comparisons['Status'] = ''
+        comparisons.loc[comparisons.Matched & comparisons.ExpectedMatch, 'Status'] = "Expected Match"
+        comparisons.loc[comparisons.Matched & ~comparisons.ExpectedMatch, 'Status'] = "Unexpected Match"
+        comparisons.loc[~comparisons.Matched & comparisons.ExpectedMatch, 'Status'] = "Unexpected Mismatch"
+        comparisons.loc[~comparisons.Matched & ~comparisons.ExpectedMatch, 'Status'] = "Expected Mismatch"
 
-        data = data[[
-            'ReferenceSample', 'QuerySample', 'CountOfCommonSites',
-            'HomozygousInRef', 'TotalMatch', 'HomozygousMatch',
+        self.comparisons = comparisons[[
+            'ReferenceSample', 'ReferenceSampleGroup', 'QuerySample', 'QuerySampleGroup',
+            'CountOfCommonSites', 'HomozygousInRef', 'TotalMatch', 'HomozygousMatch',
             'HeterozygousMatch', 'HomozygousMismatch',
             'HeterozygousMismatch', 'DiscordanceRate', 'Matched',
             'ExpectedMatch', 'Status']]
 
-        return data
+        logger.info('Total comparisons: {}'.format(len(comparisons)))
+        logger.info('Count of expected matches: {}'.format(
+            len(comparisons[comparisons['Status']=="Expected Match"])))
+        logger.info('Count of unexpected matches: {}'.format(
+            len(comparisons[comparisons['Status']=="Unexpected Match"])))
+        logger.info('Count of unexpected mismatches: {}'.format(
+            len(comparisons[comparisons['Status']=="Unexpected Mismatch"])))
+        logger.info('Count of expected mismatches: {}'.format(
+            len(comparisons[comparisons['Status']=="Expected Mismatch"])))
+
+        return self.comparisons
