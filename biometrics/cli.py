@@ -221,6 +221,8 @@ def main():
 
     run_biometrics(args)
 
+    return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -93,12 +93,6 @@ class Genotyper:
             width=width, height=height)
         fig.write_html(os.path.join(outdir, name))
 
-        data = data[[
-            'ReferenceSample', 'QuerySample', 'DatabaseComparison',
-            'HomozygousInRef', 'TotalMatch', 'HomozygousMatch',
-            'HeterozygousMatch', 'HomozygousMismatch', 'HeterozygousMismatch',
-            'DiscordanceRate', 'Matched', 'ExpectedMatch', 'Status']]
-
     def plot(self, data, outdir):
 
         # make plot for comparing input samples with each other
