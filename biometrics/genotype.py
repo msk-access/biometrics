@@ -298,10 +298,10 @@ class Genotyper:
                     'cluster_index': cluster_idx,
                     'avg_discordance': data_i['DiscordanceRate'].mean(),
                     'cluster_size': len(samples_group),
-                    'count_expected_matches': match_type_counts['Expected Match'],
-                    'count_unexpected_matches': match_type_counts['Unexpected Match'],
-                    'count_expected_mismatches': match_type_counts['Unexpected Mismatch'],
-                    'count_unexpected_mismatches': match_type_counts['Expected Mismatch']
+                    'count_expected_matches': match_type_counts.get('Expected Match'),
+                    'count_unexpected_matches': match_type_counts.get('Unexpected Match'),
+                    'count_expected_mismatches': match_type_counts.get('Unexpected Mismatch'),
+                    'count_unexpected_mismatches': match_type_counts.get('Expected Mismatch')
                 }
                 clusters.append(row)
 
