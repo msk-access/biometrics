@@ -22,6 +22,16 @@ biometrics cluster \
   -o genotype_clusters.csv
 ```
 
+You can also specify multiple inputs. It will automatically drop duplicate comparisons.
+
+```shell
+biometrics cluster \
+  -i genotype_comparison_1.csv \
+  -i genotype_comparison_2.csv \
+  -i genotype_comparison_3.csv \
+  -o genotype_clusters.csv
+```
+
 ### Output
 
 Produces a CSV file that contains the clustering results. Each row corresponds to a different sample. The table below provides a description on each column.
