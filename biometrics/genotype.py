@@ -213,39 +213,39 @@ class Genotyper:
 
         samples_input_names = [i.sample_name for i in samples_input.values()]
 
-        data = self.comparisons[self.comparisons['ReferenceSample'].isin(samples_input_names)]
-        data['is_same_group'] = data['DiscordanceRate'].map(
+        comparisons = self.comparisons[self.comparisons['ReferenceSample'].isin(samples_input_names)]
+        comparisons['is_same_group'] = comparisons['DiscordanceRate'].map(
             lambda x: 1 if x <= self.discordance_threshold else 0)
 
         graph = nx.from_pandas_edgelist(
-            data[data['is_same_group']==1], 'ReferenceSample', 'QuerySample')
+            comparisons[comparisons['is_same_group']==1], 'ReferenceSample', 'QuerySample')
 
         clusters = []
-        cluster_idx = 0
 
-        for group in nx.connected_components(graph):
+        for cluster_idx, group in enumerate(nx.connected_components(graph)):
             samples_group = list(group)
 
-            for i, sample_i in enumerate(samples_group):
+            for i, sample in enumerate(samples_group):
 
-                data_i = data[
-                    (data['ReferenceSample']==sample_i) &
-                    (data['QuerySample'].isin(samples_group))]
+                comparisons_sample = comparisons[comparisons['ReferenceSample']==sample]
+                comparisons_cluster = comparisons_sample[
+                    comparisons_sample['QuerySample'].isin(samples_group)]
 
-                match_type_counts = data_i['Status'].value_counts()
+                sample_status_counts = comparisons_sample['Status'].value_counts()
+                cluster_status_counts = comparisons_cluster['Status'].value_counts()
 
                 row = {
-                    'sample_name': sample_i,
-                    'expected_sample_group': samples_input[sample_i].sample_group,
+                    'sample_name': sample,
+                    'expected_sample_group': samples_input[sample].sample_group,
                     'cluster_index': cluster_idx,
-                    'avg_discordance': data_i['DiscordanceRate'].mean(),
+                    'avg_discordance': comparisons_cluster['DiscordanceRate'].mean(),
                     'cluster_size': len(samples_group),
-                    'count_expected_matches': match_type_counts.get('Expected Match', 0) - 1,
-                    'count_unexpected_matches': match_type_counts.get('Unexpected Match', 0)
+                    'count_expected_matches': cluster_status_counts.get('Expected Match', 0) - 1,
+                    'count_unexpected_matches': cluster_status_counts.get('Unexpected Match', 0),
+                    'count_expected_mismatches': sample_status_counts.get('Unexpected Mismatch', 0),
+                    'count_unexpected_mismatches': sample_status_counts.get('Expected Mismatch', 0)
                 }
                 clusters.append(row)
-
-            cluster_idx += 1
 
         self.clusters = pd.DataFrame(clusters)
         return self.clusters
