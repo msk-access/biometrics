@@ -195,6 +195,11 @@ class Genotyper:
                     jobs.append(current_batch)
                     current_batch = []
 
+        # add any remaining jobs
+
+        if len(current_batch) > 0:
+            jobs.append(current_batch)
+
         # analyze, collect results, and flatten the lists
 
         results = thread_pool.map(self._compute_discordance_batch_job, jobs)
