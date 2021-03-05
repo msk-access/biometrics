@@ -197,11 +197,7 @@ def run_cluster(args):
     clusters = cluster_handler.cluster(comparisons)
 
     if clusters is not None:
-        basename = 'genotype_clusters_input'
-        if args.prefix:
-            basename = args.prefix + '_' + basename
-
-        write_to_file(args, clusters, basename)
+        clusters.to_csv(args.output, index=False)
 
 
 def load_input_sample_from_db(sample_name, database):
