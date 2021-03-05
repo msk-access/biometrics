@@ -21,7 +21,6 @@ class Genotyper:
         self.zmin = zmin
         self.sample_type_ratio = 1
         self.comparisons = None
-        self.prediction_groups = None
         self.clusters = None
 
     def are_samples_same_group(self, sample1, sample2):
@@ -203,63 +202,6 @@ class Genotyper:
 
         return results
 
-    def predict_group(self, samples):
-
-        samples_input = dict(filter(
-            lambda x: not x[1].query_group, samples.items()))
-
-        if len(samples_input) == 0 or self.comparisons is None:
-            return
-
-        predictions = []
-
-        for sample_name, sample in samples_input.items():
-            row_empty = {
-                'sample': sample_name,
-                # 'minor_contamination': sample.metrics['minor_contamination'],
-                # 'major_contamination': sample.metrics['major_contamination'],
-                'expected_group': sample.sample_group,
-                'predicted_group': '',
-                'avg_discordance': '',
-                'n_sample_matches': '',
-                'sample_matches': '',
-                # 'sample_matches_minor_contamination': '',
-                # 'sample_matches_major_contamination': '',
-            }
-
-            potential_matches = self.comparisons[
-                (self.comparisons['ReferenceSample'] == sample_name) &
-                (self.comparisons['DiscordanceRate'] <= self.discordance_threshold)
-            ]
-
-            if len(potential_matches) == 0:
-                predictions.append(row_empty)
-                continue
-
-            for group in potential_matches.groupby('QuerySampleGroup'):
-                group_name = group[0]
-                potential_matches_group = group[1]
-
-                row = row_empty.copy()
-
-                sample_matches = list(set(potential_matches_group['QuerySample']))
-                sample_matches = [samples[i] for i in sample_matches]
-
-                row['predicted_group'] = group_name
-                row['avg_discordance'] = potential_matches_group['DiscordanceRate'].mean()
-                row['n_sample_matches'] = len(sample_matches)
-                row['sample_matches'] = ','.join(
-                    [i.sample_name for i in sample_matches])
-                # row['sample_matches_minor_cont'] = ','.join(
-                #     [str(i.metrics['minor_contamination']) for i in sample_matches])
-                # row['sample_matches_major_cont'] = ','.join(
-                #     [str(i.metrics['major_contamination']) for i in sample_matches])
-
-                predictions.append(row)
-
-        self.prediction_groups = pd.DataFrame(predictions)
-        self.prediction_groups = self.prediction_groups.sort_values(['sample', 'n_sample_matches'])
-        return self.prediction_groups
 
     def cluster_samples(self, samples):
 

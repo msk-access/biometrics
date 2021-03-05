@@ -118,19 +118,15 @@ def run_genotyping(args, samples):
         zmax=args.zmax)
     comparisons = genotyper.compare_samples(samples)
 
+    # save genotyping output
+
     basename = 'genotype_comparison'
     if args.prefix:
         basename = args.prefix + '_' + basename
 
     write_to_file(args, comparisons, basename)
 
-    # predictions = genotyper.predict_group(samples)
-    #
-    # basename = 'group_predictions'
-    # if args.prefix:
-    #     basename = args.prefix + '_' + basename
-    #
-    # write_to_file(args, predictions, basename)
+    # cluster the samples
 
     clusters = genotyper.cluster_samples(samples)
     basename = 'genotype_clusters'
@@ -139,12 +135,13 @@ def run_genotyping(args, samples):
 
     write_to_file(args, clusters, basename)
 
+    # save plots
 
     if args.plot:
         if len(samples) > 1000:
             print('WARNING - Turning off plotting functionality. You are trying to plot more than 1000 samples, which is too cumbersome.')
         else:
-            genotyper.plot(data, args.outdir)
+            genotyper.plot(comparisons, args.outdir)
 
     return samples
 
