@@ -155,7 +155,7 @@ def run_genotyping(args, samples):
         are_there_db_samples = len(samples_input) != len(samples)
 
         if not are_there_db_samples:
-            logger.info(
+            logger.warning(
                 'The set of database and input samples are the same. Will only cluster the samples once.')
         else:
             clusters = cluster_handler.cluster(comparisons)
