@@ -183,9 +183,17 @@ def run_genotyping(args, samples):
 
 def run_cluster(args):
 
-    comparisons = pd.read_csv(args.input)
+    comparisons = []
+    for input in args.input:
+        comparisons.append(
+            pd.read_csv(input)
+        )
+    comparisons = pd.concat(comparisons)
+    comparisons = comparisons.drop_duplicates(['ReferenceSample', 'QuerySample'])
 
     cluster_handler = Cluster(args.discordance_threshold)
+
+    logger.info('Clustering input samples...')
     clusters = cluster_handler.cluster(comparisons)
 
     if clusters is not None:

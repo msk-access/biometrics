@@ -223,7 +223,8 @@ def get_args():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_cluster.add_argument(
         '-i', '--input', action="append", required=True,
-        help='''Path to file containing output form \'biometrics genotype\' tool.''')
+        help='''Path to file containing output form \'biometrics genotype\' tool.
+        Can be specified more than once.''')
     parser_cluster.add_argument(
         '-o', '--output', default='genotype_clusters.csv',
         help='''Output filename.''')
