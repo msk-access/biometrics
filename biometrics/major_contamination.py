@@ -34,14 +34,15 @@ class MajorContamination():
 
             data = data.append(row, ignore_index=True)
 
+        data = data.sort_values('major_contamination', ascending=False)
         return data
 
-    def plot(self, data, outdir):
+    def plot(self, samples, outdir):
         """
         Plot minor contamination data.
         """
 
-        ymax = max(self.threshold, max(data['major_contamination'])) * 1.05
+        data = self.to_dataframe(samples)
         data['major_contamination'] = data['major_contamination'].map(
             lambda x: round(x, 4))
 
@@ -64,15 +65,7 @@ class MajorContamination():
             yaxis_title="Major contamination",
             title_text="Major contamination across samples",
             yaxis=dict(range=[0, ymax]))
-        fig.add_shape(
-            type='line',
-            x0=-1,
-            y0=self.threshold,
-            x1=data.shape[0],
-            y1=self.threshold,
-            line=dict(color='Red'),
-            xref='x',
-            yref='y')
+        fig.add_hline(y=self.threshold, line_color='red')
 
         fig.write_html(os.path.join(outdir, 'major_contamination.html'))
 

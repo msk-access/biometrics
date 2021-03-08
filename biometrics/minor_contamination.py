@@ -33,6 +33,7 @@ class MinorContamination():
 
             data = data.append(row, ignore_index=True)
 
+        data = data.sort_values('minor_contamination', ascending=False)
         return data
 
     def plot(self, samples, outdir):
@@ -43,7 +44,6 @@ class MinorContamination():
         data = self.to_dataframe(samples)
         data['minor_contamination'] = data['minor_contamination'].map(
             lambda x: round(x, 4))
-        data = data.sort_values('minor_contamination', ascending=False)
 
         fig = go.Figure()
         fig.add_trace(
