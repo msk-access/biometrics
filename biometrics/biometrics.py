@@ -78,7 +78,7 @@ def run_minor_contamination(args, samples):
         if len(samples) > 1000:
             logger.warning('Turning off plotting functionality. You are trying to plot more than 1000 samples, which is too cumbersome.')
         else:
-            minor_contamination.plot(data, args.outdir)
+            minor_contamination.plot(samples, args.outdir)
 
     return samples
 
