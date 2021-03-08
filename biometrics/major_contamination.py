@@ -27,9 +27,9 @@ class MajorContamination():
                 'sample_group': sample.sample_group,
                 'sample_sex': sample.sample_sex,
                 'sample_type': sample.sample_type,
-                'total_sites': sample.metrics['total_sites'],
-                'total_heterozygous_sites': sample.metrics['total_heterozygous_sites'],
-                'major_contamination': sample.metrics['major_contamination']
+                'total_sites': sample.metrics['major_contamination']['total_sites'],
+                'total_heterozygous_sites': sample.metrics['major_contamination']['total_heterozygous_sites'],
+                'major_contamination': sample.metrics['major_contamination']['val']
             }
 
             data = data.append(row, ignore_index=True)
@@ -80,13 +80,14 @@ class MajorContamination():
 
             het_sites = sites_notna[sites_notna['genotype_class'] == 'Het']
 
-            sample.metrics['total_sites'] = len(sites_notna)
-            sample.metrics['total_heterozygous_sites'] = len(het_sites)
+            sample.metrics['major_contamination'] = {}
+            sample.metrics['major_contamination']['total_sites'] = len(sites_notna)
+            sample.metrics['major_contamination']['total_heterozygous_sites'] = len(het_sites)
 
-            if sample.metrics['total_sites'] == 0:
-                sample.metrics['major_contamination'] = np.nan
+            if sample.metrics['major_contamination']['total_sites'] == 0:
+                sample.metrics['major_contamination']['val'] = np.nan
             else:
-                sample.metrics['major_contamination'] = \
+                sample.metrics['major_contamination']['val'] = \
                     len(het_sites) / len(sites_notna)
 
         return samples
