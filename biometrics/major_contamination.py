@@ -44,7 +44,7 @@ class MajorContamination():
 
         data = self.to_dataframe(samples)
         data['major_contamination'] = data['major_contamination'].map(
-            lambda x: round(x, 4))
+            lambda x: round(x, 5))
 
         fig = go.Figure()
         fig.add_trace(
@@ -63,8 +63,7 @@ class MajorContamination():
             ))
         fig.update_layout(
             yaxis_title="Major contamination",
-            title_text="Major contamination across samples",
-            yaxis=dict(range=[0, ymax]))
+            title_text="Major contamination across samples")
         fig.add_hline(y=self.threshold, line_color='red')
 
         fig.write_html(os.path.join(outdir, 'major_contamination.html'))

@@ -40,9 +40,23 @@ The CSV file contains metrics for each pair of samples compared (one per line). 
 
 
 ##### Interactive plot
+Two interactive plots are produced that help you further investigate the data.
+
+{% hint style="info" %}
+The sample order is the same between the two plots.
+{% endhint %}
+
+###### Minor contamination plot
+
 Below is an example bar plot showing the per-sample minor contamination metrics. You can hover over each bar to get more information about the sample. You can also control the minor contamination threshold (the horizontal red line) via the `--minor-threshold` flag.
 
 ![](.gitbook/assets/minor_contamination.png)
+
+###### Contributing sites plot
+
+Shows statistics for each site that contributes to the minor contamination calculation. Only sites with a minor allele frequency > 0 are shown.
+
+![](.gitbook/assets/minor_contamination_sites.png)
 
 ### Algorithm details
 

@@ -43,7 +43,7 @@ class MinorContamination():
 
         data = self.to_dataframe(samples)
         data['minor_contamination'] = data['minor_contamination'].map(
-            lambda x: round(x, 4))
+            lambda x: round(x, 5))
 
         fig = go.Figure()
         fig.add_trace(
@@ -83,7 +83,7 @@ class MinorContamination():
         plot_data = pd.DataFrame(plot_data)
         plot_data = plot_data[
             ['sample_name', 'chrom', 'pos', 'ref', 'alt', 'MAF', 'reads_all', 'A', 'C', 'T', 'G', 'N']]
-        plot_data['MAF'] = plot_data['MAF'].map(lambda x: round(x, 4))
+        plot_data['MAF'] = plot_data['MAF'].map(lambda x: round(x, 5))
 
         fig = go.Figure()
         fig.add_trace(
@@ -108,7 +108,7 @@ class MinorContamination():
 
         fig.update_layout(
             yaxis_title="Minor allele frequency",
-            title_text="Minor contamination contributing sites")
+            title_text="Statistics of sites that contribute to minor contamination")
         fig.add_hline(y=self.threshold, line_color='red')
 
         fig.write_html(os.path.join(outdir, 'minor_contamination_sites.html'))
