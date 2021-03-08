@@ -46,15 +46,19 @@ Two interactive plots are produced that help you further investigate the data.
 The sample order is the same between the two plots.
 {% endhint %}
 
+{% hint style="info" %}
+You can also control the minor contamination threshold (the horizontal red line) via the `--minor-threshold` flag.
+{% endhint %}
+
 ###### Minor contamination plot
 
-Below is an example bar plot showing the per-sample minor contamination metrics. You can hover over each bar to get more information about the sample. You can also control the minor contamination threshold (the horizontal red line) via the `--minor-threshold` flag.
+Shows the minor contamination for each sample, ranked from highest to lowest. You can hover over each bar to get more information about the sample.
 
 ![](.gitbook/assets/minor_contamination.png)
 
 ###### Contributing sites plot
 
-Shows statistics for each site that contributes to the minor contamination calculation. Only sites with a minor allele frequency > 0 are shown.
+Shows statistics for each site that contributes to the minor contamination calculation. Only sites with a minor allele frequency > 0 are shown. You can hover over each point to get more information about that site.
 
 ![](.gitbook/assets/minor_contamination_sites.png)
 
