@@ -36,6 +36,7 @@ The CSV file contains metrics for each pair of samples compared (one per line). 
 | sample_sex | Sample sex (if available). |
 | sample_type | Sample type (if available). |
 | total_homozygous_sites | Total number of homozygous sites. |
+| n_contributing_sites | Total number of contributing sites (i.e. those that have MAF > 0). |
 | minor_contamination | Minor contamination metric. |
 
 
