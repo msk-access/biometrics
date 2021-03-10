@@ -1,0 +1,42 @@
+{% set data = load_setup_py_data() %}
+
+package:
+  name: biometrics
+  version: {{ data['version'] }}
+
+source:
+  path: ..
+
+build:
+  number: 0
+  script: python setup.py install --single-version-externally-managed --record=record.txt
+
+requirements:
+  build:
+    - pip
+    - python
+    - numpy
+    - networkx
+    - pandas
+    - plotly
+    - pysam==0.16.0.1
+    - pyvcf==0.6.8
+    - retrying
+  run:
+    - python
+    - numpy
+    - networkx
+    - pandas
+    - plotly
+    - pysam==0.16.0.1
+    - pyvcf==0.6.8
+    - retrying
+
+test:
+  imports:
+    - biometrics
+
+about:
+  home: {{ data['url'] }}
+  license: {{ data['license'] }}
+summary: {{ data['description'] }}
