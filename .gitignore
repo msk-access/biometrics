@@ -6,6 +6,9 @@ __pycache__/
 *.pk
 *.csv
 *.html
+osx-64/
+noarch/
+channeldata.json
 
 # C extensions
 *.so
