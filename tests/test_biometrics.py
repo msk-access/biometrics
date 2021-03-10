@@ -94,15 +94,19 @@ class TestBiometrics(TestCase):
         samples = run_minor_contamination(self.args, samples)
 
         self.assertAlmostEqual(
-            samples['test_sample1'].metrics['minor_contamination'], 0.0043,
+            samples['test_sample1'].metrics['minor_contamination']['val'], 0.0043,
             places=4, msg='Minor contamination is wrong.')
+
+        self.assertEqual(
+            samples['test_sample1'].metrics['minor_contamination']['n_contributing_sites'], 1,
+            msg='Count of contributing sites for minor contamination is wrong.')
 
     def test_sample_major_contamination(self):
         samples = get_samples(self.args, extraction_mode=False)
         samples = run_major_contamination(self.args, samples)
 
         self.assertAlmostEqual(
-            samples['test_sample1'].metrics['major_contamination'], 0.2,
+            samples['test_sample1'].metrics['major_contamination']['val'], 0.2,
             places=1, msg='Major contamination is wrong.')
 
     def test_genotyper(self):

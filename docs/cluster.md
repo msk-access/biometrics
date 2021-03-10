@@ -9,7 +9,7 @@ Takes as input the results from running `biometrics genotype` and clusters the s
 When you run `biometrics genotype`, it automatically outputs two sets of clustering results: (1) the first set just clusters your input samples, and (2) the second set clusters your input samples and samples in the database.
 {% endhint %}
 
-{% hint style="warn" %}
+{% hint style="warning" %}
 Due to the limitations of the discordance rate metric, samples that have contamination can lead to many false positive matches using this clustering approach. Hence, you might want to consider removing contaminated samples before running this tool.
 {% endhint %}
 
