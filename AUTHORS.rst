@@ -5,7 +5,7 @@ Credits
 Development Lead
 ----------------
 
-* Ronak Shah <rons.shah@gmail.com>
+* Charlie Murphy <murphyc4@mskcc.org>
 
 Contributors
 ------------
