@@ -71,26 +71,32 @@ class MinorContamination():
 
         plot_data = []
 
-        for sample_name in data['sample_name']:
+        for i, sample_name in enumerate(data['sample_name']):
             contributing_sites = samples[sample_name].metrics['minor_contamination']['contributing_sites']
 
             for site_id, site_data in contributing_sites.items():
                 site_data['sample_name'] = sample_name
                 site_data['MAF'] = site_data['minor_allele_freq']
+                site_data['index'] = i
+
                 del site_data['minor_allele_freq']
                 plot_data.append(site_data)
 
         plot_data = pd.DataFrame(plot_data)
-        plot_data = plot_data[
-            ['sample_name', 'chrom', 'pos', 'ref', 'alt', 'MAF', 'reads_all', 'A', 'C', 'T', 'G', 'N']]
+        plot_data = plot_data[[
+            'sample_name', 'chrom', 'pos', 'ref', 'alt', 'MAF', 'reads_all', 'A', 'C', 'T', 'G',
+            'N', 'index']]
         plot_data['MAF'] = plot_data['MAF'].map(lambda x: round(x, 5))
 
+
         fig = go.Figure()
+
         fig.add_trace(
             go.Scatter(
-                x=plot_data['sample_name'],
+                x=plot_data['index'],
                 y=plot_data['MAF'],
                 mode='markers',
+                showlegend=False,
                 customdata=plot_data.to_numpy(),
                 hovertemplate='<b>Sample:</b> %{customdata[0]}' +
                               '<br><b>Chrom:</b> %{customdata[1]}' +
@@ -106,9 +112,51 @@ class MinorContamination():
                               '<br><b>Count N:</b> %{customdata[11]}' +
                               '<extra></extra>'))
 
+        data = data[data['sample_name'].isin(plot_data['sample_name'])]
+        data['index'] = range(len(data))
+
+        for i in data.index:
+            fig.add_shape(go.layout.Shape(
+                type="line",
+                x0=data.at[i, 'index'] - 0.5,
+                y0=data.at[i, 'minor_contamination'],
+                x1=data.at[i, 'index'] + 0.5,
+                y1=data.at[i, 'minor_contamination'],
+                line=dict(color='black', width=2)
+            ))
+
+        fig.add_trace(go.Scatter(
+            x=[1],
+            y=[3],
+            name='Minor contamination',
+            line_color='black'
+        ))
+        fig.add_trace(go.Scatter(
+            x=[1],
+            y=[3],
+            name='Threshold',
+            line_color='red'
+        ))
+        fig.add_trace(go.Scatter(
+            x=[1],
+            y=[3],
+            name='Minor allele sites (MAF > 0)',
+            line_color='#636EFA',
+            mode='markers'
+        ))
+
+
+        ticks = plot_data[['sample_name', 'index']].drop_duplicates()
+
         fig.update_layout(
             yaxis_title="Minor allele frequency",
-            title_text="Statistics of sites that contribute to minor contamination")
+            title_text="Statistics of sites that contribute to minor contamination",
+            yaxis = dict(range=(-0.005, plot_data['MAF'].max()*1.05)),
+            xaxis = dict(
+                tickmode = 'array',
+                tickvals = ticks['index'],
+                ticktext = ticks['sample_name']
+            ))
         fig.add_hline(y=self.threshold, line_color='red')
 
         fig.write_html(os.path.join(outdir, 'minor_contamination_sites.html'))
