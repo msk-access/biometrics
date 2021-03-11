@@ -37,8 +37,9 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9'
     ],
-    description="Package to generate sample based biometrics",
+    description="Package to generate sample based biometrics.",
     entry_points={
         'console_scripts': [
             'biometrics=biometrics.cli:main',
