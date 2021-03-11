@@ -2,6 +2,8 @@
 
 """The setup script."""
 
+import os
+
 from setuptools import setup, find_packages
 
 with open('README.md') as readme_file:
@@ -21,6 +23,9 @@ def req_file(filename):
         content = f.readlines()
         content = filter(lambda x: not x.startswith("#"), content)
     return [x.strip() for x in content]
+
+with open(os.path.join(os.path.dirname(__file__), "biometrics/VERSION"), "r") as fh:
+    __version__ = fh.read().strip()
 
 
 setup(
@@ -57,6 +62,6 @@ setup(
     },
     test_suite='tests',
     url='https://github.com/msk-access/biometrics',
-    version='0.1.12',
+    version=__version__,
     zip_safe=False,
 )
