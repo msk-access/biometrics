@@ -4,6 +4,11 @@ __pycache__/
 *$py.class
 *.DS_Store
 *.pk
+*.csv
+*.html
+osx-64/
+noarch/
+channeldata.json
 
 # C extensions
 *.so

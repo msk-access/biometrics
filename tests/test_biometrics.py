@@ -43,6 +43,7 @@ class TestBiometrics(TestCase):
             major_threshold=0.6,
             discordance_threshold=0.05,
             coverage_threshold=50,
+            min_homozygous_thresh=0.1,
             zmin=None,
             zmax=None,
             outdir='.',
@@ -51,6 +52,7 @@ class TestBiometrics(TestCase):
             default_genotype=None,
             overwrite=True,
             no_db_compare=False,
+            prefix='test',
             threads=1))
     def setUp(self, mock_args):
         """Set up test fixtures, if any."""
@@ -92,15 +94,19 @@ class TestBiometrics(TestCase):
         samples = run_minor_contamination(self.args, samples)
 
         self.assertAlmostEqual(
-            samples['test_sample1'].metrics['minor_contamination'], 0.0043,
+            samples['test_sample1'].metrics['minor_contamination']['val'], 0.0043,
             places=4, msg='Minor contamination is wrong.')
+
+        self.assertEqual(
+            samples['test_sample1'].metrics['minor_contamination']['n_contributing_sites'], 1,
+            msg='Count of contributing sites for minor contamination is wrong.')
 
     def test_sample_major_contamination(self):
         samples = get_samples(self.args, extraction_mode=False)
         samples = run_major_contamination(self.args, samples)
 
         self.assertAlmostEqual(
-            samples['test_sample1'].metrics['major_contamination'], 0.2,
+            samples['test_sample1'].metrics['major_contamination']['val'], 0.2,
             places=1, msg='Major contamination is wrong.')
 
     def test_genotyper(self):
@@ -112,7 +118,7 @@ class TestBiometrics(TestCase):
             threads=self.args.threads,
             zmin=self.args.zmin,
             zmax=self.args.zmax)
-        data = genotyper.genotype(samples)
+        data = genotyper.compare_samples(samples)
 
         self.assertEqual(len(data), 4, msg='There were not four comparisons done.')
         self.assertEqual(set(data['Status']), set(['Expected Match']), msg='All sample comparisons were expected to match.')

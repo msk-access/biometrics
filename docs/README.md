@@ -1,6 +1,6 @@
 # biometrics
 
-Python package for calculating sample contamination metrics and sample sex verification.
+Python package for genotyping samples, calculating sample contamination metrics, and sample sex verification.
 
 [![Build Status](https://travis-ci.com/msk-access/biometrics.svg?branch=master)](https://travis-ci.com/msk-access/biometrics) [![PyPi](https://img.shields.io/pypi/v/biometrics.svg?)](https://pypi.python.org/pypi/biometrics)
 

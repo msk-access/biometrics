@@ -27,23 +27,24 @@ class MajorContamination():
                 'sample_group': sample.sample_group,
                 'sample_sex': sample.sample_sex,
                 'sample_type': sample.sample_type,
-                'total_sites': sample.metrics['total_sites'],
-                'total_heterozygous_sites': sample.metrics['total_heterozygous_sites'],
-                'major_contamination': sample.metrics['major_contamination']
+                'total_sites': sample.metrics['major_contamination']['total_sites'],
+                'total_heterozygous_sites': sample.metrics['major_contamination']['total_heterozygous_sites'],
+                'major_contamination': sample.metrics['major_contamination']['val']
             }
 
             data = data.append(row, ignore_index=True)
 
+        data = data.sort_values('major_contamination', ascending=False)
         return data
 
-    def plot(self, data, outdir):
+    def plot(self, samples, outdir):
         """
         Plot minor contamination data.
         """
 
-        ymax = max(self.threshold, max(data['major_contamination'])) * 1.05
+        data = self.to_dataframe(samples)
         data['major_contamination'] = data['major_contamination'].map(
-            lambda x: round(x, 4))
+            lambda x: round(x, 5))
 
         fig = go.Figure()
         fig.add_trace(
@@ -62,17 +63,8 @@ class MajorContamination():
             ))
         fig.update_layout(
             yaxis_title="Major contamination",
-            title_text="Major contamination across samples",
-            yaxis=dict(range=[0, ymax]))
-        fig.add_shape(
-            type='line',
-            x0=-1,
-            y0=self.threshold,
-            x1=data.shape[0],
-            y1=self.threshold,
-            line=dict(color='Red'),
-            xref='x',
-            yref='y')
+            title_text="Major contamination across samples")
+        fig.add_hline(y=self.threshold, line_color='red')
 
         fig.write_html(os.path.join(outdir, 'major_contamination.html'))
 
@@ -88,13 +80,14 @@ class MajorContamination():
 
             het_sites = sites_notna[sites_notna['genotype_class'] == 'Het']
 
-            sample.metrics['total_sites'] = len(sites_notna)
-            sample.metrics['total_heterozygous_sites'] = len(het_sites)
+            sample.metrics['major_contamination'] = {}
+            sample.metrics['major_contamination']['total_sites'] = len(sites_notna)
+            sample.metrics['major_contamination']['total_heterozygous_sites'] = len(het_sites)
 
-            if sample.metrics['total_sites'] == 0:
-                sample.metrics['major_contamination'] = np.nan
+            if sample.metrics['major_contamination']['total_sites'] == 0:
+                sample.metrics['major_contamination']['val'] = np.nan
             else:
-                sample.metrics['major_contamination'] = \
+                sample.metrics['major_contamination']['val'] = \
                     len(het_sites) / len(sites_notna)
 
         return samples
