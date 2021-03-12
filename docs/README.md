@@ -12,3 +12,4 @@ Python package for genotyping samples, calculating sample contamination metrics,
 From pypi:
 
 `pip install biometrics`
+
