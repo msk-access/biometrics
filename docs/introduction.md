@@ -18,6 +18,12 @@ Compares each each sample against each other to verify expected sample matches a
 
 Click [here](genotype.md) to read more about this tool.
 
+## Cluster
+
+Takes the output from the genotype comparison tool and clusters the samples into groups. Clustering is based on binarizing the discordance score into 0 or 1, and then finding the connected samples.
+
+Click [here](cluster.md) to read more about this tool.
+
 ## Minor contamination
 
 Minor contamination check is done to see if a patient’s sample is contaminated with a little DNA from unrelated individuals.
