@@ -360,6 +360,9 @@ def get_samples(args, extraction_mode=False):
 
 
 def create_outdir(outdir):
+    if outdir is None:
+        return
+        
     os.makedirs(outdir, exist_ok=True)
 
 

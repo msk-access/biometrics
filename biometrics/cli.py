@@ -43,7 +43,7 @@ def add_extraction_args(parser):
         '--bed', required=False,
         help='''BED file containing the intervals to be queried.''')
     parser.add_argument(
-        '-db', '--database', required=True,
+        '-db', '--database',
         help='''Directory to store the intermediate files after
         running the extraction step.''')
     parser.add_argument(
@@ -84,7 +84,7 @@ def add_common_tool_args(parser):
         help='''Path to file containing sample information (one per line).
         For example: sample_name,sample_bam,sample_type,sample_sex,sample_group.''')
     parser.add_argument(
-        '-db', '--database', required=True,
+        '-db', '--database',
         help='''Directory to store the intermediate files after
         running the extraction step.''')
     parser.add_argument(
