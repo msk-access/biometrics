@@ -2,6 +2,7 @@
 """Console script for biometrics."""
 
 import sys
+import os
 import argparse
 
 from biometrics.utils import get_logger
@@ -43,7 +44,7 @@ def add_extraction_args(parser):
         '--bed', required=False,
         help='''BED file containing the intervals to be queried.''')
     parser.add_argument(
-        '-db', '--database',
+        '-db', '--database', default=os.curdir,
         help='''Directory to store the intermediate files after
         running the extraction step.''')
     parser.add_argument(
@@ -79,7 +80,7 @@ def add_common_tool_args(parser):
         '-i', '--input', action="append", required=True,
         help='''Can be one of three types: (1) path to a CSV file containing sample information (one per line). For example: sample_name,sample_bam,sample_type,sample_sex,sample_group. (2) Path to a \'*.pk\' file that was produced by the \'extract\' tool. (3) Name of the sample to analyze; this assumes there is a file named \'{sample_name}.pk\' in your database directory. Can be specified more than once.''')
     parser.add_argument(
-        '-db', '--database',
+        '-db', '--database', default=os.curdir,
         help='''Directory to store the intermediate files after
         running the extraction step.''')
     parser.add_argument(
