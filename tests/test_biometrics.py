@@ -17,8 +17,8 @@ from biometrics.sex_mismatch import SexMismatch
 CUR_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
-class TestBiometrics(TestCase):
-    """Tests for `biometrics` package."""
+class TestExtract(TestCase):
+    """Tests for the extract tool in the `biometrics` package."""
 
     @mock.patch(
         'argparse.ArgumentParser.parse_args',
@@ -88,6 +88,47 @@ class TestBiometrics(TestCase):
         self.assertEqual(samples['test_sample1'].sample_name, 'test_sample1', msg='Sample was not loaded correctly.')
         self.assertIsNotNone(samples['test_sample1'].pileup, msg='Sample pileup was not loaded correctly.')
         self.assertEqual(samples['test_sample1'].pileup.shape[0], 15, msg='Did not find pileup for 4 variants. Found: {}.'.format(samples['test_sample1'].pileup))
+
+
+class TestDownstreamTools(TestCase):
+    """Tests for downstream tools in the `biometrics` package."""
+
+    @mock.patch(
+        'argparse.ArgumentParser.parse_args',
+        return_value=argparse.Namespace(
+            subparser_name='extract',
+            input=['test_sample1', 'test_sample2'],
+            sample_bam=None,
+            sample_name=None,
+            sample_type=None,
+            sample_group=None,
+            sample_sex=None,
+            database=os.path.join(CUR_DIR, 'test_data/'),
+            vcf=None,
+            fafile=None,
+            bed=None,
+            min_mapping_quality=None,
+            min_base_quality=None,
+            min_coverage=None,
+            minor_threshold=0.002,
+            major_threshold=0.6,
+            discordance_threshold=0.05,
+            coverage_threshold=50,
+            min_homozygous_thresh=0.1,
+            zmin=None,
+            zmax=None,
+            outdir='.',
+            json=None,
+            plot=True,
+            default_genotype=None,
+            overwrite=True,
+            no_db_compare=False,
+            prefix='test',
+            threads=1))
+    def setUp(self, mock_args):
+        """Set up test fixtures, if any."""
+
+        self.args = get_args()
 
     def test_sample_minor_contamination(self):
         samples = get_samples(self.args, extraction_mode=False)
