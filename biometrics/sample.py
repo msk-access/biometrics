@@ -23,8 +23,11 @@ class Sample:
         self.query_group = query_group
         self.metrics = {}
 
-        if db is not None and self.sample_name is not None:
-            self.extraction_file = os.path.join(db, self.sample_name + '.pk')
+        if self.sample_name is not None:
+            if db is not None:
+                self.extraction_file = os.path.join(db, self.sample_name + '.pk')
+            else:
+                self.extraction_file = self.sample_name + '.pk'
 
     def save_to_file(self):
 

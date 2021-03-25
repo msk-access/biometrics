@@ -12,20 +12,36 @@ You need one or more samples to run this analysis. However, if you supply just o
 
 ### \(1\) Compares your input samples with each other
 
-This only runs if you supplied two or more input samples. The easiest way to indicate which samples you want to compare is to give the sample names via the `--sample-name` flag. Below is an example command:
+This only runs if you supplied two or more input samples. There are three ways you can provide the input to the `--input` flag:
+
+#### Method 1
+You can provide the sample names. This assumes there is a file named `{sample_name}.pk` in the database directory.
 
 ```text
 biometrics genotype \
-  -sn C-48665L-N001-d C-PCYP90-N001-d C-MH6AL9-N001-d \
-  -db /path/to/store/extract/output
+  -i C-48665L-N001-d \
+  -i C-PCYP90-N001-d \
+  -i C-MH6AL9-N001-d \
+  -db /path/to/extract/output
 ```
 
+#### Method 2
+You can directly provide it the python pickle file that was outputted from the `extract` tool.
+
+```text
+biometrics genotype \
+  -i /path/to/extract/output/C-48665L-N001-d.pk \
+  -i /path/to/extract/output/C-PCYP90-N001-d.pk \
+  -i /path/to/extract/output/C-MH6AL9-N001-d.pk \
+```
+
+#### Method 3
 You can also indicate your input samples via a CSV file, which has the same format as what you provided to the extraction tool, but you only need the `sample_name` column:
 
 ```text
 biometrics genotype \
   -i samples.csv \
-  -db /path/to/store/extract/output
+  -db /path/to/extract/output
 ```
 
 ### \(2\) Compares your input samples with remaining database samples
@@ -34,7 +50,7 @@ The second analysis will compare each of your input samples with all remaining s
 
 ```text
 biometrics genotype \
-  -sn C-48665L-N001-d C-PCYP90-N001-d C-MH6AL9-N001-d \
+  -i C-48665L-N001-d -i C-PCYP90-N001-d -i C-MH6AL9-N001-d \
   --no-db-compare \
   -db /path/to/store/extract/output
 ```
@@ -88,4 +104,3 @@ $$
 {% hint style="info" %}
 If there are &lt;10 common homozygous sites, the discordance rate can not be calculated since this is a strong indication that coverage is too low and the samples failed other QC.
 {% endhint %}
-

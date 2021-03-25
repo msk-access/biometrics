@@ -318,6 +318,9 @@ def get_samples_from_name(sample_names, database):
     Parse the sample information the user supplied via the CLI.
     """
 
+    if type(sample_names) != list:
+        sample_names = [sample_names]
+
     samples = {}
 
     for i, sample_name in enumerate(sample_names):
@@ -334,21 +337,25 @@ def get_samples(args, extraction_mode=False):
 
     samples = {}
 
-    if args.input:
-        samples.update(get_samples_from_input(
-            args.input, args.database, extraction_mode))
-
     if extraction_mode:
+        if args.input:
+            samples.update(get_samples_from_input(
+                args.input, args.database, extraction_mode))
+
         if args.sample_bam:
             samples.update(get_samples_from_bam(args))
     else:
-        if args.sample_name:
-            samples.update(get_samples_from_name(
-                args.sample_name, args.database))
 
-        for sample_name in samples.keys():
-            extration_file = os.path.join(args.database, sample_name + '.pk')
-            samples[sample_name].load_from_file(extration_file)
+        for input in args.input:
+            if input.endswith('.pk'):
+                sample = Sample(db=args.database, query_group=True)
+                sample.load_from_file(extraction_file=input)
+                samples[sample.sample_name] = sample
+            elif input.endswith('.csv') or input.endswith('.txt'):
+                samples.update(get_samples_from_input(
+                    input, args.database, extraction_mode))
+            else:
+                samples.update(get_samples_from_name(input, args.database))
 
         existing_samples = set([i for i in samples.keys()])
 
@@ -360,6 +367,9 @@ def get_samples(args, extraction_mode=False):
 
 
 def create_outdir(outdir):
+    if outdir is None:
+        return
+
     os.makedirs(outdir, exist_ok=True)
 
 
