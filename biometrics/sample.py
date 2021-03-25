@@ -14,8 +14,12 @@ class Sample:
         self.sample_bam = sample_bam
         self.sample_name = sample_name
         self.sample_sex = sample_sex
-        self.sample_group = sample_group
         self.sample_type = sample_type
+
+        if sample_group is None:
+            self.sample_group = sample_name
+        else:
+            self.sample_group = sample_group
 
         self.pileup = None
         self.region_counts = None
@@ -70,6 +74,6 @@ class Sample:
         self.sample_bam = sample_data['sample_bam']
         self.sample_name = sample_data['sample_name']
         self.sample_sex = sample_data['sample_sex']
-        self.sample_group = sample_data['sample_group']
+        self.sample_group = sample_data['sample_group'] if sample_data['sample_group'] is not None else sample_data['sample_name']
         self.sample_type = sample_data['sample_type']
         self.region_counts = region_counts

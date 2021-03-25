@@ -299,7 +299,7 @@ def get_samples_from_bam(args):
             args.sample_sex[i] if args.sample_sex is not None else None)
         sample_name = args.sample_name[i] if args.sample_name is not None else None
         sample_group = args.sample_group[i] \
-            if args.sample_group is not None else None
+            if args.sample_group is not None else args.sample_name[i]
         sample_type = args.sample_type[i] \
             if args.sample_type is not None else None
 
@@ -348,7 +348,7 @@ def get_samples(args, extraction_mode=False):
 
         for input in args.input:
             if input.endswith('.pk'):
-                sample = Sample(db=args.database, query_group=True)
+                sample = Sample(db=args.database, query_group=False)
                 sample.load_from_file(extraction_file=input)
                 samples[sample.sample_name] = sample
             elif input.endswith('.csv') or input.endswith('.txt'):
