@@ -53,14 +53,15 @@ class Genotyper:
                 customdata=data.to_numpy(),
                 hovertemplate='<b>Reference sample:</b> %{customdata[0]}' +
                               '<br><b>Query sample:</b> %{customdata[1]}' +
-                              '<br><b>Homozygous count in reference:</b> %{customdata[3]}' +
-                              '<br><b>Total match count:</b> %{customdata[4]}' +
-                              '<br><b>Homozygous match count:</b> %{customdata[5]}' +
-                              '<br><b>Heterozygous match count:</b> %{customdata[6]}' +
-                              '<br><b>Homozygous mismatch count:</b> %{customdata[7]}' +
-                              '<br><b>Heterozygous mismatch count:</b> %{customdata[8]}' +
-                              '<br><b>Discordance rate:</b> %{customdata[9]}' +
-                              '<br><b>Status:</b> %{customdata[12]}' +
+                              '<br><b>Count of common sites:</b> %{customdata[4]}' +
+                              '<br><b>Homozygous count in reference:</b> %{customdata[5]}' +
+                              '<br><b>Total match count:</b> %{customdata[6]}' +
+                              '<br><b>Homozygous match count:</b> %{customdata[7]}' +
+                              '<br><b>Heterozygous match count:</b> %{customdata[8]}' +
+                              '<br><b>Homozygous mismatch count:</b> %{customdata[9]}' +
+                              '<br><b>Heterozygous mismatch count:</b> %{customdata[10]}' +
+                              '<br><b>Discordance rate:</b> %{customdata[11]}' +
+                              '<br><b>Status:</b> %{customdata[14]}' +
                               '<extra></extra>',
                 zmin=self.zmin,
                 zmax=self.zmax,
@@ -96,18 +97,20 @@ class Genotyper:
 
         # make plot for comparing input samples with each other
 
-        data_sub = data[~data['DatabaseComparison']].copy()
+        data_sub = data[~data['IsInputToDatabaseComparison']].copy()
+        del data_sub['IsInputToDatabaseComparison']
         data_sub['DiscordanceRate'] = data_sub['DiscordanceRate'].map(
             lambda x: round(x, 4))
 
         if data_sub.shape[0] > 1:
             self._plot_heatmap(
-                data_sub, outdir, name='genotype_comparison_input_only.html',
+                data_sub, outdir, name='genotype_comparison_input.html',
                 title="Discordance calculations between input samples")
 
         # make plot for comparing input samples with database samples
 
-        data_sub = data[data['DatabaseComparison']].copy()
+        data_sub = data[data['IsInputToDatabaseComparison']].copy()
+        del data_sub['IsInputToDatabaseComparison']
         data_sub['DiscordanceRate'] = data_sub['DiscordanceRate'].map(
             lambda x: round(x, 4))
 
@@ -238,7 +241,7 @@ class Genotyper:
                 samples_input, samples_input, samples)
 
             for i in range(len(results)):
-                results[i]['DatabaseComparison'] = True
+                results[i]['IsInputToDatabaseComparison'] = False
             comparisons += results
 
         # for each input sample, compare with all the samples in the db
@@ -248,7 +251,7 @@ class Genotyper:
                 samples_input, samples_db, samples)
 
             for i in range(len(results)):
-                results[i]['DatabaseComparison'] = True
+                results[i]['IsInputToDatabaseComparison'] = True
             comparisons += results
 
         comparisons = pd.DataFrame(comparisons)
@@ -256,6 +259,7 @@ class Genotyper:
         # compute discordance rate
 
         comparisons['DiscordanceRate'] = comparisons['HomozygousMismatch'] / (comparisons['HomozygousInRef'] + EPSILON)
+
         # data['DiscordanceRate'] = data['DiscordanceRate'].map(lambda x: round(x, 6))
         comparisons.loc[comparisons['HomozygousInRef'] < 10, 'DiscordanceRate'] = np.nan
 
@@ -277,9 +281,7 @@ class Genotyper:
             ~comparisons['Matched'] & ~comparisons['ExpectedMatch'], 'Status'] = "Expected Mismatch"
 
         self.comparisons = comparisons[[
-            'ReferenceSample', 'ReferenceSampleGroup', 'QuerySample', 'QuerySampleGroup',
-            'CountOfCommonSites', 'HomozygousInRef', 'TotalMatch', 'HomozygousMatch',
-            'HeterozygousMatch', 'HomozygousMismatch',
+            'ReferenceSample', 'ReferenceSampleGroup', 'QuerySample', 'QuerySampleGroup', 'IsInputToDatabaseComparison', 'CountOfCommonSites', 'HomozygousInRef', 'TotalMatch', 'HomozygousMatch', 'HeterozygousMatch', 'HomozygousMismatch',
             'HeterozygousMismatch', 'DiscordanceRate', 'Matched',
             'ExpectedMatch', 'Status']]
 

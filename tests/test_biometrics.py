@@ -13,6 +13,9 @@ from biometrics.cli import get_args
 from biometrics.extract import Extract
 from biometrics.genotype import Genotyper
 from biometrics.sex_mismatch import SexMismatch
+from biometrics.minor_contamination import MinorContamination
+from biometrics.major_contamination import MajorContamination
+
 
 CUR_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -224,7 +227,7 @@ class TestDownstreamTools(TestCase):
 
         self.args = get_args()
 
-    def test_sample_minor_contamination(self):
+    def test_minor_contamination(self):
         samples = get_samples(self.args, extraction_mode=False)
         samples = run_minor_contamination(self.args, samples)
 
@@ -236,13 +239,25 @@ class TestDownstreamTools(TestCase):
             samples['test_sample1'].metrics['minor_contamination']['n_contributing_sites'], 1,
             msg='Count of contributing sites for minor contamination is wrong.')
 
-    def test_sample_major_contamination(self):
+    def test_plot_minor_contamination(self):
+        samples = get_samples(self.args, extraction_mode=False)
+        minor_contamination = MinorContamination(threshold=self.args.minor_threshold)
+        samples = minor_contamination.estimate(samples)
+        minor_contamination.plot(samples, self.args.outdir)
+
+    def test_major_contamination(self):
         samples = get_samples(self.args, extraction_mode=False)
         samples = run_major_contamination(self.args, samples)
 
         self.assertAlmostEqual(
             samples['test_sample1'].metrics['major_contamination']['val'], 0.2,
             places=1, msg='Major contamination is wrong.')
+
+    def test_plot_major_contamination(self):
+        samples = get_samples(self.args, extraction_mode=False)
+        major_contamination = MajorContamination(threshold=self.args.minor_threshold)
+        samples = major_contamination.estimate(samples)
+        major_contamination.plot(samples, self.args.outdir)
 
     def test_genotyper(self):
         samples = get_samples(self.args, extraction_mode=False)
@@ -257,6 +272,18 @@ class TestDownstreamTools(TestCase):
 
         self.assertEqual(len(data), 4, msg='There were not four comparisons done.')
         self.assertEqual(set(data['Status']), set(['Expected Match']), msg='All sample comparisons were expected to match.')
+
+    def test_genotyper_plot(self):
+        samples = get_samples(self.args, extraction_mode=False)
+
+        genotyper = Genotyper(
+            no_db_compare=self.args.no_db_compare,
+            discordance_threshold=self.args.discordance_threshold,
+            threads=self.args.threads,
+            zmin=self.args.zmin,
+            zmax=self.args.zmax)
+        data = genotyper.compare_samples(samples)
+        genotyper.plot(data, self.args.outdir)
 
     def test_sexmismatch(self):
         samples = get_samples(self.args, extraction_mode=False)
