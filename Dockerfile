@@ -7,7 +7,7 @@ FROM python:3.6-slim
 ARG BUILD_DATE
 ARG BUILD_VERSION
 ARG LICENSE="Apache-2.0"
-ARG BIOMETRICS_VERSION=0.2.1
+ARG BIOMETRICS_VERSION=0.2.2
 ARG VCS_REF
 ################## METADATA ########################
 LABEL org.opencontainers.image.vendor="MSKCC"
