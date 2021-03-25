@@ -12,3 +12,7 @@ Python package for genotyping samples, calculating sample contamination metrics,
 From pypi:
 
 `pip install biometrics`
+
+From conda (python v3.6 only):
+
+`conda create -n myenv -c bioconda -c conda-forge -c msk-access python=3.6 biometrics`
