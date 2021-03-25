@@ -269,10 +269,12 @@ class Genotyper:
                 samples[x['QuerySample']]), axis=1)
 
         comparisons['Status'] = ''
-        comparisons.loc[comparisons.Matched & comparisons.ExpectedMatch, 'Status'] = "Expected Match"
-        comparisons.loc[comparisons.Matched & ~comparisons.ExpectedMatch, 'Status'] = "Unexpected Match"
-        comparisons.loc[~comparisons.Matched & comparisons.ExpectedMatch, 'Status'] = "Unexpected Mismatch"
-        comparisons.loc[~comparisons.Matched & ~comparisons.ExpectedMatch, 'Status'] = "Expected Mismatch"
+        comparisons.loc[comparisons['Matched'] & comparisons['ExpectedMatch'], 'Status'] = "Expected Match"
+        comparisons.loc[comparisons['Matched'] & ~comparisons['ExpectedMatch'], 'Status'] = "Unexpected Match"
+        comparisons.loc[
+            ~comparisons['Matched'] & comparisons['ExpectedMatch'], 'Status'] = "Unexpected Mismatch"
+        comparisons.loc[
+            ~comparisons['Matched'] & ~comparisons['ExpectedMatch'], 'Status'] = "Expected Mismatch"
 
         self.comparisons = comparisons[[
             'ReferenceSample', 'ReferenceSampleGroup', 'QuerySample', 'QuerySampleGroup',
