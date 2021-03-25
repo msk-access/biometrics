@@ -2,6 +2,7 @@
 """Console script for biometrics."""
 
 import sys
+import os
 import argparse
 
 from biometrics.utils import get_logger
@@ -17,22 +18,22 @@ def add_extraction_args(parser):
         help='''Path to file containing sample information (one per line).
         For example: sample_name,sample_bam,sample_type,sample_sex,sample_group''')
     parser.add_argument(
-        '-sb', '--sample-bam', nargs="+", required=False,
+        '-sb', '--sample-bam', action="append", required=False,
         help='''Space-delimited list of BAM files.''')
     parser.add_argument(
-        '-st', '--sample-type', nargs="+", required=False,
+        '-st', '--sample-type', action="append", required=False,
         help='''Space-delimited list of sample types: Normal or Tumor.
         Must be in the same order as --sample-bam.''')
     parser.add_argument(
-        '-ss', '--sample-sex', nargs="+", required=False,
+        '-ss', '--sample-sex', action="append", required=False,
         help='''Space-delimited list of sample sex (i.e. M or F). Must be
         in the same order as --sample-bam.''')
     parser.add_argument(
-        '-sg', '--sample-group', nargs="+", required=False,
+        '-sg', '--sample-group', action="append", required=False,
         help='''Space-delimited list of sample group information
         (e.g. sample patient ID). Must be in the same order as --sample-bam.''')
     parser.add_argument(
-        '-sn', '--sample-name', nargs="+", required=False,
+        '-sn', '--sample-name', action="append", required=False,
         help='''Space-delimited list of sample names. If not specified,
         sample name is automatically figured out from the BAM file. Must
         be in the same order as --sample-bam.''')
@@ -43,7 +44,7 @@ def add_extraction_args(parser):
         '--bed', required=False,
         help='''BED file containing the intervals to be queried.''')
     parser.add_argument(
-        '-db', '--database', required=True,
+        '-db', '--database', default=os.curdir,
         help='''Directory to store the intermediate files after
         running the extraction step.''')
     parser.add_argument(
@@ -76,15 +77,10 @@ def add_extraction_args(parser):
 
 def add_common_tool_args(parser):
     parser.add_argument(
-        '-sn', '--sample-name', nargs="+", required=False,
-        help='''Space-delimited list of sample names to analyze.
-        Assumes the samples have already been extracted.''')
+        '-i', '--input', action="append", required=True,
+        help='''Can be one of three types: (1) path to a CSV file containing sample information (one per line). For example: sample_name,sample_bam,sample_type,sample_sex,sample_group. (2) Path to a \'*.pk\' file that was produced by the \'extract\' tool. (3) Name of the sample to analyze; this assumes there is a file named \'{sample_name}.pk\' in your database directory. Can be specified more than once.''')
     parser.add_argument(
-        '-i', '--input', action="append", required=False,
-        help='''Path to file containing sample information (one per line).
-        For example: sample_name,sample_bam,sample_type,sample_sex,sample_group.''')
-    parser.add_argument(
-        '-db', '--database', required=True,
+        '-db', '--database', default=os.curdir,
         help='''Directory to store the intermediate files after
         running the extraction step.''')
     parser.add_argument(
