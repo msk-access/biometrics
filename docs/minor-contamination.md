@@ -8,14 +8,29 @@ Minor contamination is a metric to see if a sample is contaminated with small am
 
 ## How to run the tool
 
-You can run this tool with one or more samples. The two required inputs are the list of sample names and the database \(biometrics will automatically load all sample data from the database\). Below is an example command:
+You can run this tool with one or more samples. There are three ways you can provide the input to the `--input` flag:
+
+#### Method 1
+
+You can provide the sample names. This assumes there is a file named `{sample_name}.pk` in the database directory.
 
 ```text
 biometrics minor \
-  -sn C-48665L-N001-d C-PCYP90-N001-d C-MH6AL9-N001-d \
-  -db /path/to/store/extract/output
+  -i C-48665L-N001-d -i C-PCYP90-N001-d -i C-MH6AL9-N001-d \
+  -db /path/to/extract/output
 ```
 
+#### Method 2
+You can directly provide it the python pickle file that was outputted from the `extract` tool.
+
+```text
+biometrics minor \
+  -i /path/to/extract/output/C-48665L-N001-d.pk \
+  -i /path/to/extract/output/C-PCYP90-N001-d.pk \
+  -i /path/to/extract/output/C-MH6AL9-N001-d.pk \
+```
+
+#### Method 3
 You can also indicate your input samples via a CSV file, which has the same format as what you provided to the extraction tool, but you only need the `sample_name` column:
 
 ```text
@@ -69,4 +84,3 @@ Shows statistics for each site that contributes to the minor contamination calcu
 ## Algorithm details
 
 Minor contamination is calculated as the average minor allele frequency for homozygous sites. A homozygous site is defined as one with &lt; 10% minor allele frequency.
-
