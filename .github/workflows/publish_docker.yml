@@ -13,7 +13,7 @@ jobs:
         uses: docker/build-push-action@v1
         with:
           username: ${{ github.actor }}
-          password: ${{ secrets.RS_PAT }}
+          password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
-          repository: ghcr.io/msk-access/biometrics
+          repository: msk-access/biometrics/biometrics
           tag_with_ref: true
