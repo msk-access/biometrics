@@ -25,4 +25,5 @@ jobs:
           file: ./Dockerfile
           registry: ghcr.io
           push: true
-          tag_with_ref: true
+          tags: |
+            ghcr.io/msk-access/biometrics:0.2.4
