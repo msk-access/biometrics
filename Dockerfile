@@ -7,7 +7,7 @@ FROM python:3.6-slim
 ARG BUILD_DATE
 ARG BUILD_VERSION
 ARG LICENSE="Apache-2.0"
-ARG BIOMETRICS_VERSION=0.2.4
+ARG BIOMETRICS_VERSION
 ARG VCS_REF
 ################## METADATA ########################
 LABEL org.opencontainers.image.vendor="MSKCC"
@@ -26,9 +26,10 @@ LABEL org.opencontainers.image.description="This container uses python3.6 as the
 
 ################## INSTALL ##########################
 
-ENV BIOMETRICS_VERSION ${BIOMETRICS_VERSION}
+WORKDIR /app
+ADD . /app
 
 RUN apt-get update \
   && apt-get install gcc g++ zlib1g-dev -y \
-  && pip install cython plotly \
-  && pip install biometrics==${BIOMETRICS_VERSION}
+  && pip install -r requirements.txt \
+  && pip install .

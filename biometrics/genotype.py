@@ -52,7 +52,7 @@ class Genotyper:
                 name='Discordance',
                 customdata=data.to_numpy(),
                 hovertemplate='<b>Reference sample:</b> %{customdata[0]}' +
-                              '<br><b>Query sample:</b> %{customdata[1]}' +
+                              '<br><b>Query sample:</b> %{customdata[2]}' +
                               '<br><b>Count of common sites:</b> %{customdata[4]}' +
                               '<br><b>Homozygous count in reference:</b> %{customdata[5]}' +
                               '<br><b>Total match count:</b> %{customdata[6]}' +
