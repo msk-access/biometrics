@@ -53,6 +53,7 @@ class TestExtract(TestCase):
             overwrite=True,
             no_db_compare=False,
             prefix='test',
+            version=False,
             threads=1))
     def setUp(self, mock_args):
         """Set up test fixtures, if any."""
@@ -124,6 +125,7 @@ class TestLoadData(TestCase):
             overwrite=True,
             no_db_compare=False,
             prefix='test',
+            version=False,
             threads=1))
     def setUp(self, mock_args):
         """Set up test fixtures, if any."""
@@ -172,6 +174,7 @@ class TestLoadDataPickle(TestCase):
             overwrite=True,
             no_db_compare=False,
             prefix='test',
+            version=False,
             threads=1))
     def setUp(self, mock_args):
         """Set up test fixtures, if any."""
@@ -218,6 +221,7 @@ class TestDownstreamTools(TestCase):
             overwrite=True,
             no_db_compare=False,
             prefix='test',
+            version=False,
             threads=1))
     def setUp(self, mock_args):
         """Set up test fixtures, if any."""
