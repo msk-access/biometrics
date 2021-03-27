@@ -5,6 +5,7 @@ import sys
 import os
 import argparse
 
+import biometrics
 from biometrics.utils import get_logger
 from biometrics.biometrics import run_biometrics
 
@@ -141,6 +142,10 @@ def get_args():
         and/or as individual samples.''')
     subparsers = parser.add_subparsers(help='', dest="subparser_name")
 
+    parser.add_argument(
+        '-v', '--version', action='store_true',
+        help='''Print the version.''')
+
     # extract parser
 
     parser_extract = subparsers.add_parser(
@@ -230,6 +235,10 @@ def get_args():
         as matching samples.''')
 
     args = parser.parse_args()
+
+    if args.version:
+        print(biometrics.__version__)
+        sys.exit(0)
 
     check_args(args)
 
