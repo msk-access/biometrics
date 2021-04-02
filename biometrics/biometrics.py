@@ -240,14 +240,14 @@ def load_database_samples(database, existing_samples):
     return samples
 
 
-def get_samples_from_input(input, database, extraction_mode):
+def get_samples_from_input(inputs, database, extraction_mode):
     """
     Parse the sample information from the user-supplied CSV file.
     """
 
     samples = {}
 
-    for fpath in input:
+    for fpath in inputs:
 
         input = pd.read_csv(fpath, sep=',')
 
