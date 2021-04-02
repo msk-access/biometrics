@@ -245,6 +245,9 @@ def get_samples_from_input(inputs, database, extraction_mode):
     Parse the sample information from the user-supplied CSV file.
     """
 
+    if type(inputs) != list:
+        inputs = [inputs]
+
     samples = {}
 
     for fpath in inputs:
