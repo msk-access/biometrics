@@ -228,11 +228,11 @@ class Genotyper:
         if self.no_db_compare:
             if len(samples_input) <= 1:
                 logger.error("You need to specify 2 or more samples in order to compare genotypes.")
-                sys.exit(1)
+                sys.exit(0)
         else:
             if len(samples_input) <= 1 and len(samples_db) < 1:
-                logger.error("There are no samples in the database to compare with")
-                sys.exit(1)
+                logger.error("You need to specify 2 or more samples in order to compare genotypes.")
+                sys.exit(0)
 
         # compare all the input samples to each other
 
