@@ -200,8 +200,13 @@ class Extract:
 
                 mapq = pileupread.alignment.mapping_quality
                 read_name = pileupread.alignment.qname
-                base_qual = pileupread.alignment.qual[pileupread.query_position]
                 base = pileupread.alignment.query_sequence[pileupread.query_position]
+                # temporary fix for when alignment qualities contain non-ascii characters, which
+                # happens sometimes from fgbio duplex sequening toolset
+                try:
+                    base_qual = pileupread.alignment.qual[pileupread.query_position]
+                except:
+                    base_qual = 30
 
                 if (mapq < self.min_mapping_quality) or pileupread.is_refskip or pileupread.is_del:
                     # skip the read if its mapping quality is too low
@@ -313,7 +318,8 @@ class Extract:
                 sample.load_from_file()
                 continue
 
-            samples_to_extract.append(sample)
+            # samples_to_extract.append(sample)
+            self._extraction_job(sample)
 
         # if any samples need to be extracted, then do so
         # (using multiprocessing)
