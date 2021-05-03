@@ -318,8 +318,7 @@ class Extract:
                 sample.load_from_file()
                 continue
 
-            # samples_to_extract.append(sample)
-            self._extraction_job(sample)
+            samples_to_extract.append(sample)
 
         # if any samples need to be extracted, then do so
         # (using multiprocessing)
