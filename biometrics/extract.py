@@ -51,6 +51,12 @@ class Extract:
             return
 
         self.regions = pd.read_csv(self.bed, sep='\t', header=None)
+
+        # only keep Y chrom regions
+        self.regions = self.regions[self.regions[0].isin(['Y', 'chrY'])]
+        if len(self.regions) == 0:
+            print('There are not Y chromosome regions!')
+
         self.regions.columns = range(self.regions.shape[1])
 
     def _extract_regions(self, sample):
