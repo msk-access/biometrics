@@ -1,3 +1,5 @@
+from collections import Counter
+
 import pandas as pd
 import networkx as nx
 
@@ -33,15 +35,23 @@ class Cluster:
         clusters = []
 
         for cluster_idx, group in enumerate(nx.connected_components(graph)):
-            samples_group = list(group)
+            samples_in_group = list(group)
+            sample_groups = list(set(
+                comparisons[comparisons['ReferenceSample'].isin(samples_in_group)]['ReferenceSampleGroup']))
 
-            for i, sample in enumerate(samples_group):
+            occurences = Counter(sample_groups)
+            max_occurence = occurences.most_common()
+            max_occurence_val = max_occurence[0][1]
+            most_common_group = list(filter(lambda x: x[1] == max_occurence_val, max_occurence))
+            most_common_group = ','.join([i[0] for i in most_common_group])
+
+            for i, sample in enumerate(samples_in_group):
 
                 comparisons_sample = comparisons[
                     (comparisons['ReferenceSample']==sample) &
                     (comparisons['QuerySample']!=sample)]
                 comparisons_cluster = comparisons_sample[
-                    comparisons_sample['QuerySample'].isin(samples_group)]
+                    comparisons_sample['QuerySample'].isin(samples_in_group)]
 
                 sample_status_counts = comparisons_sample['Status'].value_counts()
                 cluster_status_counts = comparisons_cluster['Status'].value_counts()
@@ -53,8 +63,9 @@ class Cluster:
                 row = {
                     'sample_name': sample,
                     'expected_sample_group': sample2group[sample],
+                    'predicted_sample_group': most_common_group,
                     'cluster_index': cluster_idx,
-                    'cluster_size': len(samples_group),
+                    'cluster_size': len(samples_in_group),
                     'avg_discordance': mean_discordance,
                     'count_expected_matches': cluster_status_counts.get('Expected Match', 0),
                     'count_unexpected_matches': cluster_status_counts.get('Unexpected Match', 0),
