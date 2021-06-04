@@ -206,7 +206,10 @@ def load_input_sample_from_db(sample_name, database):
     database.
     """
 
-    extraction_file = os.path.join(database, sample_name + '.pk')
+    extraction_file = os.path.join(database, sample_name + '.pickle')
+
+    if not os.path.exists(extraction_file):
+        extraction_file = os.path.join(database, sample_name + '.pk')
 
     assert os.path.exists(extraction_file), 'Could not find: {}. Please rerun the extraction step.'.format(
         extraction_file)
@@ -225,29 +228,33 @@ def load_database_samples(database, existing_samples):
 
     samples = {}
 
-    for pickle_file in glob.glob(os.path.join(database, '*pk')):
+    for pattern in ['*.pickle', '*.pk']:
+        for pickle_file in glob.glob(os.path.join(database, pattern)):
 
-        sample_name = os.path.basename(pickle_file).replace('.pk', '')
+            sample_name = os.path.basename(pickle_file).replace('.pickle', '').replace('.pk', '')
 
-        if sample_name in existing_samples:
-            continue
+            if sample_name in existing_samples:
+                continue
 
-        sample = Sample(db=database, query_group=True)
-        sample.load_from_file(extraction_file=pickle_file)
+            sample = Sample(db=database, query_group=True)
+            sample.load_from_file(extraction_file=pickle_file)
 
-        samples[sample.sample_name] = sample
+            samples[sample.sample_name] = sample
 
     return samples
 
 
-def get_samples_from_input(input, database, extraction_mode):
+def get_samples_from_input(inputs, database, extraction_mode):
     """
     Parse the sample information from the user-supplied CSV file.
     """
 
+    if type(inputs) != list:
+        inputs = [inputs]
+
     samples = {}
 
-    for fpath in input:
+    for fpath in inputs:
 
         input = pd.read_csv(fpath, sep=',')
 
@@ -347,7 +354,7 @@ def get_samples(args, extraction_mode=False):
     else:
 
         for input in args.input:
-            if input.endswith('.pk'):
+            if input.endswith('.pickle') or input.endswith('.pk'):
                 sample = Sample(db=args.database, query_group=False)
                 sample.load_from_file(extraction_file=input)
                 samples[sample.sample_name] = sample

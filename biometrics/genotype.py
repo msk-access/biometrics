@@ -1,4 +1,3 @@
-import sys
 import os
 from multiprocessing import Pool
 
@@ -227,22 +226,19 @@ class Genotyper:
 
         if self.no_db_compare:
             if len(samples_input) <= 1:
-                logger.error("You need to specify 2 or more samples in order to compare genotypes.")
-                sys.exit(1)
+                logger.warning("You should specify 2 or more samples in order to compare genotypes.")
         else:
             if len(samples_input) <= 1 and len(samples_db) < 1:
-                logger.error("There are no samples in the database to compare with")
-                sys.exit(1)
+                logger.warning("You should specify 2 or more samples in order to compare genotypes.")
 
         # compare all the input samples to each other
 
-        if sample_n_input > 1:
-            results = self._compare_sample_lists(
-                samples_input, samples_input, samples)
+        results = self._compare_sample_lists(
+            samples_input, samples_input, samples)
 
-            for i in range(len(results)):
-                results[i]['IsInputToDatabaseComparison'] = False
-            comparisons += results
+        for i in range(len(results)):
+            results[i]['IsInputToDatabaseComparison'] = False
+        comparisons += results
 
         # for each input sample, compare with all the samples in the db
 

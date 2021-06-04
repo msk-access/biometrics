@@ -70,49 +70,53 @@ class MinorContamination():
         # plot VAF of contributing sites
 
         plot_data = []
+        samples_with_contributing_sites = []
 
         for i, sample_name in enumerate(data['sample_name']):
             contributing_sites = samples[sample_name].metrics['minor_contamination']['contributing_sites']
+
+            if len(contributing_sites) > 0:
+                samples_with_contributing_sites.append(sample_name)
 
             for site_id, site_data in contributing_sites.items():
                 site_data['sample_name'] = sample_name
                 site_data['MAF'] = site_data['minor_allele_freq']
                 site_data['index'] = i
 
-                del site_data['minor_allele_freq']
                 plot_data.append(site_data)
 
         plot_data = pd.DataFrame(plot_data)
-        plot_data = plot_data[[
-            'sample_name', 'chrom', 'pos', 'ref', 'alt', 'MAF', 'reads_all', 'A', 'C', 'T', 'G',
-            'N', 'index']]
-        plot_data['MAF'] = plot_data['MAF'].map(lambda x: round(x, 5))
-
 
         fig = go.Figure()
 
-        fig.add_trace(
-            go.Scatter(
-                x=plot_data['index'],
-                y=plot_data['MAF'],
-                mode='markers',
-                showlegend=False,
-                customdata=plot_data.to_numpy(),
-                hovertemplate='<b>Sample:</b> %{customdata[0]}' +
-                              '<br><b>Chrom:</b> %{customdata[1]}' +
-                              '<br><b>Pos:</b> %{customdata[2]}' +
-                              '<br><b>Ref allele:</b> %{customdata[3]}' +
-                              '<br><b>Alt allele:</b> %{customdata[4]}' +
-                              '<br><b>MAF:</b> %{customdata[5]}' +
-                              '<br><b>Total reads:</b> %{customdata[6]}' +
-                              '<br><b>Count A:</b> %{customdata[7]}' +
-                              '<br><b>Count C:</b> %{customdata[8]}' +
-                              '<br><b>Count T:</b> %{customdata[9]}' +
-                              '<br><b>Count G:</b> %{customdata[10]}' +
-                              '<br><b>Count N:</b> %{customdata[11]}' +
-                              '<extra></extra>'))
+        if len(plot_data) > 0:
+            plot_data = plot_data[[
+                'sample_name', 'chrom', 'pos', 'ref', 'alt', 'MAF', 'reads_all', 'A', 'C', 'T', 'G',
+                'N', 'index']]
+            plot_data['MAF'] = plot_data['MAF'].map(lambda x: round(x, 5))
 
-        data = data[data['sample_name'].isin(plot_data['sample_name'])]
+            fig.add_trace(
+                go.Scatter(
+                    x=plot_data['index'],
+                    y=plot_data['MAF'],
+                    mode='markers',
+                    showlegend=False,
+                    customdata=plot_data.to_numpy(),
+                    hovertemplate='<b>Sample:</b> %{customdata[0]}' +
+                                  '<br><b>Chrom:</b> %{customdata[1]}' +
+                                  '<br><b>Pos:</b> %{customdata[2]}' +
+                                  '<br><b>Ref allele:</b> %{customdata[3]}' +
+                                  '<br><b>Alt allele:</b> %{customdata[4]}' +
+                                  '<br><b>MAF:</b> %{customdata[5]}' +
+                                  '<br><b>Total reads:</b> %{customdata[6]}' +
+                                  '<br><b>Count A:</b> %{customdata[7]}' +
+                                  '<br><b>Count C:</b> %{customdata[8]}' +
+                                  '<br><b>Count T:</b> %{customdata[9]}' +
+                                  '<br><b>Count G:</b> %{customdata[10]}' +
+                                  '<br><b>Count N:</b> %{customdata[11]}' +
+                                  '<extra></extra>'))
+
+        data = data[data['sample_name'].isin(samples_with_contributing_sites)]
         data['index'] = range(len(data))
 
         for i in data.index:
@@ -145,13 +149,14 @@ class MinorContamination():
             mode='markers'
         ))
 
+        if len(plot_data) > 0:
+            fig.update_layout(yaxis = dict(range=(-0.005, plot_data['MAF'].max()*1.05)))
 
-        ticks = plot_data[['sample_name', 'index']].drop_duplicates()
+        ticks = data[['sample_name', 'index']].drop_duplicates()
 
         fig.update_layout(
             yaxis_title="Minor allele frequency",
             title_text="Statistics of sites that contribute to minor contamination",
-            yaxis = dict(range=(-0.005, plot_data['MAF'].max()*1.05)),
             xaxis = dict(
                 tickmode = 'array',
                 tickvals = ticks['index'],
