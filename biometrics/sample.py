@@ -29,9 +29,9 @@ class Sample:
 
         if self.sample_name is not None:
             if db is not None:
-                self.extraction_file = os.path.join(db, self.sample_name + '.pk')
+                self.extraction_file = os.path.join(db, self.sample_name + '.pickle')
             else:
-                self.extraction_file = self.sample_name + '.pk'
+                self.extraction_file = self.sample_name + '.pickle'
 
     def save_to_file(self):
 
