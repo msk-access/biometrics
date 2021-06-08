@@ -8,6 +8,7 @@ import argparse
 from unittest import TestCase
 from unittest import mock
 
+import pandas as pd
 from biometrics.biometrics import get_samples, run_minor_contamination, run_major_contamination
 from biometrics.cli import get_args
 from biometrics.extract import Extract
@@ -93,6 +94,10 @@ class TestExtract(TestCase):
         self.assertIsNotNone(samples['test_sample1'].pileup, msg='Sample pileup was not loaded correctly.')
         self.assertEqual(samples['test_sample1'].pileup.shape[0], 15, msg='Did not find pileup for 4 variants. Found: {}.'.format(samples['test_sample1'].pileup))
 
+        self.assertIsNotNone(
+            samples['test_sample1'].region_counts,
+            msg='Sample bed file was not loaded correctly.')
+
 
 class TestLoadData(TestCase):
     """Tests load data by sample name in `biometrics` package."""
@@ -110,7 +115,7 @@ class TestLoadData(TestCase):
             database=os.path.join(CUR_DIR, 'test_data/'),
             vcf=None,
             fafile=None,
-            bed=None,
+            bed=os.path.join(CUR_DIR, 'test_data/test.bed'),
             min_mapping_quality=None,
             min_base_quality=None,
             min_coverage=None,
@@ -149,8 +154,8 @@ class TestLoadDataPickle(TestCase):
         return_value=argparse.Namespace(
             subparser_name='extract',
             input=[
-                os.path.join(CUR_DIR, 'test_data/test_sample1.pk'),
-                os.path.join(CUR_DIR, 'test_data/test_sample2.pk')],
+                os.path.join(CUR_DIR, 'test_data/test_sample1.pickle'),
+                os.path.join(CUR_DIR, 'test_data/test_sample2.pickle')],
             sample_bam=None,
             sample_name=None,
             sample_type=None,
@@ -206,7 +211,7 @@ class TestDownstreamTools(TestCase):
             database=os.path.join(CUR_DIR, 'test_data/'),
             vcf=None,
             fafile=None,
-            bed=None,
+            bed=os.path.join(CUR_DIR, 'test_data/test.bed'),
             min_mapping_quality=None,
             min_base_quality=None,
             min_coverage=None,
@@ -297,3 +302,59 @@ class TestDownstreamTools(TestCase):
 
         self.assertEqual(set(results['expected_sex']), set(['M']), msg='Expected all samples to have an expected sex of M.')
         self.assertEqual(set(results['predicted_sex']), set(['M']), msg='Expected all samples to not have a sex mismatch.')
+
+
+class TestNASexMismatch(TestCase):
+    """Test that sex mismatch returns NA if no Y chrom regions."""
+
+    @mock.patch(
+        'argparse.ArgumentParser.parse_args',
+        return_value=argparse.Namespace(
+            subparser_name='extract',
+            input=None,
+            sample_bam=[
+                os.path.join(CUR_DIR, 'test_data/test_sample1_golden.bam'),
+                os.path.join(CUR_DIR, 'test_data/test_sample2_golden.bam')],
+            sample_name=['test_sample1', 'test_sample2'],
+            sample_type=['tumor', 'tumor'],
+            sample_group=['patient1', 'patient1'],
+            sample_sex=['M', 'M'],
+            database=os.path.join(CUR_DIR, 'test_data/'),
+            vcf=os.path.join(CUR_DIR, 'test_data/test.vcf'),
+            fafile=os.path.join(CUR_DIR, 'test_data/ref.fasta'),
+            bed=os.path.join(CUR_DIR, 'test_data/test-noY.bed'),
+            min_mapping_quality=1,
+            min_base_quality=1,
+            min_coverage=10,
+            minor_threshold=0.002,
+            major_threshold=0.6,
+            discordance_threshold=0.05,
+            coverage_threshold=50,
+            min_homozygous_thresh=0.1,
+            zmin=None,
+            zmax=None,
+            outdir='.',
+            json=None,
+            plot=False,
+            default_genotype=None,
+            overwrite=True,
+            no_db_compare=False,
+            prefix='test',
+            version=False,
+            threads=1))
+    def setUp(self, mock_args):
+        """Set up test fixtures, if any."""
+
+        self.args = get_args()
+
+    def test_sexmismatch_noY(self):
+
+        extractor = Extract(self.args)
+        samples = get_samples(self.args, extraction_mode=True)
+        samples = extractor.extract(samples)
+
+        sex_mismatch = SexMismatch(self.args.coverage_threshold)
+        results = sex_mismatch.detect_mismatch(samples)
+
+        self.assertTrue(
+            pd.isna(results.at[0, 'predicted_sex']), msg='Predicted sample sex should have been nan.')

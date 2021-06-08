@@ -55,7 +55,7 @@ class Extract:
         # only keep Y chrom regions
         self.regions = self.regions[self.regions[0].isin(['Y', 'chrY'])]
         if len(self.regions) == 0:
-            print('There are not Y chromosome regions!')
+            print('There are no Y chromosome regions. Cannot determine if there is a sex mismatch.')
 
         self.regions.columns = range(self.regions.shape[1])
 
@@ -87,9 +87,9 @@ class Extract:
                 'end': end,
                 'count': count})
 
-        region_counts = pd.DataFrame(region_counts)
-
-        sample.region_counts = region_counts
+        if len(region_counts) > 0:
+            region_counts = pd.DataFrame(region_counts)
+            sample.region_counts = region_counts
 
         return sample
 
