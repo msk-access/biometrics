@@ -262,6 +262,7 @@ class Genotyper:
         # for each comparison, indicate if the match/mismatch is expected
         # or not expected
 
+        comparisons.loc[comparisons['ReferenceSample']==comparisons['QuerySample'], 'DiscordanceRate'] = 0
         comparisons['Matched'] = comparisons['DiscordanceRate'] < self.discordance_threshold
         comparisons['ExpectedMatch'] = comparisons.apply(
             lambda x: self.are_samples_same_group(
@@ -275,6 +276,8 @@ class Genotyper:
             ~comparisons['Matched'] & comparisons['ExpectedMatch'], 'Status'] = "Unexpected Mismatch"
         comparisons.loc[
             ~comparisons['Matched'] & ~comparisons['ExpectedMatch'], 'Status'] = "Expected Mismatch"
+        comparisons.loc[pd.isna(comparisons['DiscordanceRate']), 'Status'] = ''
+
 
         self.comparisons = comparisons[[
             'ReferenceSample', 'ReferenceSampleGroup', 'QuerySample', 'QuerySampleGroup', 'IsInputToDatabaseComparison', 'CountOfCommonSites', 'HomozygousInRef', 'TotalMatch', 'HomozygousMatch', 'HeterozygousMatch', 'HomozygousMismatch',

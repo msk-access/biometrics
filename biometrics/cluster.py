@@ -27,12 +27,13 @@ class Cluster:
             comparisons['QuerySample'], comparisons['QuerySampleGroup'])))
 
         comparisons['is_same_group'] = comparisons['DiscordanceRate'].map(
-            lambda x: 1 if x <= self.discordance_threshold else 0)
+            lambda x: 1 if ((x <= self.discordance_threshold) & (~pd.isna(x))) else 0)
 
         graph = nx.from_pandas_edgelist(
             comparisons[comparisons['is_same_group']==1], 'ReferenceSample', 'QuerySample')
 
         clusters = []
+        cluster_idx = 0
 
         for cluster_idx, group in enumerate(nx.connected_components(graph)):
             samples_in_group = list(group)
