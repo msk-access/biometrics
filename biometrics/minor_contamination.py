@@ -184,8 +184,8 @@ class MinorContamination():
 
             if len(hom_sites) == 0:
                 sample.metrics['minor_contamination']['val'] = np.nan
-                sample.metrics['minor_contamination']['n_contributing_sites'] = np.nan
-                sample.metrics['minor_contamination']['contributing_sites'] = np.nan
+                sample.metrics['minor_contamination']['n_contributing_sites'] = 0
+                sample.metrics['minor_contamination']['contributing_sites'] = {}
             else:
 
                 contributing_sites = hom_sites[hom_sites['minor_allele_freq']>0]
