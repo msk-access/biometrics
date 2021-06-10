@@ -33,6 +33,7 @@ class Cluster:
             comparisons[comparisons['is_same_group']==1], 'ReferenceSample', 'QuerySample')
 
         clusters = []
+        cluster_idx = 0
 
         for cluster_idx, group in enumerate(nx.connected_components(graph)):
             samples_in_group = list(group)
