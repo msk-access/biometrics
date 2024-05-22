@@ -213,6 +213,9 @@ class Extract:
                     base_qual = pileupread.alignment.qual[pileupread.query_position]
                 except:
                     base_qual = 30
+                 #to deal with non-ascii characters
+                if base_qual == '#':
+                    continue
 
                 if (mapq < self.min_mapping_quality) or pileupread.is_refskip or pileupread.is_del:
                     # skip the read if its mapping quality is too low
