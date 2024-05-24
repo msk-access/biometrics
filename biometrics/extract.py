@@ -274,13 +274,11 @@ class Extract:
         pileup = pd.DataFrame()
 
         for site in self.sites:
-
             pileup_site = self._pileup(bam, site)
 
             pileup_site = self._get_genotype_info(
                 pileup_site, site['ref_allele'], site['alt_allele'])
-
-            pileup = pileup.append(pileup_site, ignore_index=True)
+            pileup = pd.concat([pileup, pd.DataFrame([pileup_site])], ignore_index=True)
 
         pileup = pileup[[
             'chrom', 'pos', 'ref', 'alt', 'reads_all', 'matches', 'mismatches',
@@ -331,11 +329,9 @@ class Extract:
 
         # if any samples need to be extracted, then do so
         # (using multiprocessing)
-
         if len(samples_to_extract) > 0:
 
             thread_pool = Pool(self.threads)
-
             samples_processed = thread_pool.map(
                 self._extraction_job, samples_to_extract)
 
