@@ -13,7 +13,7 @@ logger = get_logger()
 
 class Genotyper:
 
-    def __init__(self, no_db_compare, discordance_threshold=0.05, threads=1, zmin=None, zmax=None, het=False):
+    def __init__(self, no_db_compare, discordance_threshold=0.05, threads=1, zmin=None, zmax=None,het=False):
         self.no_db_compare = no_db_compare
         self.discordance_threshold = discordance_threshold
         self.threads = threads
@@ -255,10 +255,10 @@ class Genotyper:
 
         # compute discordance rate
         if self.het:
-            comparisons['DiscordanceRate'] = comparisons['HomozygousMismatch'] / (comparisons['HomozygousInRef'] + EPSILON)
+            comparisons['DiscordanceRate'] = (comparisons['HomozygousMismatch'] + comparisons['HeterozygousMismatch']) / (comparisons['TotalMatch'] + EPSILON)
         else:
-            comparisons['DiscordanceRate'] = comparisons['HomozygousMismatch'] + comparisons['HeterozygousMismatch'] / (comparisons['TotalMatch'] + EPSILON)
-
+            comparisons['DiscordanceRate'] = comparisons['HomozygousMismatch'] / (comparisons['HomozygousInRef'] + EPSILON)
+        
         # data['DiscordanceRate'] = data['DiscordanceRate'].map(lambda x: round(x, 6))
         comparisons.loc[comparisons['HomozygousInRef'] < 10, 'DiscordanceRate'] = np.nan
 

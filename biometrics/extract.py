@@ -64,7 +64,6 @@ class Extract:
         Code to extract the coverage information for the regions listed
         in the BED file.
         """
-
         if self.regions is None:
             return sample
 
@@ -162,7 +161,6 @@ class Extract:
         computing pileup information (usually the forward read). Then the
         'new_base' is from the second read in the overlaping pair.
         """
-
         if old_base is None:
             return [new_base, new_base_qual]
 
@@ -173,7 +171,7 @@ class Extract:
             if new_base == site['ref_allele']:
                 return [new_base, new_base_qual]
             else:
-                return [old_base, old_base_qual]
+                return [old_base, old_base_qual] 
 
         if old_base == site['ref_allele']:
             return [old_base, old_base_qual]
@@ -212,10 +210,7 @@ class Extract:
                 try:
                     base_qual = pileupread.alignment.qual[pileupread.query_position]
                 except:
-                    base_qual = 30
-                 #to deal with non-ascii characters
-                if base_qual == '#':
-                    continue
+                    base_qual = str(30)
 
                 if (mapq < self.min_mapping_quality) or pileupread.is_refskip or pileupread.is_del:
                     # skip the read if its mapping quality is too low
@@ -274,11 +269,13 @@ class Extract:
         pileup = pd.DataFrame()
 
         for site in self.sites:
+
             pileup_site = self._pileup(bam, site)
 
             pileup_site = self._get_genotype_info(
                 pileup_site, site['ref_allele'], site['alt_allele'])
-            pileup = pd.concat([pileup, pd.DataFrame([pileup_site])], ignore_index=True)
+
+            pileup = pileup.append(pileup_site, ignore_index=True)
 
         pileup = pileup[[
             'chrom', 'pos', 'ref', 'alt', 'reads_all', 'matches', 'mismatches',
@@ -329,9 +326,11 @@ class Extract:
 
         # if any samples need to be extracted, then do so
         # (using multiprocessing)
+
         if len(samples_to_extract) > 0:
 
             thread_pool = Pool(self.threads)
+
             samples_processed = thread_pool.map(
                 self._extraction_job, samples_to_extract)
 
