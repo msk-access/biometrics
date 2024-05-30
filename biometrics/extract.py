@@ -171,7 +171,7 @@ class Extract:
             if new_base == site['ref_allele']:
                 return [new_base, new_base_qual]
             else:
-                return [old_base, old_base_qual] 
+                return [old_base, old_base_qual]
 
         if old_base == site['ref_allele']:
             return [old_base, old_base_qual]
@@ -274,8 +274,7 @@ class Extract:
 
             pileup_site = self._get_genotype_info(
                 pileup_site, site['ref_allele'], site['alt_allele'])
-
-            pileup = pileup.append(pileup_site, ignore_index=True)
+            pileup = pd.concat([pileup, pd.DataFrame([pileup_site])], ignore_index=True)
 
         pileup = pileup[[
             'chrom', 'pos', 'ref', 'alt', 'reads_all', 'matches', 'mismatches',
@@ -321,7 +320,6 @@ class Extract:
             if os.path.exists(sample.extraction_file) and not self.overwrite:
                 sample.load_from_file()
                 continue
-
             samples_to_extract.append(sample)
 
         # if any samples need to be extracted, then do so
