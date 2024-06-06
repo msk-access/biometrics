@@ -209,8 +209,11 @@ class Extract:
                 # happens sometimes from fgbio duplex sequening toolset
                 try:
                     base_qual = pileupread.alignment.qual[pileupread.query_position]
+                    #this is a character value
                 except:
-                    base_qual = str(30)
+                    base_qual = chr(0+33)
+                #use the least Phred score (i.e 0) The ASCII value for above will be ! which will pass the condition.
+                #Anything less than 33 as Phred score are all non-printable characters (eg tab, carriage return etc)
 
                 if (mapq < self.min_mapping_quality) or pileupread.is_refskip or pileupread.is_del:
                     # skip the read if its mapping quality is too low
