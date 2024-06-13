@@ -13,7 +13,7 @@ logger = get_logger()
 
 class Genotyper:
 
-    def __init__(self, no_db_compare, discordance_threshold=0.05, threads=1, zmin=None, zmax=None,het=False):
+    def __init__(self, no_db_compare, discordance_threshold=0.05, threads=1, zmin=None, zmax=None, het=False):
         self.no_db_compare = no_db_compare
         self.discordance_threshold = discordance_threshold
         self.threads = threads
@@ -21,7 +21,7 @@ class Genotyper:
         self.zmin = zmin
         self.sample_type_ratio = 1
         self.comparisons = None
-        self.het=het
+        self.het = het
 
     def are_samples_same_group(self, sample1, sample2):
 
