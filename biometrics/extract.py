@@ -179,9 +179,13 @@ class Extract:
             return [old_base, old_base_qual]
         elif new_base == site['ref_allele']:
             return [new_base, new_base_qual]
-        elif old_base == site['alt_allele'] and old_base_qual >= '!':
+        elif old_base == site['alt_allele'] and isinstance(old_base_qual, str) and old_base_qual >= '!':
             return [old_base, old_base_qual]
-        elif new_base == site['alt_allele'] and new_base_qual >= '!':
+        elif new_base == site['alt_allele'] and isinstance(new_base_qual, str) and new_base_qual >= '!':
+            return [new_base, new_base_qual]
+        elif old_base == site['alt_allele'] and isinstance(old_base_qual, int):
+            return [old_base, old_base_qual]
+        elif new_base == site['alt_allele'] and isinstance(new_base_qual, int):
             return [new_base, new_base_qual]
         else:
             return ['N', '&']
