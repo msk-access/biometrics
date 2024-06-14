@@ -294,7 +294,7 @@ class Extract:
             pileup_site = self._get_genotype_info(
                 pileup_site, site['ref_allele'], site['alt_allele'])
 
-            pileup = pileup.append(pileup_site, ignore_index=True)
+            pileup = pd.concat([pileup, pd.DataFrame([pileup_site])], ignore_index=True)
 
         pileup = pileup[[
             'chrom', 'pos', 'ref', 'alt', 'reads_all', 'matches', 'mismatches',
