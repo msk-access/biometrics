@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import vcf
 from pysam import AlignmentFile
+import math
 
 
 class Extract:
@@ -64,6 +65,7 @@ class Extract:
         Code to extract the coverage information for the regions listed
         in the BED file.
         """
+
         if self.regions is None:
             return sample
 
@@ -205,20 +207,34 @@ class Extract:
                 mapq = pileupread.alignment.mapping_quality
                 read_name = pileupread.alignment.qname
                 base = pileupread.alignment.query_sequence[pileupread.query_position]
-                # temporary fix for when alignment qualities contain non-ascii characters, which
-                # happens sometimes from fgbio duplex sequening toolset
-                try:
-                    base_qual = pileupread.alignment.qual[pileupread.query_position]
-                    #this is a character value
-                except:
-                    base_qual = chr(0+33)
-                #use the least Phred score (i.e 0) The ASCII value for above will be ! which will pass the condition.
-                #Anything less than 33 as Phred score are all non-printable characters (eg tab, carriage return etc)
 
                 if (mapq < self.min_mapping_quality) or pileupread.is_refskip or pileupread.is_del:
                     # skip the read if its mapping quality is too low
                     # or if the site is part of an indel
                     continue
+
+                ###########################
+                ### fix for when alignment qualities contain non-ascii characters, which
+                # happens sometimes from fgbio duplex sequening toolset
+                """"
+                Whenever we come across a bad character - or a non printable character at a particular position
+                the quality at that position is replaced with the average read quality.
+                There are some reads that are totally non-readable we skip the read
+
+                """
+                total_read_qual_avg = 0
+                try:
+                    for char in pileupread.alignment.qual:
+                        total_read_qual_avg += int(ord(char))
+                    read_avg=math.ceil(total_read_qual_avg/len(pileupread.alignment.qual))
+                except:
+                    continue
+
+                try:
+                    base_qual = pileupread.alignment.qual[pileupread.query_position]
+                except:
+                    base_qual=chr(read_avg)
+
 
                 if read_name in read_data and read_data[read_name][0] == 'N':
                     continue
@@ -277,7 +293,8 @@ class Extract:
 
             pileup_site = self._get_genotype_info(
                 pileup_site, site['ref_allele'], site['alt_allele'])
-            pileup = pd.concat([pileup, pd.DataFrame([pileup_site])], ignore_index=True)
+
+            pileup = pileup.append(pileup_site, ignore_index=True)
 
         pileup = pileup[[
             'chrom', 'pos', 'ref', 'alt', 'reads_all', 'matches', 'mismatches',
@@ -323,6 +340,7 @@ class Extract:
             if os.path.exists(sample.extraction_file) and not self.overwrite:
                 sample.load_from_file()
                 continue
+
             samples_to_extract.append(sample)
 
         # if any samples need to be extracted, then do so
@@ -331,7 +349,6 @@ class Extract:
         if len(samples_to_extract) > 0:
 
             thread_pool = Pool(self.threads)
-
             samples_processed = thread_pool.map(
                 self._extraction_job, samples_to_extract)
 
