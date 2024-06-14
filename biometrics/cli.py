@@ -216,6 +216,9 @@ def get_args():
     parser_genotype.add_argument(
         '--zmax', type=float,
         help='''Maximum z value for the colorscale on the heatmap.''')
+    parser_genotype.add_argument(
+        '--het', type=bool,
+        help='''Include Hetrozygous sites along with homozygous sites when calculating discordant rate, helps specifically in cases where there are less than 100 total number of sites''')
 
     # cluster parser
 
@@ -256,3 +259,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+    

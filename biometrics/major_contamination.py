@@ -31,8 +31,7 @@ class MajorContamination():
                 'total_heterozygous_sites': sample.metrics['major_contamination']['total_heterozygous_sites'],
                 'major_contamination': sample.metrics['major_contamination']['val']
             }
-
-            data = data.append(row, ignore_index=True)
+            data = pd.concat([data, pd.DataFrame([row])], ignore_index=True)
 
         data = data.sort_values('major_contamination', ascending=False)
         return data

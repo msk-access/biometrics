@@ -118,7 +118,8 @@ def run_genotyping(args, samples):
         discordance_threshold=args.discordance_threshold,
         threads=args.threads,
         zmin=args.zmin,
-        zmax=args.zmax)
+        zmax=args.zmax,
+        het=args.het)
     cluster_handler = Cluster(args.discordance_threshold)
     comparisons = genotyper.compare_samples(samples)
 

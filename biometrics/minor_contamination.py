@@ -30,8 +30,7 @@ class MinorContamination():
                 'n_contributing_sites': sample.metrics['minor_contamination']['n_contributing_sites'],
                 'minor_contamination': sample.metrics['minor_contamination']['val']
             }
-
-            data = data.append(row, ignore_index=True)
+            data = pd.concat([data, pd.DataFrame([row])], ignore_index=True)
 
         data = data.sort_values('minor_contamination', ascending=False)
         return data
