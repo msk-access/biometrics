@@ -5,9 +5,11 @@ Credits
 Development Lead
 ----------------
 
-* Charlie Murphy <murphyc4@mskcc.org>
+* Karthigayini Sivaprakasm (sivaprk@mskcc.org)
 
 Contributors
 ------------
 
-None yet. Why not be the first?
+* Eric Buehler (buehlere@mskcc.org)
+* Ronak Shah (shahr2@mskcc.org)
+* Charlie Murphy <murphyc4@mskcc.org>
