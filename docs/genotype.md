@@ -55,6 +55,37 @@ biometrics genotype \
   -db /path/to/store/extract/output
 ```
 
+## Discordance Calculation
+
+The rate of discordance can be calculated in two ways depending on the analysis type using the `--het` flag. This flag includes heterozygous sites in the calculation of discordance rate and is recommended to use with Clonal Hematopoesis (CH) analysis . The **default** value is  `FALSE`.
+
+```
+biometrics genotype \
+  --het FALSE \
+  -i samples.csv \
+  -db /path/to/extract/output
+```
+
+Any samples with a discordance rate of 5% or higher are considered mismatches.
+$$
+Discordance\ Rate = \frac{Number\ of\ matching\ homozygous\ SNPs\ in\ Reference\ but\ not\ Query}{Number\ of\ homozygous\ SNPs\ in\ Reference}\\
+$$
+
+```
+biometrics genotype \
+  --het TRUE \
+  -i samples.csv \
+  -db /path/to/extract/output
+```
+
+
+$$
+Discordance\ Rate = \frac{Number\ of\ matching\ homozygous\ \&\ heterozygous\ SNPs\ in\ Reference\ but\ not\ Query}{Total\ number\ of\ Matching\ SNPs}\\
+$$
+{% hint style="info" %}
+If there are &lt;10 common homozygous sites, the discordance rate can not be calculated since this is a strong indication that coverage is too low and the samples failed other QC.
+{% endhint %}
+
 ## Output
 
 All analyses output a CSV file containing the metrics from comparing each sample. An interactive heatmap can also optionally be produced by supplying the `--plot` flag. These outputs are saved either to the current working directory or to a folder you specify via `--outdir`.
