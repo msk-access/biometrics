@@ -124,14 +124,3 @@ Below are the two figures that are outputted from the two types of comparisons t
 
 ![](.gitbook/assets/genotype_comparison_input_only.png)
 
-## Algorithm details
-
-Any samples with a discordance rate of 5% or higher are considered mismatches.
-
-$$
-Discordance\ Rate = \frac{Number\ of\ matching\ homozygous\ SNPs\ in\ Reference\ but\ not\ Query}{Number\ of\ homozygous\ SNPs\ in\ Reference}\\
-$$
-
-{% hint style="info" %}
-If there are &lt;10 common homozygous sites, the discordance rate can not be calculated since this is a strong indication that coverage is too low and the samples failed other QC.
-{% endhint %}
