@@ -9,9 +9,14 @@ Compares each sample against each other to verify expected sample matches and id
 
 ## How to run the tool
 
-You need one or more samples to run this analysis. However, if you supply just one sample then it is assumed you have samples already in the database to compare with. There are two required inputs: \(1\) the names of the sample\(s\) you want to compare \(referred to as `input samples` below\), and \(2\) the database \(biometrics will automatically load all sample data from the database\). Moreover, there are two types of comparisons that are performed when running the tool:
+You need one or more samples to run this analysis. However, if you supply just one sample then it is assumed you have samples already in the database to compare with. There are two required inputs:
 
-### \(1\) Compares your input samples with each other
+1. The names of the sample\(s\) you want to compare \(referred to as `input samples` below\), and
+2. The database \(biometrics will automatically load all sample data from the database\).
+
+Moreover, there are two types of comparisons that are performed when running the tool:
+
+### 1. Compares your input samples with each other
 
 This only runs if you supplied two or more input samples. There are three ways you can provide the input to the `--input` flag:
 
@@ -19,7 +24,7 @@ This only runs if you supplied two or more input samples. There are three ways y
 
 You can provide the sample names. This assumes there is a file named `{sample_name}.pk` in the database directory.
 
-```text
+```bash
 biometrics genotype \
   -i C-48665L-N001-d \
   -i C-PCYP90-N001-d \
@@ -31,7 +36,7 @@ biometrics genotype \
 
 You can directly provide it the python pickle file that was outputted from the `extract` tool.
 
-```text
+```bash
 biometrics genotype \
   -i /path/to/extract/output/C-48665L-N001-d.pk \
   -i /path/to/extract/output/C-PCYP90-N001-d.pk \
@@ -42,17 +47,17 @@ biometrics genotype \
 
 You can also indicate your input samples via a CSV file, which has the same format as what you provided to the extraction tool, but you only need the `sample_name` column:
 
-```text
+```bash
 biometrics genotype \
   -i samples.csv \
   -db /path/to/extract/output
 ```
 
-### \(2\) Compares your input samples with remaining database samples
+### 2. Compares your input samples with remaining database samples
 
 The second analysis will compare each of your input samples with all remaining samples in the database. However, if you wish to disable this step and not do the comparison then you can supply the `--no-db-compare` flag:
 
-```text
+```bash
 biometrics genotype \
   -i C-48665L-N001-d -i C-PCYP90-N001-d -i C-MH6AL9-N001-d \
   --no-db-compare \
@@ -61,9 +66,9 @@ biometrics genotype \
 
 ## Discordance Calculation
 
-The rate of discordance can be calculated in two ways depending on the analysis type using the `--het` flag. This flag includes heterozygous sites in the calculation of discordance rate and is recommended to use with Clonal Hematopoesis (CH) analysis . The **default** value is  `FALSE`.
+The rate of discordance can be calculated in two ways depending on the analysis type using the `--het` flag. This flag includes heterozygous sites in the calculation of discordance rate and is recommended when number of sites to be profiled are `< 100` . The **default** value is  `FALSE`.
 
-```
+```bash
 biometrics genotype \
   --het FALSE \
   -i samples.csv \
@@ -75,13 +80,12 @@ $$
 Discordance\ Rate = \frac{Number\ of\ matching\ homozygous\ SNPs\ in\ Reference\ but\ not\ Query}{Number\ of\ homozygous\ SNPs\ in\ Reference}\\
 $$
 
-```
+```bash
 biometrics genotype \
   --het TRUE \
   -i samples.csv \
   -db /path/to/extract/output
 ```
-
 
 $$
 Discordance\ Rate = \frac{Number\ of\ matching\ homozygous\ \&\ heterozygous\ SNPs\ in\ Reference\ but\ not\ Query}{Total\ number\ of\ Matching\ SNPs}\\
@@ -96,7 +100,12 @@ If there are &lt;10 common homozygous sites, the discordance rate can not be cal
 All analyses output a CSV file containing the metrics from comparing each sample. An interactive heatmap can also optionally be produced by supplying the `--plot` flag. These outputs are saved either to the current working directory or to a folder you specify via `--outdir`.
 
 {% hint style="info" %}
-It also automatically outputs two sets of clustering results: \(1\) the first set just clusters your input samples, and \(2\) the second set clusters your input samples and samples in the database. Please see the [cluster](cluster.md) documentation to understand the output files.
+It also automatically outputs two sets of clustering results:
+
+1. The first set just clusters your input samples, and
+2. The second set clusters your input samples and samples in the database.
+
+Please see the [cluster](cluster.md) documentation to understand the output files.
 {% endhint %}
 
 ### CSV files
@@ -127,5 +136,4 @@ Contains metrics for each pair of samples compared \(one on each line\). The tab
 
 Below are the two figures that are outputted from the two types of comparisons that are done. Samples that are unexpected matches or mismatches will be marked with a red star in the heatmap.
 
-![](/Users/ksivaprakasam/Documents/GitHub/biometrics/docs/.gitbook/assets/genotype_comparison_input_only.png)
-
+![](.gitbook/assets/genotype_comparison_input_only.png)
