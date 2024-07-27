@@ -43,8 +43,8 @@ jobs:
           elif [ "${{ github.event_name }}" = "push" ]; then
             TAGS="$TAGS,${DOCKER_IMAGE}:sha-${GITHUB_SHA::8}"
           fi
-          echo ::set-output name=version::${VERSION}
-          echo ::set-output name=tags::${TAGS}
+          run: echo "{version}=${VERSION}" >> $GITHUB_OUTPUT
+          run: echo "{tags}=${TAGS}" >> $GITHUB_OUTPUT
       -
         name: Login to GitHub Container Registry
         #if: github.event_name != 'pull_request'
@@ -54,16 +54,15 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.RS_PAT }}
       - name: Push to GitHub Packages
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
-          registry: ghcr.io
           push: true
-          tags: ${{ steps.prep.outputs.tags }}
+          tags: $tags
           build-args: |
-            BIOMETRICS_VERSION=${{ steps.prep.outputs.version }}
+            BIOMETRICS_VERSION=$version
           labels: |
             org.opencontainers.image.title=${{ github.event.repository.name }}
             org.opencontainers.image.description=${{ github.event.repository.description }}
-            org.opencontainers.image.version=${{ steps.prep.outputs.version }}
+            org.opencontainers.image.version=$version
