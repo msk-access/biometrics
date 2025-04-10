@@ -2,6 +2,7 @@ import pickle
 import os
 
 import pandas as pd
+import pdb
 
 
 class Sample:
@@ -51,8 +52,43 @@ class Sample:
             'pileup_data': pileup_data,
             'region_counts': region_counts
         }
-
         pickle.dump(sample_data, open(self.extraction_file, "wb"))
+
+        #################################################
+        #converting pileup data to FP summary like csv file
+        #get the alt count based on the alt on the genotype
+        def match_column_letters(row):
+            matched_values = []
+            for letter in row['genotype']:  # Iterate through each character in 'genotype'
+                for col in row.index:
+                    if letter in col:  # Check if character is in column name
+                        matched_values.append(f"{letter}:{row[col]}")
+            return ",".join(matched_values) if matched_values else None
+
+        summary_file = "ALL_FPsummary.txt"
+        #make sure to remove older txt file. But this is neccessary to add the samples to existing df
+        if os.path.exists(summary_file):
+            fp_summary = pd.read_csv(summary_file)
+        else:
+            fp_summary = pd.DataFrame()
+
+        #convert existing pileup data as dataframe
+        pileup_df =pd.DataFrame.from_dict(self.pileup)
+        pileup_df = pileup_df[pileup_df['genotype_class'].notna()]
+        sample_name= self.sample_name
+
+        new_sample_data = pd.DataFrame()
+        new_sample_data['Locus'] = pileup_df['chrom'].astype(str) + ":" + pileup_df['pos'].astype(str)
+        new_sample_data[sample_name + '_Counts'] = pileup_df.apply(match_column_letters, axis=1)
+        new_sample_data[sample_name + '_Genotypes'] = pileup_df['genotype']
+        new_sample_data[sample_name + '_MinorAlleleFreq'] = pileup_df['minor_allele_freq']
+
+        #merge the dataframe with the empty frame to create a single df with all the samples
+        if not fp_summary.empty:
+            fp_summary = pd.merge(fp_summary, new_sample_data, on='Locus', how='outer')
+        else:
+            fp_summary = new_sample_data
+        fp_summary.to_csv(summary_file, index=False)
 
     def load_from_file(self, extraction_file=None):
 
