@@ -31,8 +31,10 @@ class Sample:
         if self.sample_name is not None:
             if db is not None:
                 self.extraction_file = os.path.join(db, self.sample_name + '.pickle')
+                self.summary_file = os.path.join(db, "ALL_FPsummary.txt")
             else:
                 self.extraction_file = self.sample_name + '.pickle'
+                self.summary_file = "ALL_FPsummary.txt"
 
     def save_to_file(self):
 
@@ -73,10 +75,10 @@ class Sample:
                         matched_values.append(f"{letter}:{row[col]}")
             return ",".join(matched_values) if matched_values else None
 
-        summary_file = "ALL_FPsummary.txt"
+
         #make sure to remove older txt file. But this is neccessary to add the samples to existing df
-        if os.path.exists(summary_file):
-            fp_summary = pd.read_csv(summary_file)
+        if os.path.exists(self.summary_file):
+            fp_summary = pd.read_csv(self.summary_file)
         else:
             fp_summary = pd.DataFrame()
 
@@ -97,7 +99,7 @@ class Sample:
             fp_summary = pd.merge(fp_summary, new_sample_data, on='Locus', how='outer')
         else:
             fp_summary = new_sample_data
-        fp_summary.to_csv(summary_file, index=False)
+        fp_summary.to_csv(self.summary_file, index=False)
 
     def load_from_file(self, extraction_file=None):
 
