@@ -73,7 +73,7 @@ class Sample:
                         matched_values.append(f"{letter}:{row[col]}")
             return ",".join(matched_values) if matched_values else None
 
-        summary_file = "ALL_FPsummary.csv"
+        summary_file = "ALL_FPsummary.txt"
         #make sure to remove older txt file. But this is neccessary to add the samples to existing df
         if os.path.exists(summary_file):
             fp_summary = pd.read_csv(summary_file)
