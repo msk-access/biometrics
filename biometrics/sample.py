@@ -57,7 +57,15 @@ class Sample:
         #################################################
         #converting pileup data to FP summary like csv file
         #get the alt count based on the alt on the genotype
-        def match_column_letters(row):
+        def match_gt_letters(row):
+            matched_values = []
+            for letter in row['genotype']:  # Iterate through each character in 'genotype'
+                for col in row.index:
+                    if letter in col:  # Check if character is in column name
+                        matched_values.append(f"{letter}:{row[col]}")
+            return ",".join(matched_values) if matched_values else None
+
+        def match_ref_letters(row):
             matched_values = []
             for letter in row['genotype']:  # Iterate through each character in 'genotype'
                 for col in row.index:
@@ -79,7 +87,8 @@ class Sample:
 
         new_sample_data = pd.DataFrame()
         new_sample_data['Locus'] = pileup_df['chrom'].astype(str) + ":" + pileup_df['pos'].astype(str)
-        new_sample_data[sample_name + '_Counts'] = pileup_df.apply(match_column_letters, axis=1)
+        new_sample_data[sample_name + '_ref_Counts'] = pileup_df.apply(match_ref_letters, axis=1)
+        new_sample_data[sample_name + '_gt_Counts'] = pileup_df.apply(match_gt_letters, axis=1)
         new_sample_data[sample_name + '_Genotypes'] = pileup_df['genotype']
         new_sample_data[sample_name + '_MinorAlleleFreq'] = pileup_df['minor_allele_freq']
 
