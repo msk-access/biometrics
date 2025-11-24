@@ -44,7 +44,10 @@ class Cluster:
             max_occurence = occurences.most_common()
             max_occurence_val = max_occurence[0][1]
             most_common_group = list(filter(lambda x: x[1] == max_occurence_val, max_occurence))
-            most_common_group = ':'.join([i[0] for i in most_common_group])
+            most_common_group = ':'.join(
+                str(k) if not isinstance(k, (tuple, list)) else ':'.join(map(str, k))
+                for k, _ in most_common_group
+            )
 
             for i, sample in enumerate(samples_in_group):
 

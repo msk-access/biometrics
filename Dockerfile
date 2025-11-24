@@ -30,6 +30,7 @@ WORKDIR /app
 ADD . /app
 
 RUN apt-get update \
-  && apt-get install gcc g++ zlib1g-dev -y \
+  && apt-get install gcc g++ make procps libbz2-dev liblzma-dev libcurl4-openssl-dev libncurses5-dev zlib1g-dev locales locales-all -y --no-install-recommends \
+  && pip install cython==0.29.36 \
   && pip install -r requirements.txt \
   && pip install .
